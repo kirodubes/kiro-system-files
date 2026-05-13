@@ -1,21 +1,32 @@
 #!/bin/bash
-
-# Exit on error, undefined variables, and pipe failures
-set -Euo pipefail
-
-# Source common library
-if [[ -f /usr/local/lib/kiro-common.sh ]]; then
-    source /usr/local/lib/kiro-common.sh
-else
-    echo "ERROR: kiro-common.sh not found" >&2
-    exit 1
-fi
-
+#
+##################################################################################################################
+# Written to be used on 64 bits computers
+# Author 	: 	Erik Dubois
+# Website 	: 	http://www.erikdubois.be
+##################################################################################################################
+##################################################################################################################
+#
+#   DO NOT JUST RUN THIS. EXAMINE AND JUDGE. RUN AT YOUR OWN RISK.
+#
 ##################################################################################################################
 
-project=$(basename "$(pwd)")
+# Problem solving commands
+
+# Read before using it.
+# https://www.atlassian.com/git/tutorials/undoing-changes/git-reset
+# git reset --hard orgin/master
+# ONLY if you are very sure and no coworkers are on your github.
+
+# Command that have helped in the past
+# Force git to overwrite local files on pull - no merge
+# git fetch all
+# git push --set-upstream origin master
+# git reset --hard orgin/master
+
+project=$(basename `pwd`)
 echo "-----------------------------------------------------------------------------"
-echo "this is project https://github.com/erikdubois/${project}"
+echo "this is project https://github.com/erikdubois/"$project
 echo "-----------------------------------------------------------------------------"
 git config --global pull.rebase false
 git config --global user.name "Erik Dubois"
