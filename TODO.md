@@ -4,6 +4,12 @@
 
 ## Planned
 
+### kiro-lint — static config analyser
+- Check `etc/sysctl.d/` files for duplicate keys within the same file
+- Cross-check `modprobe.d/` parameters against `/sys/module/<driver>/parameters/` on the running system
+- Flag conflicting settings across files (e.g. `power_save` set in both modprobe.d and a udev rule)
+- Verify udev `ATTR{}` write targets exist in sysfs before deployment
+
 ### Phase 2 — Script flags
 - Add `--help` and `--dry-run` to all `usr/local/bin/` scripts
 
