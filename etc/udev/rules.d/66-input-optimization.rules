@@ -6,17 +6,14 @@
 # configured in X11 (xorg.conf.d), Wayland compositor config, or user
 # session scripts — udev has no mechanism to inject these settings.
 
-# USB keyboards: disable autosuspend to keep them immediately responsive
-ACTION=="add", SUBSYSTEM=="usb", DRIVERS=="usbhid", ATTRS{bInterfaceClass}=="03", \
-  ATTRS{bInterfaceSubClass}=="01", \
-  ATTR{power/autosuspend_delay_ms}="-1", \
-  ATTR{power/control}="on"
-
-# USB mice: disable autosuspend to prevent lag on first click
-ACTION=="add", SUBSYSTEM=="usb", DRIVERS=="usbhid", ATTRS{bInterfaceClass}=="03", \
-  ATTRS{bInterfaceSubClass}=="02", \
-  ATTR{power/autosuspend_delay_ms}="-1", \
-  ATTR{power/control}="on"
+# USB HID devices (keyboards, mice, game controllers, drawing tablets):
+# disable autosuspend on the parent USB device node.
+# power/autosuspend_delay_ms lives on the device node (1-7), not the
+# interface node (1-7:1.0), so we match the interface and write to its parent.
+ACTION=="add", SUBSYSTEM=="usb", DEVTYPE=="usb_interface", \
+  ATTRS{bInterfaceClass}=="03", \
+  RUN+="/bin/sh -c 'echo -1 > /sys$(dirname %p)/power/autosuspend_delay_ms'", \
+  RUN+="/bin/sh -c 'echo on > /sys$(dirname %p)/power/control'"
 
 # Removed rules and reasons:
 # - echo > /proc/sys/kernel/autorepeat_interval: path does not exist
