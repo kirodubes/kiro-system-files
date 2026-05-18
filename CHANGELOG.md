@@ -1,5 +1,34 @@
 # CHANGELOG
 
+## 2026.05.18 (session 3)
+
+**What Changed**
+Complete audit and fix of all `etc/` configuration files — sysctl, udev rules, systemd drop-ins, modprobe options. 23 issues resolved across Critical / High / Medium / Low / Documentation categories. Every config file the package ships is now safe to deploy on a general desktop or laptop without hardware-specific breakage.
+
+**Technical Details**
+- **Critical**: `probe_mask=1` removed from `audio-hda.conf` (was blocking HDMI audio by limiting HDA bus scan to first codec); `jackpoll_ms=0` → `500` (0 disabled headphone jack detection); `61-audio-power.rules` was a verbatim copy of `60-io-scheduler.rules` — replaced with correct USB/PCIe audio power management; `DPRINTK=1` removed from `intel-ethernet.conf` (was flooding journal on any Intel e1000e NIC)
+- **High**: `kernel.sysrq=0` → `244` (REISUB bitmask: R+E+I+S+U+B); `ptrace_scope=2` → `1` (2 breaks gdb/strace/IDE debuggers); `DefaultTimeoutStartSec=10s` → `30s` (10s killed databases and Samba on first start); watchdog block commented out (iTCO_wdt and sp5100_tco are blacklisted so `/dev/watchdog` never exists); journal `Storage=volatile` → `persistent` (volatile lost all logs on reboot); journald file had three concatenated blocks with conflicting duplicate keys — rate limiting ended up clobbered to 0/0 (disabled entirely); NVIDIA `power/control=auto` udev rule removed (causes GPU hangs on GTX 900/1000 series)
+- **Medium**: `vm.dirty_ratio`/`vm.dirty_background_ratio` removed (silently ignored when `dirty_bytes` is set); duplicate sysctl keys deduplicated (kptr_restrict×2, netdev_max_backlog×2, tcp_fastopen×2, entire BBR/fq block×2); NVMe `set-feature -f 2` rule removed (feature ID 2 is Write Atomicity Normal, not APST); `hdparm -M 128` removed (was mislabelled as TRIM — actually Acoustic Management, mostly ignored by modern drives); `68-sound-power.rules` had `power_save=10` conflicting with `modprobe.d` `power_save=0`; `realtek-ethernet.conf` invalid r8169 parameters stripped and `use_dac=1` reverted to safe default; `amdgpu.conf` instability warning added for early Vega/Navi
+- **Low**: `kernel.unprivileged_userns_clone` removed (hardened-kernel-only sysctl, causes errors on vanilla Arch); `66-input-optimization.rules` rewritten — all four previous rules were no-ops (non-existent procfs path, fake libinput env vars, wrong usbhid jitter direction); `DefaultTasksMax=infinity` → `65536`; user subsequently refined the USB HID autosuspend rules to correctly match on `usb_interface` and write to the parent device node via `dirname %p`
+- **Documentation**: `overcommit_ratio=50` comment updated to note it is ignored when `overcommit_memory=1`; `sched_autogroup_enabled=0` trade-off documented (correct for single-user audio desktop, reduces fairness on multi-user systems); `nvidia.conf` `NVreg_InitializeSystemMemoryAllocations=0` single-user caveat added
+
+**Files Modified**
+- `etc/modprobe.d/audio-hda.conf`
+- `etc/modprobe.d/amdgpu.conf`
+- `etc/modprobe.d/intel-ethernet.conf`
+- `etc/modprobe.d/nvidia.conf`
+- `etc/modprobe.d/realtek-ethernet.conf`
+- `etc/sysctl.d/99-kiro-optimizations.conf`
+- `etc/systemd/journald.conf.d/10-kiro-journal.conf`
+- `etc/systemd/system.conf.d/10-kiro-system.conf`
+- `etc/udev/rules.d/61-audio-power.rules`
+- `etc/udev/rules.d/64-gpu-optimization.rules`
+- `etc/udev/rules.d/65-storage-optimization.rules`
+- `etc/udev/rules.d/66-input-optimization.rules`
+- `etc/udev/rules.d/68-sound-power.rules`
+
+---
+
 ## 2026.05.18 (session 2)
 
 **What Changed**

@@ -49,7 +49,15 @@ Key sections and their functions:
 | `etc/modprobe.d/` | Driver options for AMD/Nvidia GPU, audio, ethernet |
 | `etc/security/limits.d/` | ulimit overrides for audio and system processes |
 
-## Current improvement status (see IMPROVEMENTS.md)
+## Configuration files — audit status (2026.05.18)
 
-- Phase 1 (80% done): unified library, error handling, variable quoting
+All `etc/` config files were audited and fixed. The set is now safe to deploy on general desktop and laptop hardware without hardware-specific breakage. Key outcomes:
+- `etc/sysctl.d/99-kiro-optimizations.conf` — duplicate keys removed, security settings calibrated for usability (sysrq=244, ptrace_scope=1), comments corrected
+- `etc/udev/rules.d/` — broken rules replaced or removed; NVIDIA GPU power rule removed (hangs); input rules rewritten with working sysfs paths
+- `etc/systemd/` — journal storage changed to persistent; rate limiting fixed; timeouts increased to safe values
+- `etc/modprobe.d/` — invalid r8169 parameters stripped; probe_mask removed; DPRINTK=1 removed; warnings added for amdgpu and nvidia single-user caveat
+
+## Script improvement status
+
+- Phase 1 (complete): unified library, error handling, variable quoting — all 33 scripts source `kiro-common.sh`
 - Phases 2–4 (planned): `--help`/`--dry-run` flags, config files, full shellcheck/shfmt pass
