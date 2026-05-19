@@ -2,18 +2,20 @@
 # Optimizes I/O performance for different device types
 # Imported from EndeavourOS standards
 
-# SSD: Tune BFQ scheduler for lower idle latency
+# SSD: Switch to BFQ then set idle slice to 0.
+# scheduler= must be assigned first so the kernel creates queue/iosched/ before
+# udev evaluates the slice_idle_us assignment on the same event.
 ACTION=="add|change", SUBSYSTEM=="block", \
   KERNEL=="sd[a-z]*|mmcblk[0-9]*", ATTR{queue/rotational}=="0", \
-  ATTR{queue/iosched/slice_idle_us}="0"
+  ATTR{queue/scheduler}="bfq", ATTR{queue/iosched/slice_idle_us}="0"
 
 # NVMe: Reduce polling delay for responsiveness
 ACTION=="add|change", KERNEL=="nvme[0-9]*n[0-9]*", \
   ATTR{queue/io_poll_delay}="0"
 
-# HDD: Tune BFQ for rotational drives
+# HDD: Switch to BFQ and increase FIFO batch for sequential throughput
 ACTION=="add|change", SUBSYSTEM=="block", \
   KERNEL=="sd[a-z]*", ATTR{queue/rotational}=="1", \
-  ATTR{queue/iosched/fifo_batch}="32"
+  ATTR{queue/scheduler}="bfq", ATTR{queue/iosched/fifo_batch}="32"
 
 # Note: read_ahead_kb rules removed - attribute only exists on block devices, not partitions
