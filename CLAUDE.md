@@ -103,6 +103,10 @@ pkg=$(pacman -Qqo "$(realpath "${BASH_SOURCE[0]}")" 2>/dev/null) \
 echo "${RED}This script must be run as root.${RESET}" >&2
 ```
 
+## Files excluded from the package
+
+- `etc/cups/cups-permissions.conf` — **do not add to the package**; it conflicts during ISO build and must be applied by post-install scripting or the user manually.
+
 ## Man pages
 
 Man pages live in `usr/share/man/man8/` (section 8, system-admin commands). After deploying new pages, run `sudo mandb` manually — the `man-db.timer` only fires once daily with up to 12h random delay.
