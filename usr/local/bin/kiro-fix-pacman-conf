@@ -18,8 +18,33 @@ else
 fi
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+DRY_RUN=false
 
 main() {
+    for arg in "$@"; do
+        case "$arg" in
+            -h|--help)
+                show_help "$(basename "$0")" \
+                    "Replace /etc/pacman.conf with the Kiro default" \
+                    "[--help] [--version] [--dry-run]" \
+                    ""
+                exit 0
+                ;;
+            -v|--version)
+                show_version "$(basename "$0")"
+                exit 0
+                ;;
+            -d|--dry-run)
+                DRY_RUN=true
+                log_info "Dry-run mode enabled — no changes will be made"
+                ;;
+            *)
+                log_error "Unknown option: $arg"
+                exit 1
+                ;;
+        esac
+    done
+
     log_section "Getting /etc/pacman.conf"
 
     local local_pacman="/usr/local/share/kiro/pacman.conf"
@@ -27,7 +52,7 @@ main() {
 
     if [[ -f "${local_pacman}" ]]; then
         log_subsection "Using local pacman.conf"
-        if sudo cp "${local_pacman}" /etc/pacman.conf; then
+        if execute_or_dryrun "Copy local pacman.conf to /etc/pacman.conf" sudo cp "${local_pacman}" /etc/pacman.conf; then
             log_success "pacman.conf copied from local system"
             return 0
         else
@@ -41,7 +66,7 @@ main() {
 
     if check_connectivity 3 8.8.8.8; then
         log_subsection "Downloading latest pacman.conf from GitHub"
-        if sudo wget "${github_url}" -O /etc/pacman.conf; then
+        if execute_or_dryrun "Download pacman.conf from GitHub" sudo wget "${github_url}" -O /etc/pacman.conf; then
             log_success "pacman.conf downloaded successfully"
             return 0
         else

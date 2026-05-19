@@ -20,6 +20,26 @@ fi
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
 main() {
+    for arg in "$@"; do
+        case "$arg" in
+            -h|--help)
+                show_help "$(basename "$0")" \
+                    "Display Kiro system diagnostic information" \
+                    "[--help] [--version]" \
+                    ""
+                exit 0
+                ;;
+            -v|--version)
+                show_version "$(basename "$0")"
+                exit 0
+                ;;
+            *)
+                log_error "Unknown option: $arg"
+                exit 1
+                ;;
+        esac
+    done
+
     if [ "$(id -u)" -ne 0 ]; then
         log_warn "This script needs to be run with superuser rights. Use: sudo $0"
         exit 1

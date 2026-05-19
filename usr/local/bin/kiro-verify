@@ -19,6 +19,23 @@ fi
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
+for _arg in "$@"; do
+    case "$_arg" in
+        -h|--help)
+            show_help "$(basename "$0")" \
+                "Verify Kiro system configuration is correctly applied" \
+                "[--help] [--version]" \
+                ""
+            exit 0
+            ;;
+        -v|--version)
+            show_version "$(basename "$0")"
+            exit 0
+            ;;
+    esac
+done
+unset _arg
+
 if [[ $EUID -ne 0 ]]; then
     echo "Run kiro-verify with root privileges: sudo kiro-verify"
     trap - ERR

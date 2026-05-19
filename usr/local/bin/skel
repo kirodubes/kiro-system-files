@@ -18,8 +18,33 @@ else
 fi
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+DRY_RUN=false
 
 main() {
+    for arg in "$@"; do
+        case "$arg" in
+            -h|--help)
+                show_help "$(basename "$0")" \
+                    "Copy /etc/skel to home directory with a ~/.config backup" \
+                    "[--help] [--version] [--dry-run]" \
+                    ""
+                exit 0
+                ;;
+            -v|--version)
+                show_version "$(basename "$0")"
+                exit 0
+                ;;
+            -d|--dry-run)
+                DRY_RUN=true
+                log_info "Dry-run mode enabled — no changes will be made"
+                ;;
+            *)
+                log_error "Unknown option: $arg"
+                exit 1
+                ;;
+        esac
+    done
+
     echo "##################################################################################"
     echo "Skel copies /etc/skel to your home directory after making a backup of ~/.config"
     echo
@@ -33,23 +58,25 @@ main() {
     echo "More info: https://arcolinux.com/updating-your-system-with-skel-and-still-keeping-your-own-settings/"
     echo "##################################################################################"
 
-    read -rp "Can we copy/paste the content from /etc/skel to your home directory? (y/n) " response
-
-    if [[ "$response" == [yY] ]]; then
-        local time
-        time=$(date +%Y.%m.%d-%H.%M.%S)
-        [[ -d ~/.config ]] || mkdir ~/.config
-
-        log_info "Making a backup of ~/.config to ~/.config-backup-$time"
-        cp -Rf ~/.config "$HOME/.config-backup-$time"
-
-        log_info "Copying /etc/skel to home — be patient"
-        cp -r /etc/skel/. "$HOME"
-
-        log_success "$(basename "$0") done"
-    else
-        log_info "Nothing has been changed."
+    if [[ "$DRY_RUN" == "false" ]]; then
+        read -rp "Can we copy/paste the content from /etc/skel to your home directory? (y/n) " response
+        if [[ "$response" != [yY] ]]; then
+            log_info "Nothing has been changed."
+            return
+        fi
     fi
+
+    local time
+    time=$(date +%Y.%m.%d-%H.%M.%S)
+    [[ -d ~/.config ]] || mkdir ~/.config
+
+    log_info "Making a backup of ~/.config to ~/.config-backup-$time"
+    execute_or_dryrun "Backup ~/.config to ~/.config-backup-$time" cp -Rf ~/.config "$HOME/.config-backup-$time"
+
+    log_info "Copying /etc/skel to home — be patient"
+    execute_or_dryrun "Copy /etc/skel to $HOME" cp -r /etc/skel/. "$HOME"
+
+    log_success "$(basename "$0") done"
 }
 
 main "$@"

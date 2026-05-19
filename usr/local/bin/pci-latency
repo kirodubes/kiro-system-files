@@ -19,6 +19,28 @@ else
 fi
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+DRY_RUN=false
+
+for _arg in "$@"; do
+    case "$_arg" in
+        -h|--help)
+            show_help "$(basename "$0")" \
+                "Set PCI bus latency timers for all devices" \
+                "[--help] [--version] [--dry-run]" \
+                ""
+            exit 0
+            ;;
+        -v|--version)
+            show_version "$(basename "$0")"
+            exit 0
+            ;;
+        -d|--dry-run)
+            DRY_RUN=true
+            log_info "Dry-run mode enabled — no changes will be made"
+            ;;
+    esac
+done
+unset _arg
 
 if [[ $EUID -ne 0 ]]; then
     log_error "Run as root: sudo pci-latency"
@@ -34,14 +56,20 @@ fi
 main() {
     log_section "PCI Latency Timer Optimization"
 
-    # All devices: conservative 20-cycle default
-    setpci -s '*:*' latency_timer=20 2>/dev/null || true
+    if [[ "${DRY_RUN}" == "true" ]]; then
+        log_info "[DRY-RUN] Would execute: setpci -s '*:*' latency_timer=20"
+        log_info "[DRY-RUN] Would execute: setpci -s '0:0' latency_timer=0"
+        log_info "[DRY-RUN] Would execute: setpci -s '*:*:04xx' latency_timer=80"
+    else
+        # All devices: conservative 20-cycle default
+        setpci -s '*:*' latency_timer=20 2>/dev/null || true
 
-    # Northbridge/chipset: 0 = unlimited, for internal bus arbitration
-    setpci -s '0:0' latency_timer=0 2>/dev/null || true
+        # Northbridge/chipset: 0 = unlimited, for internal bus arbitration
+        setpci -s '0:0' latency_timer=0 2>/dev/null || true
 
-    # Multimedia audio (class 04xx): 80 cycles prevents crackling under I/O load
-    setpci -s '*:*:04xx' latency_timer=80 2>/dev/null || true
+        # Multimedia audio (class 04xx): 80 cycles prevents crackling under I/O load
+        setpci -s '*:*:04xx' latency_timer=80 2>/dev/null || true
+    fi
 
     log_success "$(basename "$0") done"
 }

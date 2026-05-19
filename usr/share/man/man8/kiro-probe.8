@@ -1,0 +1,46 @@
+.TH KIRO-PROBE 8 "2026-05-19" "Kiro" "Kiro System Tools"
+.SH NAME
+kiro-probe \- upload a hardware probe to linux-hardware.org
+.SH SYNOPSIS
+.B kiro-probe
+[\fB\-h\fR|\fB\-\-help\fR]
+[\fB\-v\fR|\fB\-\-version\fR]
+[\fB\-d\fR|\fB\-\-dry\-run\fR]
+.SH DESCRIPTION
+.B kiro-probe
+installs
+.B hw-probe
+if it is not already present, then runs
+.B hw-probe\ \-all\ \-upload
+to collect a full hardware inventory and upload it to
+.IR https://linux-hardware.org .
+.PP
+The upload generates a unique probe URL that can be shared for hardware
+compatibility reports and bug reports.
+.SH OPTIONS
+.TP
+.BR \-h ", " \-\-help
+Print a help message and exit.
+.TP
+.BR \-v ", " \-\-version
+Print version information and exit.
+.TP
+.BR \-d ", " \-\-dry\-run
+Show what would be executed without making any changes.
+.SH FILES
+.TP
+.I /usr/bin/hw-probe
+Probe binary installed by the hw-probe package.
+.TP
+.I /usr/local/lib/kiro-common.sh
+Shared library.
+.SH EXAMPLES
+.EX
+kiro-probe --dry-run
+kiro-probe
+.EE
+.SH SEE ALSO
+.BR hw-probe (1),
+.BR pacman (8)
+.SH AUTHOR
+Erik Dubois <https://www.erikdubois.be>

@@ -18,17 +18,42 @@ else
 fi
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+DRY_RUN=false
 
 main() {
-    if test -f /usr/bin/reflector ; then
+    for arg in "$@"; do
+        case "$arg" in
+            -h|--help)
+                show_help "$(basename "$0")" \
+                    "Update the pacman mirrorlist using reflector" \
+                    "[--help] [--version] [--dry-run]" \
+                    ""
+                exit 0
+                ;;
+            -v|--version)
+                show_version "$(basename "$0")"
+                exit 0
+                ;;
+            -d|--dry-run)
+                DRY_RUN=true
+                log_info "Dry-run mode enabled — no changes will be made"
+                ;;
+            *)
+                log_error "Unknown option: $arg"
+                exit 1
+                ;;
+        esac
+    done
+
+    if test -f /usr/bin/reflector; then
         log_info "reflector is present"
     else
         log_info "Installing reflector"
-        sudo pacman -S reflector --noconfirm
+        execute_or_dryrun "Install reflector" sudo pacman -S reflector --noconfirm
     fi
 
-    #sudo /usr/bin/reflector --latest 100 --fastest 100 --number 10 --save /etc/pacman.d/mirrorlist
-    sudo /usr/bin/reflector --score 100 --fastest 10 --number 10 --verbose --save /etc/pacman.d/mirrorlist
+    execute_or_dryrun "Rank mirrors and save to /etc/pacman.d/mirrorlist" \
+        sudo /usr/bin/reflector --score 100 --fastest 10 --number 10 --verbose --save /etc/pacman.d/mirrorlist
 
     log_success "$(basename "$0") done"
 }

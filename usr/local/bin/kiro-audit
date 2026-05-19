@@ -85,6 +85,40 @@ on_error() {
 
 trap 'on_error "$LINENO" "$BASH_COMMAND"' ERR
 
+for _arg in "$@"; do
+    case "$_arg" in
+        -h|--help)
+            cat <<'EOF'
+kiro-audit - Kiro ISO installed system audit
+
+Usage:
+    kiro-audit [--help] [--version]
+
+Options:
+    -h, --help     Show this help message and exit
+    -v, --version  Show version information and exit
+
+Description:
+    Comprehensive post-install audit of a Kiro system. Checks kernel,
+    microcode, mkinitcpio, audio stack, Calamares cleanup, kiro_final
+    configuration, pacman repositories, desktop environments, SDDM,
+    user groups, systemd services, file permissions, bootloader, and
+    package integrity.
+
+    Must be run as root: sudo kiro-audit
+
+For more information, visit: https://www.erikdubois.be
+EOF
+            exit 0
+            ;;
+        -v|--version)
+            echo "kiro-audit version 1.0.0"
+            exit 0
+            ;;
+    esac
+done
+unset _arg
+
 if [[ $EUID -ne 0 ]]; then
     echo "Run kiro-audit with root privileges: sudo kiro-audit"
     trap - ERR

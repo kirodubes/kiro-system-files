@@ -18,8 +18,33 @@ else
 fi
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+DRY_RUN=false
 
 main() {
+    for arg in "$@"; do
+        case "$arg" in
+            -h|--help)
+                show_help "$(basename "$0")" \
+                    "Identify the active GPU driver and OpenGL renderer" \
+                    "[--help] [--version] [--dry-run]" \
+                    ""
+                exit 0
+                ;;
+            -v|--version)
+                show_version "$(basename "$0")"
+                exit 0
+                ;;
+            -d|--dry-run)
+                DRY_RUN=true
+                log_info "Dry-run mode enabled — no changes will be made"
+                ;;
+            *)
+                log_error "Unknown option: $arg"
+                exit 1
+                ;;
+        esac
+    done
+
     log_warn "Some commands will give no output or error messages — one of them should give you info"
 
     log_section "Check 1 — lspci"
@@ -30,13 +55,17 @@ main() {
     lspci -x | grep VGA
 
     log_section "Check 2 — glxinfo"
-    if test -f /usr/bin/glxinfo ; then
+    if test -f /usr/bin/glxinfo; then
         log_info "glxinfo is present"
     else
         log_info "Installing glxinfo (note: conflicts with mesa-demos)"
-        sudo pacman -S glxinfo --noconfirm
+        execute_or_dryrun "Install glxinfo" sudo pacman -S glxinfo --noconfirm
     fi
-    glxinfo | grep -E "OpenGL vendor|OpenGL renderer*"
+    if [[ "$DRY_RUN" == "true" ]] && ! command -v glxinfo &>/dev/null; then
+        log_info "[DRY-RUN] Would run: glxinfo | grep OpenGL vendor/renderer"
+    else
+        glxinfo | grep -E "OpenGL vendor|OpenGL renderer*"
+    fi
 
     log_section "Check 3 — nvidia-smi"
     if test -f /usr/bin/nvidia-smi; then
