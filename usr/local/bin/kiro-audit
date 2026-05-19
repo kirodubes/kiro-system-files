@@ -579,16 +579,16 @@ check_udev_rules() {
         fail "60-io-scheduler.rules missing"
     fi
 
-    # HID autosuspend — 66-input-optimization.rules must use DEVTYPE not ENV{DEVTYPE}
+    # HID autosuspend — 66-input-optimization.rules must use ENV{DEVTYPE}, not bare DEVTYPE
     local hid_rules="/etc/udev/rules.d/66-input-optimization.rules"
     if [[ -f "${hid_rules}" ]]; then
         pass "66-input-optimization.rules present"
         if grep -q 'ENV{DEVTYPE}' "${hid_rules}"; then
-            fail "66-input-optimization.rules uses deprecated ENV{DEVTYPE} — causes udev errors"
-            apply_fix "sed -i 's/ENV{DEVTYPE}/DEVTYPE/g' ${hid_rules}" \
-                sed -i 's/ENV{DEVTYPE}/DEVTYPE/g' "${hid_rules}"
+            pass "66-input-optimization.rules uses ENV{DEVTYPE} (correct)"
         else
-            pass "66-input-optimization.rules uses DEVTYPE (correct)"
+            fail "66-input-optimization.rules uses bare DEVTYPE — invalid key in current udev; should be ENV{DEVTYPE}"
+            apply_fix "sed -i 's/DEVTYPE==/ENV{DEVTYPE}==/g' ${hid_rules}" \
+                sed -i 's/DEVTYPE==/ENV{DEVTYPE}==/g' "${hid_rules}"
         fi
         if grep -q 'udev-hid-autosuspend' "${hid_rules}"; then
             pass "66-input-optimization.rules calls udev-hid-autosuspend helper"
@@ -608,6 +608,56 @@ check_udev_rules() {
     else
         fail "/usr/local/bin/udev-hid-autosuspend missing"
     fi
+}
+
+check_pam_config() {
+    log_section "PAM configuration"
+
+    local system_auth="/etc/pam.d/system-auth"
+    if [[ ! -f "${system_auth}" ]]; then
+        fail "${system_auth} missing"
+        return
+    fi
+    pass "${system_auth} present"
+
+    # pam_faillock must have audit=0 — lqx kernel has no audit socket; without
+    # this flag every sudo call logs "Error sending audit message: Protocol not supported"
+    local faillock_bad
+    faillock_bad=$(grep 'pam_faillock.so' "${system_auth}" | grep -v 'audit=0' || true)
+    if [[ -z "${faillock_bad}" ]]; then
+        pass "pam_faillock.so lines all have audit=0"
+    else
+        fail "pam_faillock.so line(s) missing audit=0 in ${system_auth}"
+        echo "${faillock_bad}" | while read -r line; do echo "        ${line}"; done
+    fi
+}
+
+check_resolved_config() {
+    log_section "systemd-resolved configuration"
+
+    local drop_in
+    drop_in=$(grep -rl 'MulticastDNS=no' /etc/systemd/resolved.conf /etc/systemd/resolved.conf.d/ 2>/dev/null | head -1 || true)
+    if [[ -n "${drop_in}" ]]; then
+        pass "MulticastDNS=no set (${drop_in}) — avahi owns mDNS"
+    else
+        warn "MulticastDNS not disabled in systemd-resolved; may conflict with avahi-daemon"
+    fi
+
+    local hosts_no
+    hosts_no=$(grep -rl 'ReadEtcHosts=no' /etc/systemd/resolved.conf /etc/systemd/resolved.conf.d/ 2>/dev/null | head -1 || true)
+    if [[ -n "${hosts_no}" ]]; then
+        pass "ReadEtcHosts=no set (${hosts_no}) — resolved skips hBlock hosts file"
+    else
+        warn "ReadEtcHosts not disabled; resolved will parse /etc/hosts on every boot (slow with hBlock)"
+    fi
+}
+
+check_tumbler() {
+    log_section "Tumbler / thumbnailing"
+
+    pkg_installed libgepub \
+        && pass "libgepub installed (tumbler EPUB thumbnailer)" \
+        || fail "libgepub missing — tumbler logs 'cannot open shared object file: libgepub-0.7.so.0' on every file-manager launch"
 }
 
 check_failed_units() {
@@ -684,6 +734,9 @@ main() {
     check_udev_rules
     check_permissions
     check_sysctl_security
+    check_pam_config
+    check_resolved_config
+    check_tumbler
     check_failed_units
     check_dev_rel
     check_nvidia
