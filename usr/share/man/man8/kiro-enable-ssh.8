@@ -1,0 +1,76 @@
+.TH KIRO-ENABLE-SSH 8 "2026-05-19" "Kiro" "Kiro System Tools"
+.SH NAME
+kiro-enable-ssh \- install openssh and enable the sshd service
+.SH SYNOPSIS
+.B kiro-enable-ssh
+[\fB\-h\fR|\fB\-\-help\fR]
+[\fB\-v\fR|\fB\-\-version\fR]
+[\fB\-d\fR|\fB\-\-dry\-run\fR]
+.SH DESCRIPTION
+.B kiro-enable-ssh
+installs the
+.B openssh
+package and immediately enables and starts the
+.B sshd
+systemd service so the machine becomes reachable via SSH in a single step.
+.PP
+Must be run as root.
+.PP
+The script performs the following steps in order:
+.IP 1. 4
+Installs
+.B openssh
+via
+.BR pacman\ -S\ openssh\ --noconfirm .
+.IP 2. 4
+Enables and starts the
+.B sshd
+service via
+.BR systemctl\ enable\ --now\ sshd .
+.SH OPTIONS
+.TP
+.BR \-h ", " \-\-help
+Print a help message and exit.
+.TP
+.BR \-v ", " \-\-version
+Print version information and exit.
+.TP
+.BR \-d ", " \-\-dry\-run
+Print every command that would be executed without making any changes to the
+system.
+Useful for auditing the sequence of operations before running for real.
+.SH EXIT STATUS
+.TP
+.B 0
+All steps completed (or simulated in dry-run mode).
+.TP
+.B 1
+Script was not run as root, or an unknown option was supplied.
+.SH FILES
+.TP
+.I /usr/local/lib/kiro-common.sh
+Shared library providing logging, colour output, and
+.B execute_or_dryrun
+support.
+.SH EXAMPLES
+Preview all operations without making changes:
+.PP
+.RS 4
+.EX
+sudo kiro-enable-ssh --dry-run
+.EE
+.RE
+.PP
+Install openssh and start sshd immediately:
+.PP
+.RS 4
+.EX
+sudo kiro-enable-ssh
+.EE
+.RE
+.SH SEE ALSO
+.BR pacman (8),
+.BR sshd (8),
+.BR systemctl (1)
+.SH AUTHOR
+Erik Dubois <https://www.erikdubois.be>
