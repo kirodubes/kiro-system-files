@@ -217,16 +217,15 @@ section_packages() {
     total=$(pacman -Q 2>/dev/null | wc -l)
     _field "Installed" "$total packages"
 
-    local aur_helper="none detected"
-    for h in paru yay trizen pikaur aurman pakku; do
+    for h in paru yay; do
         if command -v "$h" &>/dev/null; then
             local hver
             hver=$(pacman -Q "$h" 2>/dev/null | awk '{print $2}' || echo "installed")
-            aur_helper="$h ($hver)"
-            break
+            _field "AUR helper: $h" "ok ($hver)"
+        else
+            _field "AUR helper: $h" "not installed"
         fi
     done
-    _field "AUR helper" "$aur_helper"
 }
 
 ##################################################################################################################
