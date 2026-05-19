@@ -31,7 +31,13 @@ section_system() {
     log_subsection "System"
 
     if [[ -f /etc/dev-rel ]]; then
-        _field "ISO" "$(tr '\n' ' ' < /etc/dev-rel | xargs)"
+        local release codename build
+        release=$(grep '^ISO_RELEASE=' /etc/dev-rel | cut -d= -f2-)
+        codename=$(grep '^ISO_CODENAME=' /etc/dev-rel | cut -d= -f2-)
+        build=$(grep '^ISO_BUILD=' /etc/dev-rel | cut -d= -f2-)
+        _field "ISO release" "$release"
+        _field "ISO codename" "$codename"
+        _field "ISO build" "$build"
     else
         _field "ISO" "(no /etc/dev-rel)"
     fi
