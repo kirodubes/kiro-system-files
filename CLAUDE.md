@@ -11,7 +11,11 @@ System configuration and utility scripts for Kiro / ArcoLinux-based desktops. It
 
 ## Deployment
 
-There is no build step. Files are installed by copying them into place on the live system (matching the `usr/` and `etc/` directory tree). `setup-edu.sh` configures git remotes; `up.sh` commits and pushes.
+**Always build and install the package — never `sudo cp` files directly.**
+
+After committing changes, build and install the package (e.g. `makepkg -si`). Direct copying bypasses pacman, creates untracked files, and breaks future upgrades.
+
+`setup-edu.sh` configures git remotes; `up.sh` commits and pushes.
 
 ## Shared library (`kiro-common.sh`)
 
