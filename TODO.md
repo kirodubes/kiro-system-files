@@ -4,9 +4,6 @@
 
 ## Planned
 
-### kiro-lint — follow-on
-- `snd_hda_intel.stateful_codec` flagged FAIL (not exposed in lqx 7.0.9 parameters) — verify on a vanilla Arch kernel or remove from audio-hda.conf if the param doesn't exist upstream
-
 ### Phase 2 — Script flags
 - Add `--help` and `--dry-run` to all `usr/local/bin/` scripts
 
