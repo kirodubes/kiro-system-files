@@ -39,7 +39,7 @@ section_system() {
     [[ -d /sys/firmware/efi ]] && _field "Firmware" "UEFI" || _field "Firmware" "BIOS/Legacy"
 
     local pkg
-    pkg=$(pacman -Qqo "$(realpath "${BASH_SOURCE[0]}")" 2>/dev/null) \
+    pkg=$(pacman -Qqo "/usr/local/bin/$(basename "${BASH_SOURCE[0]}")" 2>/dev/null) \
         && _field "Kiro package" "$(pacman -Q "$pkg")" \
         || _field "Kiro package" "not installed via pacman"
 }
