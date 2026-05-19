@@ -73,6 +73,17 @@ section_hardware() {
 section_gpu() {
     log_subsection "GPU"
 
+    local intel_gpu
+    intel_gpu=$(lspci | grep -iE 'vga|3d|display' | grep -i intel | head -1 | sed 's/.*: //' || true)
+    if [[ -n "$intel_gpu" ]]; then
+        local intel_driver
+        intel_driver=$(lspci -nnk | grep -A5 -i intel | grep -i 'kernel driver' | head -1 | cut -d: -f2 | xargs || echo "none")
+        _field "Intel GPU" "$intel_gpu"
+        _field "Intel driver" "$intel_driver"
+    else
+        _field "Intel GPU" "not detected"
+    fi
+
     local amd_gpu
     amd_gpu=$(lspci | grep -iE 'vga|3d|display' | grep -iE 'amd|radeon|advanced micro' | head -1 | sed 's/.*: //' || true)
     if [[ -n "$amd_gpu" ]]; then
