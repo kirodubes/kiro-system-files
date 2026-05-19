@@ -136,7 +136,7 @@ section_desktop() {
     _field "Display manager" "$dm"
 
     local wm="unknown"
-    for w in dwm chadwm bspwm i3 openbox xfwm4 kwin_x11 kwin_wayland mutter gnome-shell sway hyprland; do
+    for w in ohmychadwm chadwm dwm bspwm i3 openbox xfwm4 kwin_x11 kwin_wayland mutter gnome-shell sway hyprland; do
         if pgrep -x "$w" &>/dev/null; then
             wm="$w"; break
         fi
