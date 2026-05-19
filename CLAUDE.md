@@ -60,4 +60,17 @@ All `etc/` config files were audited and fixed. The set is now safe to deploy on
 ## Script improvement status
 
 - Phase 1 (complete): unified library, error handling, variable quoting — all 33 scripts source `kiro-common.sh`
-- Phases 2–4 (planned): `--help`/`--dry-run` flags, config files, full shellcheck/shfmt pass
+- Phase 2 (in progress): `--help`/`--version`/`--dry-run` flags and man pages — pattern established on `kiro-fix-pacman-keys` and `kiro-enable-ssh`
+- Phases 3–4 (planned): config files, full shellcheck/shfmt pass
+
+## `log_error` is a trap handler, not a message function
+
+`log_error` in `kiro-common.sh` takes `lineno` and `cmd` params — it is wired to the ERR trap. Calling it with a plain string produces the full banner with the string treated as a line number. For user-facing messages (e.g. root checks), use:
+
+```bash
+echo "${RED}This script must be run as root.${RESET}" >&2
+```
+
+## Man pages
+
+Man pages live in `usr/share/man/man8/` (section 8, system-admin commands). After deploying new pages, run `sudo mandb` manually — the `man-db.timer` only fires once daily with up to 12h random delay.

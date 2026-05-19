@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## 2026.05.19 (session 2)
+
+**What Changed**
+Added `kiro-enable-ssh` — a one-step script that installs `openssh` and immediately enables/starts `sshd`. Fixed incorrect use of `log_error` for a user-facing root-check message.
+
+**Technical Details**
+- Script follows the Phase 2 pattern: sources `kiro-common.sh`, supports `--help`/`--version`/`--dry-run`, requires root via `[[ $EUID -ne 0 ]]` guard
+- `log_error` in `kiro-common.sh` is the ERR trap handler — it takes `lineno`/`cmd` params, not a message string. Calling it with a plain string produces the full `⚠️ ERROR DETECTED` banner with the message treated as a line number. Root-check failures (and any user-facing error before the trap can fire) must use `echo "${RED}...${RESET}" >&2` instead
+- Man pages belong in `usr/share/man/man8/` (maps to `/usr/share/man/man8/` on deploy) — the path is correct. `mandb` runs on a daily systemd timer (`man-db.timer`) with up to 12h random delay, not at boot. Run `sudo mandb` manually after deploying new pages to get immediate tab completion
+
+**Files Modified**
+- `usr/local/bin/kiro-enable-ssh` (new)
+- `usr/share/man/man8/kiro-enable-ssh.8` (new)
+
+---
+
 ## 2026.05.19
 
 **What Changed**
