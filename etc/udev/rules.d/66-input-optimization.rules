@@ -10,10 +10,9 @@
 # disable autosuspend on the parent USB device node.
 # power/autosuspend_delay_ms lives on the device node (1-7), not the
 # interface node (1-7:1.0), so we match the interface and write to its parent.
-ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_interface", \
+ACTION=="add", SUBSYSTEM=="usb", DEVTYPE=="usb_interface", \
   ATTRS{bInterfaceClass}=="03", \
-  RUN+="/bin/sh -c 'echo -1 > /sys$(dirname %p)/power/autosuspend_delay_ms'", \
-  RUN+="/bin/sh -c 'echo on > /sys$(dirname %p)/power/control'"
+  RUN+="/usr/local/bin/udev-hid-autosuspend %p"
 
 # Removed rules and reasons:
 # - echo > /proc/sys/kernel/autorepeat_interval: path does not exist
