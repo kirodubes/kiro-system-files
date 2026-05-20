@@ -1,5 +1,38 @@
 # CHANGELOG
 
+## 2026.05.20
+
+**What Changed**
+Added the mandatory `Purpose:` / `Why:` header block to 18 scripts in `usr/local/bin/` to bring them in line with the canonical bash template in `~/.claude/CLAUDE.md`.
+
+**Technical Details**
+- Inserted a `# Purpose:` prose block (what the script does) followed by a `# Why:` line (motivation) into each script's existing `#####` banner header, between the `DO NOT JUST RUN THIS` warning and the closing banner line.
+- No functional code changes — headers only. Existing `set -Euo pipefail`, `SCRIPT_DIR`, sourcing of `kiro-common.sh`, and arg parsing all left untouched.
+- `kiro-audit` header refreshed: dropped the old short "verify the install is correct" line and replaced with the full Purpose/Why pair that lists what the audit actually checks (kernel, microcode, mkinitcpio, audio, Calamares cleanup, kiro_final, repos, DEs, SDDM, groups, services, permissions, bootloader, packages).
+- Brings these scripts into compliance so anyone opening the file can tell what it does without reading the body — matches the standard set by Kiro-HQ's `up.sh` / `setup.sh` / `cleanup.sh`.
+
+**Files Modified**
+- `usr/local/bin/get-nemesis`
+- `usr/local/bin/kiro-audit`
+- `usr/local/bin/kiro-diag`
+- `usr/local/bin/kiro-enable-ssh`
+- `usr/local/bin/kiro-fix-gpg-conf`
+- `usr/local/bin/kiro-fix-mirrors`
+- `usr/local/bin/kiro-fix-pacman-conf`
+- `usr/local/bin/kiro-fix-pacman-keys`
+- `usr/local/bin/kiro-get-mirrors`
+- `usr/local/bin/kiro-install-tools`
+- `usr/local/bin/kiro-iso-version`
+- `usr/local/bin/kiro-lint`
+- `usr/local/bin/kiro-probe`
+- `usr/local/bin/kiro-set-cores`
+- `usr/local/bin/kiro-verify`
+- `usr/local/bin/kiro-which-vga`
+- `usr/local/bin/pci-latency`
+- `usr/local/bin/skel`
+
+---
+
 ## 2026.05.19 (session 5)
 
 **What Changed**
