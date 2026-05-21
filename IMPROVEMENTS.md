@@ -142,15 +142,15 @@ fi
 
 ## Key Improvements Summary
 
-| Category | Before | After | Impact |
-|----------|--------|-------|--------|
-| Error Handling | `#set -e` (commented) | `set -Euo pipefail` | Silent failures → detected |
-| Unquoted Variables | 20+ instances | Fixed in critical scripts | Word splitting vulnerabilities → safe |
-| Download Verification | None | Full validation | Partial/corrupt files → caught |
-| Destructive Ops | No confirmation | `confirm_destructive_operation()` | Accidental data loss → prevented |
-| Code Reuse | Duplicated functions | Single `kiro-common.sh` | 100 lines duplicated → 0 |
-| Logging Consistency | Mixed echo/tput | Unified `log_*()` functions | Inconsistent output → professional |
-| Library Size | N/A | 1000+ lines | 80+ functions available |
+| Category              | Before                | After                             | Impact                                |
+|-----------------------|-----------------------|-----------------------------------|---------------------------------------|
+| Error Handling        | `#set -e` (commented) | `set -Euo pipefail`               | Silent failures → detected            |
+| Unquoted Variables    | 20+ instances         | Fixed in critical scripts         | Word splitting vulnerabilities → safe |
+| Download Verification | None                  | Full validation                   | Partial/corrupt files → caught        |
+| Destructive Ops       | No confirmation       | `confirm_destructive_operation()` | Accidental data loss → prevented      |
+| Code Reuse            | Duplicated functions  | Single `kiro-common.sh`           | 100 lines duplicated → 0              |
+| Logging Consistency   | Mixed echo/tput       | Unified `log_*()` functions       | Inconsistent output → professional    |
+| Library Size          | N/A                   | 1000+ lines                       | 80+ functions available               |
 
 ---
 

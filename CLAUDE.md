@@ -45,13 +45,13 @@ Key sections and their functions:
 
 ## Configuration file locations
 
-| Path | Purpose |
-|------|---------|
-| `etc/sysctl.d/99-kiro-optimizations.conf` | Kernel tuning (memory, network, I/O, security) |
-| `etc/udev/rules.d/60–68-*.rules` | Hardware tuning rules (I/O schedulers, GPU, USB, audio) |
-| `etc/systemd/system.conf.d/` | Global systemd service/timeout/resource settings |
-| `etc/modprobe.d/` | Driver options for AMD/Nvidia GPU, audio, ethernet |
-| `etc/security/limits.d/` | ulimit overrides for audio and system processes |
+| Path                                      | Purpose                                                 |
+|-------------------------------------------|---------------------------------------------------------|
+| `etc/sysctl.d/99-kiro-optimizations.conf` | Kernel tuning (memory, network, I/O, security)          |
+| `etc/udev/rules.d/60–68-*.rules`          | Hardware tuning rules (I/O schedulers, GPU, USB, audio) |
+| `etc/systemd/system.conf.d/`              | Global systemd service/timeout/resource settings        |
+| `etc/modprobe.d/`                         | Driver options for AMD/Nvidia GPU, audio, ethernet      |
+| `etc/security/limits.d/`                  | ulimit overrides for audio and system processes         |
 
 ## Configuration files — audit status (2026.05.18)
 
