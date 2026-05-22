@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 2026.05.21
+
+**What Changed**
+Aligned `etc/samba/smb.conf.nemesis` with the personal `arcolinux-nemesis` template. Casing for the Samba share path normalised on the lowercase `Shared` form (was `SHARED`).
+
+**Technical Details**
+- `[SAMBASHARE] path = /home/erik/SHARED` → `/home/erik/Shared`; comment header updated to match.
+- Decision came out of the HQ cross-stack audit between `arcolinux-nemesis` (personal install scripts) and `edu-system-files` (Kiro block). The two repos shipped functionally identical templates that differed only on casing; `Shared` wins as the canonical form because `arcolinux-nemesis` actively writes `/etc/samba/smb.conf` from its own template on Erik's machines, so aligning here prevents churn.
+- The other two collisions found in the audit (zram-generator.conf, 90-memory-accounting.conf) were resolved on the nemesis side by deleting the offending nemesis scripts — `edu-system-files` keeps ownership of those system files unchanged.
+
+**Files Modified**
+- [etc/samba/smb.conf.nemesis](etc/samba/smb.conf.nemesis)
+
 ## 2026.05.20
 
 **What Changed**
