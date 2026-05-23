@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="kiro.jpg" alt="Kiro" width="220" />
+</p>
+
 # edu-system-files
 
 System-level files for the Kiro distro — kernel parameters, udev rules, systemd drop-ins, sudoers rules, modprobe blacklists, X11 keyboard maps, sysctl tunings, plus the **`kiro-*` toolchain** of diagnostic and maintenance commands. Owned by Kiro; collisions with personal install scripts (e.g. `arcolinux-nemesis`) are resolved in favour of this repo — see [HQ/ECOSYSTEM.md → cascade rules](../../Insync/Kiro/Kiro-HQ/ECOSYSTEM.md).
