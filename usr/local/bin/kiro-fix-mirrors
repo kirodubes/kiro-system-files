@@ -46,14 +46,14 @@ main() {
                 log_info "Dry-run mode enabled — no changes will be made"
                 ;;
             *)
-                log_error "Unknown option: $arg"
+                echo "${RED}Unknown option: $arg${RESET}" >&2
                 exit 1
                 ;;
         esac
     done
 
     if [ ! -x /usr/bin/rate-mirrors ]; then
-        log_error "rate-mirrors is not installed. Please install the 'rate-mirrors' package."
+        echo "${RED}rate-mirrors is not installed. Please install the 'rate-mirrors' package.${RESET}" >&2
         exit 1
     fi
 

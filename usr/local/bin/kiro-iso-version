@@ -40,7 +40,7 @@ main() {
                 exit 0
                 ;;
             *)
-                log_error "Unknown option: $arg"
+                echo "${RED}Unknown option: $arg${RESET}" >&2
                 exit 1
                 ;;
         esac

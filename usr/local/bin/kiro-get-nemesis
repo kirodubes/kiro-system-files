@@ -48,7 +48,7 @@ main() {
                 log_info "Dry-run mode enabled — no changes will be made"
                 ;;
             *)
-                log_error "Unknown option: $arg"
+                echo "${RED}Unknown option: $arg${RESET}" >&2
                 exit 1
                 ;;
         esac

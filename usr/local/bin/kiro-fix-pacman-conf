@@ -46,7 +46,7 @@ main() {
                 log_info "Dry-run mode enabled — no changes will be made"
                 ;;
             *)
-                log_error "Unknown option: $arg"
+                echo "${RED}Unknown option: $arg${RESET}" >&2
                 exit 1
                 ;;
         esac
@@ -81,7 +81,7 @@ main() {
             exit 1
         fi
     else
-        log_error "No internet connectivity — cannot proceed: no local file and no internet"
+        echo "${RED}No internet connectivity — cannot proceed: no local file and no internet${RESET}" >&2
         exit 1
     fi
 }

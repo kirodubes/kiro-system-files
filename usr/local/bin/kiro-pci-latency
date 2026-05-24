@@ -55,7 +55,7 @@ unset _arg
 ensure_root "$@"
 
 if ! command -v setpci > /dev/null 2>&1; then
-    log_error "setpci not found — install pciutils"
+    echo "${RED}setpci not found — install pciutils${RESET}" >&2
     exit 1
 fi
 
