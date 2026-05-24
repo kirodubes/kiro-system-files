@@ -38,9 +38,9 @@ System-level files for the Kiro distro — kernel parameters, udev rules, system
 | `kiro-set-cores`       | Set the number of active CPU cores                                      |
 | `kiro-verify`          | Post-install verification — does the install match the ISO manifest?    |
 | `kiro-which-vga`       | Detect installed VGA card vendor (Intel / AMD / NVIDIA)                 |
-| `get-nemesis`          | Helper to fetch the nemesis_repo bootstrap                              |
-| `pci-latency`          | One-shot PCI latency tweak                                              |
-| `skel`                 | `/etc/skel/` propagation helper                                         |
+| `kiro-get-nemesis`     | Helper to fetch the nemesis_repo bootstrap                              |
+| `kiro-pci-latency`     | One-shot PCI latency tweak                                              |
+| `kiro-skel`            | `/etc/skel/` propagation helper                                         |
 
 ### `usr/lib/systemd/`, `usr/share/backgrounds/`
 Bundled system-wide systemd units and Kiro wallpapers.

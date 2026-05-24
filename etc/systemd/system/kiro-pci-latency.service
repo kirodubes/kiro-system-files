@@ -6,12 +6,12 @@ After=multi-user.target
 [Service]
 Type=oneshot
 User=root
-ExecStart=/usr/local/bin/pci-latency
+ExecStart=/usr/local/bin/kiro-pci-latency
 StandardOutput=journal
 StandardError=journal
-SyslogIdentifier=pci-latency
+SyslogIdentifier=kiro-pci-latency
 
-# Continue boot even if script fails (pci-latency changes are non-critical)
+# Continue boot even if script fails (kiro-pci-latency changes are non-critical)
 RemainAfterExit=yes
 
 [Install]

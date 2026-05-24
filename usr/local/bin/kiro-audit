@@ -11,8 +11,9 @@ set -euo pipefail
 #   Comprehensive post-install audit of a Kiro system. Checks kernel,
 #   microcode, mkinitcpio, audio stack, Calamares cleanup, kiro_final
 #   configuration, pacman repositories, desktop environments, SDDM,
-#   user groups, systemd services, file permissions, bootloader, and
-#   package integrity. `--fix` auto-remediates known issues. Run as root.
+#   user groups, systemd services and drop-ins, udev rules, file
+#   permissions, bootloader, and package integrity. `--fix` auto-remediates
+#   known issues. Re-runs itself as root (polkit popup or sudo) if needed.
 #
 #   Why: verifies an installed Kiro system matches the intended
 #   specification; catches drift between what the ISO is supposed to
@@ -93,6 +94,24 @@ on_error() {
 
 trap 'on_error "$LINENO" "$BASH_COMMAND"' ERR
 
+#####################################################################
+# Privilege — re-exec as root (polkit popup in a GUI, sudo over SSH/tty)
+#####################################################################
+# kiro-audit is self-contained and does NOT source kiro-common.sh, so it
+# carries its own copy of this helper. Keep it in sync with kiro-common.sh.
+ensure_root() {
+    [[ $EUID -eq 0 ]] && return 0
+    trap - ERR
+    local self
+    self="$(realpath "${BASH_SOURCE[-1]}")"
+    if [[ -n "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ]] && command -v pkexec >/dev/null 2>&1; then
+        echo "${YELLOW}$(basename "$self") needs root — requesting your password...${RESET}" >&2
+        exec pkexec env TERM="${TERM:-xterm-256color}" "$self" "$@"
+    fi
+    echo "${YELLOW}$(basename "$self") needs root — re-running with sudo...${RESET}" >&2
+    exec sudo "$self" "$@"
+}
+
 FIX_MODE=false
 
 for _arg in "$@"; do
@@ -119,7 +138,9 @@ Description:
     In read-only mode (default), fixable FAILs show a FIX? hint with
     the command that --fix would run.
 
-    Must be run as root: sudo kiro-audit
+    Requires root. If not run as root, it re-elevates automatically:
+    a polkit password popup in a graphical session, or a sudo prompt
+    over SSH/tty.
 
 For more information, visit: https://www.erikdubois.be
 EOF
@@ -546,10 +567,27 @@ check_zram() {
 check_udev_rules() {
     log_section "Udev rules"
 
+    # All rule files the edu-system-files package ships
+    local expected_rules=(
+        60-io-scheduler.rules
+        60-ioschedulers-tuning.rules
+        61-audio-power.rules
+        62-network-optimization.rules
+        63-usb-optimization.rules
+        64-gpu-optimization.rules
+        65-storage-optimization.rules
+        66-input-optimization.rules
+        67-laptop-optimization.rules
+        68-sound-power.rules
+    )
+    local r
+    for r in "${expected_rules[@]}"; do
+        [[ -f "/etc/udev/rules.d/${r}" ]] && pass "udev rule present: ${r}" || fail "udev rule missing: ${r}"
+    done
+
     # IO scheduler — correct assignment per device type (from CachyOS research)
     local rules_file="/etc/udev/rules.d/60-io-scheduler.rules"
     if [[ -f "${rules_file}" ]]; then
-        pass "60-io-scheduler.rules present"
         grep -q 'rotational.*=="0".*mq-deadline\|mq-deadline.*rotational.*=="0"' "${rules_file}" \
             && pass "IO scheduler: SSD → mq-deadline" \
             || fail "IO scheduler: SSD not set to mq-deadline (check 60-io-scheduler.rules)"
@@ -559,16 +597,37 @@ check_udev_rules() {
         grep -q 'nvme.*none\|none.*nvme' "${rules_file}" \
             && pass "IO scheduler: NVMe → none" \
             || warn "IO scheduler: NVMe rule not found in 60-io-scheduler.rules"
-    else
-        fail "60-io-scheduler.rules missing"
     fi
+}
 
-    local hid_rules="/etc/udev/rules.d/66-input-optimization.rules"
-    if [[ -f "${hid_rules}" ]]; then
-        pass "66-input-optimization.rules present"
-    else
-        fail "66-input-optimization.rules missing"
-    fi
+check_systemd_dropins() {
+    log_section "Systemd drop-ins"
+
+    local dropins=(
+        /etc/systemd/system/systemd-logind.service.d/10-kiro-session.conf
+        /etc/systemd/system.conf.d/10-kiro-system.conf
+        /etc/systemd/system.conf.d/90-memory-accounting.conf
+        /etc/systemd/journald.conf.d/10-kiro-journal.conf
+        /etc/systemd/coredump.conf.d/10-kiro-coredump.conf
+        /etc/systemd/user.conf.d/10-kiro-user.conf
+    )
+    local f
+    for f in "${dropins[@]}"; do
+        [[ -f "${f}" ]] && pass "drop-in present: ${f#/etc/systemd/}" || fail "drop-in missing: ${f#/etc/systemd/}"
+    done
+}
+
+check_modprobe_thp() {
+    log_section "Modprobe & THP tuning"
+
+    local f
+    for f in intel-ethernet.conf realtek-ethernet.conf; do
+        [[ -f "/etc/modprobe.d/${f}" ]] && pass "modprobe.d/${f} present" || fail "modprobe.d/${f} missing"
+    done
+
+    [[ -f /etc/tmpfiles.d/thp-tuning.conf ]] \
+        && pass "tmpfiles.d/thp-tuning.conf present" \
+        || fail "tmpfiles.d/thp-tuning.conf missing"
 }
 
 
@@ -670,8 +729,10 @@ main() {
     check_sddm
     check_user_groups
     check_services
+    check_systemd_dropins
     check_zram
     check_udev_rules
+    check_modprobe_thp
     check_permissions
     check_sysctl_security
     check_resolved_config

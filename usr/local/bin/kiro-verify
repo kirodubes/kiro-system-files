@@ -91,7 +91,7 @@ check_config_files() {
         /etc/systemd/coredump.conf.d/10-kiro-coredump.conf
         /etc/systemd/user.conf.d/10-kiro-user.conf
         /etc/systemd/zram-generator.conf
-        /etc/systemd/system/pci-latency.service
+        /etc/systemd/system/kiro-pci-latency.service
         /etc/modprobe.d/blacklist-watchdog.conf
         /etc/modprobe.d/amdgpu.conf
         /etc/modprobe.d/audio-hda.conf
@@ -294,7 +294,8 @@ check_io_schedulers() {
                 _check_scheduler "$dev" "none"
                 ;;
             mmcblk*)
-                _check_scheduler "$dev" "bfq"
+                # 60-io-scheduler.rules groups mmcblk with non-rotational sd* → mq-deadline
+                _check_scheduler "$dev" "mq-deadline"
                 ;;
             sd*)
                 local rotational
@@ -370,6 +371,17 @@ check_thp() {
             warn_check "THP khugepaged/max_ptes_none: expected 511, got $val"
         fi
     fi
+
+    local scan_file="$thp_base/khugepaged/scan_sleep_millisecs"
+    if [[ -f "$scan_file" ]]; then
+        local val
+        val=$(cat "$scan_file")
+        if [[ "$val" == "10" ]]; then
+            ok "THP khugepaged/scan_sleep_millisecs: 10"
+        else
+            warn_check "THP khugepaged/scan_sleep_millisecs: expected 10, got $val"
+        fi
+    fi
 }
 
 ##################################################################################################################
@@ -412,15 +424,15 @@ check_systemd_units() {
         systemctl list-units --state=failed --no-legend --no-pager 2>/dev/null | head -10 || true
     fi
 
-    # pci-latency is a oneshot service — check result rather than active state
+    # kiro-pci-latency is a oneshot service — check result rather than active state
     local pci_result
-    pci_result=$(systemctl show pci-latency.service --property=Result --value 2>/dev/null || echo "unknown")
+    pci_result=$(systemctl show kiro-pci-latency.service --property=Result --value 2>/dev/null || echo "unknown")
     if [[ "$pci_result" == "success" ]]; then
-        ok "Systemd pci-latency.service: completed successfully"
+        ok "Systemd kiro-pci-latency.service: completed successfully"
     elif [[ "$pci_result" == "unknown" ]]; then
-        warn_check "Systemd pci-latency.service: not found or not started this boot"
+        warn_check "Systemd kiro-pci-latency.service: not found or not started this boot"
     else
-        ko "Systemd pci-latency.service: result=$pci_result"
+        ko "Systemd kiro-pci-latency.service: result=$pci_result"
     fi
 
     # zram-generator creates zram devices early in boot

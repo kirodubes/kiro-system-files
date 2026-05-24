@@ -286,22 +286,20 @@ _sysfs_attr_exists() {
     local attr_path="$2"
 
     local search_base=""
-    local pfx_filter=""
 
-    case "$kernel_pat" in
-        nvme*n*|sd[a-z]*|mmcblk*|vd[a-z]*)
-            search_base="/sys/block"
-            ;;
-        card*)
-            search_base="/sys/class/sound"
-            ;;
-        eth*|en[a-z]*|wl*|w*)
-            search_base="/sys/class/net"
-            ;;
-        *)
-            return 2
-            ;;
-    esac
+    # Classify by device family. The KERNEL value is matched as data, not a
+    # glob: it literally contains metacharacters (e.g. "sd[a-z]*"), so a case
+    # glob like sd[a-z]*) never matches its own pattern string. Use substring
+    # tests on the family token instead.
+    if [[ "$kernel_pat" == *nvme* || "$kernel_pat" == *sd* || "$kernel_pat" == *mmcblk* || "$kernel_pat" == *vd* ]]; then
+        search_base="/sys/block"
+    elif [[ "$kernel_pat" == *card* ]]; then
+        search_base="/sys/class/sound"
+    elif [[ "$kernel_pat" == *eth* || "$kernel_pat" == *en* || "$kernel_pat" == *wl* || "$kernel_pat" == *ww* ]]; then
+        search_base="/sys/class/net"
+    else
+        return 2
+    fi
 
     [[ -d "$search_base" ]] || return 2
 
@@ -331,6 +329,35 @@ _sysfs_attr_exists() {
     return 1
 }
 
+# Return 0 if attr_path exists on a live device in the given udev subsystem.
+# Return 1 if devices of that subsystem exist but none expose the attr.
+# Return 2 if no device of that subsystem is present (SKIP).
+# Used for rules that match by SUBSYSTEM== rather than KERNEL== (e.g. the
+# power/control writes in 61-audio-power and 64-gpu-optimization).
+_sysfs_subsystem_attr_exists() {
+    local subsystem="$1"
+    local attr_path="$2"
+
+    # Bus subsystems (usb, pci, …) expose devices under /sys/bus/<sub>/devices;
+    # class subsystems (backlight, sound, …) under /sys/class/<sub>. Try both so
+    # power/* attrs on bus devices and class-level attrs are each reachable.
+    local bases=("/sys/bus/$subsystem/devices" "/sys/class/$subsystem")
+
+    local found_device=0
+    local base dev
+    for base in "${bases[@]}"; do
+        [[ -d "$base" ]] || continue
+        for dev in "$base"/*/; do
+            [[ -d "$dev" ]] || continue
+            found_device=1
+            [[ -e "${dev%/}/$attr_path" ]] && return 0
+        done
+    done
+
+    [[ $found_device -eq 0 ]] && return 2
+    return 1
+}
+
 check_udev_attr_targets() {
     log_subsection "Udev: ATTR Write Targets in Sysfs"
 
@@ -353,9 +380,13 @@ check_udev_attr_targets() {
             writes=$(grep -oP 'ATTR\{[^}]+\}(?<!=)="[^"]*"' <<< "$line" 2>/dev/null || true)
             [[ -z "$writes" ]] && continue
 
-            # Extract KERNEL pattern for device type resolution
-            local kernel_pat
+            # Resolve device type from KERNEL== (preferred) or SUBSYSTEM==
+            local kernel_pat subsys
             kernel_pat=$(grep -oP 'KERNEL=="[^"]+"' <<< "$line" 2>/dev/null \
+                | head -1 \
+                | grep -oP '(?<=")[^"]+' \
+                || true)
+            subsys=$(grep -oP 'SUBSYSTEM=="[^"]+"' <<< "$line" 2>/dev/null \
                 | head -1 \
                 | grep -oP '(?<=")[^"]+' \
                 || true)
@@ -366,18 +397,22 @@ check_udev_attr_targets() {
                 local attr_path
                 attr_path=$(sed 's/ATTR{\([^}]*\)}.*/\1/' <<< "$w")
 
-                if [[ -z "$kernel_pat" ]]; then
-                    skip_check "[$fname] ATTR{$attr_path}: no KERNEL= in rule — cannot determine device type"
+                local rc=0 ctx
+                if [[ -n "$kernel_pat" ]]; then
+                    ctx="KERNEL==\"$kernel_pat\""
+                    _sysfs_attr_exists "$kernel_pat" "$attr_path" || rc=$?
+                elif [[ -n "$subsys" ]]; then
+                    ctx="SUBSYSTEM==\"$subsys\""
+                    _sysfs_subsystem_attr_exists "$subsys" "$attr_path" || rc=$?
+                else
+                    skip_check "[$fname] ATTR{$attr_path}: no KERNEL=/SUBSYSTEM= in rule — cannot determine device type"
                     continue
                 fi
 
-                local rc=0
-                _sysfs_attr_exists "$kernel_pat" "$attr_path" || rc=$?
-
                 case $rc in
-                    0) ok "[$fname] ATTR{$attr_path} exists in sysfs (KERNEL==\"$kernel_pat\")" ;;
-                    1) ko "[$fname] ATTR{$attr_path}: not found on any KERNEL==\"$kernel_pat\" device" ;;
-                    2) skip_check "[$fname] ATTR{$attr_path}: no KERNEL==\"$kernel_pat\" device to verify against" ;;
+                    0) ok "[$fname] ATTR{$attr_path} exists in sysfs ($ctx)" ;;
+                    1) ko "[$fname] ATTR{$attr_path}: not found on any $ctx device" ;;
+                    2) skip_check "[$fname] ATTR{$attr_path}: no $ctx device to verify against" ;;
                 esac
             done <<< "$writes"
         done < <(_join_lines "$f")

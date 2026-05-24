@@ -1,13 +1,13 @@
-.TH PCI-LATENCY 8 "2026-05-19" "Kiro" "Kiro System Tools"
+.TH KIRO-PCI-LATENCY 8 "2026-05-19" "Kiro" "Kiro System Tools"
 .SH NAME
-pci-latency \- set PCI bus latency timers for all devices
+kiro-pci-latency \- set PCI bus latency timers for all devices
 .SH SYNOPSIS
-.B pci-latency
+.B kiro-pci-latency
 [\fB\-h\fR|\fB\-\-help\fR]
 [\fB\-v\fR|\fB\-\-version\fR]
 [\fB\-d\fR|\fB\-\-dry\-run\fR]
 .SH DESCRIPTION
-.B pci-latency
+.B kiro-pci-latency
 calls
 .BR setpci (8)
 to program the PCI latency timer register on all bus devices.
@@ -28,9 +28,9 @@ prevents audio crackling when I/O activity is high.
 .B setpci
 returns non-zero for devices that do not implement the latency register
 (e.g. PCIe root ports); these errors are silently ignored.
-.B pci-latency
+.B kiro-pci-latency
 is normally run as a oneshot systemd service at boot via
-.IR /etc/systemd/system/pci-latency.service .
+.IR /etc/systemd/system/kiro-pci-latency.service .
 .SH OPTIONS
 .TP
 .BR \-h ", " \-\-help
@@ -43,18 +43,18 @@ Print version information and exit (does not require root).
 Show what would be executed without making any changes.
 .SH NOTES
 Must be run as root:
-.B sudo pci-latency
+.B sudo kiro-pci-latency
 .SH FILES
 .TP
-.I /etc/systemd/system/pci-latency.service
+.I /etc/systemd/system/kiro-pci-latency.service
 Systemd unit that runs this script at boot.
 .TP
 .I /usr/local/lib/kiro-common.sh
 Shared library.
 .SH EXAMPLES
 .EX
-pci-latency --dry-run
-sudo pci-latency
+kiro-pci-latency --dry-run
+sudo kiro-pci-latency
 .EE
 .SH SEE ALSO
 .BR setpci (8),
