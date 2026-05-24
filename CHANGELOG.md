@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 2026.05.24
+
+**What Changed**
+Stopped `62-network-optimization.rules` from emitting two boot-time `ethtool` errors on machines with a consumer Intel NIC (I217/I218/I219, e1000e driver). The rule applied server-NIC tuning knobs to all e1000e devices, which they reject.
+
+**Technical Details**
+- The rule lumped `e1000e` together with the server NICs (`igb|ixgbe|i40e`) and assumed shared capabilities. On the I219-V two RUN commands failed every boot: `ethtool -C $name rx-usecs 0 rx-frames 0 tx-usecs 0 tx-frames 0` (exit 1 — consumer e1000e only supports `rx-usecs`, the per-frame/tx knobs return EINVAL) and `ethtool -K $name gso on` (exit 92 — GSO is already on by default and fixed, so setting it returns EOPNOTSUPP).
+- Split `e1000e` onto its own coalescing line using only the supported `rx-usecs 0`; left the full four-knob line for `igb|ixgbe|i40e`. Dropped `e1000e` from the GSO line entirely.
+- Networking was never affected — link came up fine; this was cosmetic boot-log noise. Found via `dmesg`/`journalctl` on picard (bare-metal Kiro v26.05.24), traced to the package with `pacman -Qo`. Shared rule, so the fix improves both the production and `-next` ISOs.
+
+**Files Modified**
+- [etc/udev/rules.d/62-network-optimization.rules](etc/udev/rules.d/62-network-optimization.rules)
+
 ## 2026.05.22
 
 **What Changed**

@@ -3,11 +3,16 @@
 # ============================================================================
 # Optimizes network drivers for low latency and responsiveness
 
-# Intel Ethernet: disable interrupt coalescing for low latency
+# Intel server NICs: disable interrupt coalescing for low latency
 # Prevents buffering delays in network packets
 # ~5-10ms latency reduction for desktop/gaming
-ACTION=="add", SUBSYSTEM=="net", DRIVERS=="e1000e|igb|ixgbe|i40e", \
+ACTION=="add", SUBSYSTEM=="net", DRIVERS=="igb|ixgbe|i40e", \
   RUN+="/usr/bin/ethtool -C $name rx-usecs 0 rx-frames 0 tx-usecs 0 tx-frames 0"
+
+# Intel client NICs (e1000e: I217/I218/I219): only rx-usecs is supported;
+# rx-frames/tx-usecs/tx-frames return EINVAL (ethtool exit 1) on these controllers
+ACTION=="add", SUBSYSTEM=="net", DRIVERS=="e1000e", \
+  RUN+="/usr/bin/ethtool -C $name rx-usecs 0"
 
 # Realtek Ethernet: balanced power and performance
 # Uses minimal coalescing (64us) to reduce latency while saving power
@@ -32,7 +37,9 @@ ACTION=="add", SUBSYSTEM=="net", KERNEL=="wlan*|wif*", ATTR{mtu}="1500"
 
 # Enable Generic Segmentation Offload (GSO) for high-speed interfaces
 # Helps with TCP throughput on gigabit+ connections
-ACTION=="add", SUBSYSTEM=="net", DRIVERS=="e1000e|ixgbe|i40e", \
+# (e1000e omitted: GSO is already on by default there; forcing it returns
+#  EOPNOTSUPP — ethtool exit 92 — on consumer I219-class controllers)
+ACTION=="add", SUBSYSTEM=="net", DRIVERS=="ixgbe|i40e", \
   RUN+="/usr/bin/ethtool -K $name gso on"
 
 # Disable TSO if causing latency issues (uncomment if needed)
