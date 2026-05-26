@@ -441,6 +441,15 @@ check_services() {
     systemctl is-enabled firewalld &>/dev/null \
         && pass "firewalld.service enabled" \
         || warn "firewalld.service not enabled"
+
+    # logrotate.timer — enabled via Calamares so file-based logs (pacman.log,
+    # Xorg/app logs) rotate; journald rotates its own store separately
+    if systemctl is-enabled logrotate.timer &>/dev/null; then
+        pass "logrotate.timer enabled"
+    else
+        warn "logrotate.timer not enabled (file-based logs won't rotate)"
+        apply_fix "systemctl enable logrotate.timer" systemctl enable logrotate.timer
+    fi
 }
 
 check_permissions() {

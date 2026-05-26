@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 2026.05.26
+
+**What Changed**
+- `kiro-audit` now checks that `logrotate.timer` is enabled. Kiro enables it on the installed system via the Calamares `services-systemd` module so file-based logs (`pacman.log`, Xorg/app logs) rotate; journald rotates its own store separately. The audit `WARN`s (not `FAIL`s) when the timer is disabled and offers a `--fix` that runs `systemctl enable logrotate.timer`. `man-db.timer` was reviewed at the same time and intentionally left unchecked — it is not enabled on Kiro (marginal benefit vs periodic wakeup churn).
+
+**Technical Details**
+- New block in `check_services()` beside the firewalld check, using the established `pass`/`warn` + `apply_fix` pattern. `is-enabled` is authoritative: a fresh install can read active-but-disabled, which won't persist across reboot. Mirrors the matching checks added the same day to `/syscheck` (item 15) and the ATT Dev page's "System integrity (kiro-audit mirror)" group.
+
+**Files Modified**
+- `usr/local/bin/kiro-audit`
+
 ## 2026.05.25
 
 **What Changed**
