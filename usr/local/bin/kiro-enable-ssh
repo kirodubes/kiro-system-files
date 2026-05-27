@@ -66,10 +66,18 @@ main() {
 
     log_subsection "Allowing SSH through the firewall"
     if command -v firewall-cmd >/dev/null 2>&1; then
-        execute_or_dryrun "Allow ssh service in firewalld (permanent)" \
-            firewall-cmd --permanent --add-service=ssh
+        # firewall-cmd (even --permanent) needs the daemon over D-Bus; when it's
+        # not running — e.g. on the live ISO — use firewall-offline-cmd instead.
         if systemctl is-active --quiet firewalld; then
+            execute_or_dryrun "Allow ssh service in firewalld (permanent)" \
+                firewall-cmd --permanent --add-service=ssh
             execute_or_dryrun "Reload firewalld" firewall-cmd --reload
+        elif command -v firewall-offline-cmd >/dev/null 2>&1; then
+            log_info "firewalld not running — applying permanent rule offline"
+            execute_or_dryrun "Allow ssh service in firewalld (offline)" \
+                firewall-offline-cmd --add-service=ssh
+        else
+            log_info "firewalld not running — nothing is blocking SSH, skipping firewall rule"
         fi
     else
         log_info "firewalld not installed — skipping firewall rule"
