@@ -43,6 +43,19 @@ Key sections and their functions:
 - Root checks via `require_root_tools` or `[[ $EUID -ne 0 ]]` guard
 - Avoid hard-coding paths that `kiro-common.sh` already provides
 
+## Kernel-agnostic rule
+
+**Every system tweak shipped by this package — sysctl, udev, modprobe, systemd drop-in, tmpfile, NetworkManager conf, audit check — must work on any kernel a Kiro user might run.** Kiro ships `linux-cachyos` as default + `linux-zen` as fallback (2026-05-28), but users freely swap to `linux-hardened`, `linux-lts`, custom kernels, etc.
+
+This means:
+- No tweak may depend on a kernel-specific sysfs path, parameter, or scheduler that only one kernel exposes.
+- No modprobe option that exists in only one kernel's driver build.
+- No service that requires a CachyOS-only or Zen-only feature.
+- When reviewing a new tweak, ask: "does this break on linux-lts?" If yes, redesign or skip.
+- `kiro-audit` itself is kernel-agnostic (see `detect_kernels()` and `check_kernel`).
+
+Past examples of this rule applied: `kiro-audit` rewrite 2026-05-28; the 5 Garuda imports same day (systemd-oomd, mei blacklist, btusb reset, zswap disable, NM-lo) were all verified kernel-agnostic before adoption.
+
 ## Configuration file locations
 
 | Path                                      | Purpose                                                 |

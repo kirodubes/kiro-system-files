@@ -691,6 +691,80 @@ check_modprobe_thp() {
         || fail "tmpfiles.d/thp-tuning.conf missing"
 }
 
+check_garuda_imports() {
+    # 5 items adopted from Garuda 2026-05-28
+    # See: kiro-iso/docs/garuda-comparison-2026-05-28.md
+    log_section "Garuda imports (2026-05-28)"
+
+    # 1. systemd-oomd — config drop-ins + active daemon
+    local oomd_files=(
+        /etc/systemd/oomd.conf.d/10-kiro-oomd.conf
+        /etc/systemd/system/system.slice.d/10-kiro-oomd-per-slice.conf
+        /etc/systemd/user/slice.d/10-kiro-oomd-per-slice.conf
+    )
+    local f
+    for f in "${oomd_files[@]}"; do
+        [[ -f "${f}" ]] && pass "oomd drop-in: ${f#/etc/systemd/}" || fail "oomd drop-in missing: ${f#/etc/systemd/}"
+    done
+    if systemctl is-enabled systemd-oomd &>/dev/null; then
+        pass "systemd-oomd.service enabled"
+    else
+        fail "systemd-oomd.service not enabled (drop-ins are dead config without it)"
+        apply_fix "systemctl enable systemd-oomd" systemctl enable systemd-oomd
+    fi
+    if systemctl is-active systemd-oomd &>/dev/null; then
+        pass "systemd-oomd.service active"
+    else
+        warn "systemd-oomd.service not active (will start at next boot if enabled)"
+    fi
+
+    # 2. Intel ME blacklist (privacy + attack surface)
+    if [[ -f /etc/modprobe.d/blacklist-intel-me.conf ]] \
+       && grep -q '^blacklist mei$' /etc/modprobe.d/blacklist-intel-me.conf \
+       && grep -q '^blacklist mei_me$' /etc/modprobe.d/blacklist-intel-me.conf; then
+        pass "modprobe.d/blacklist-intel-me.conf present (mei + mei_me blacklisted)"
+    else
+        fail "modprobe.d/blacklist-intel-me.conf missing or incomplete"
+    fi
+    # Confirm modules are not actually loaded
+    if lsmod | grep -qE '^mei(_me)?\b'; then
+        warn "mei/mei_me still loaded — blacklist not honored (initramfs rebuild needed?)"
+    else
+        pass "mei/mei_me not loaded"
+    fi
+
+    # 3. btusb reset=1 (Bluetooth USB suspend/resume fix)
+    if [[ -f /etc/modprobe.d/bluetooth-usb.conf ]] \
+       && grep -q '^options btusb reset=1' /etc/modprobe.d/bluetooth-usb.conf; then
+        pass "modprobe.d/bluetooth-usb.conf present (btusb reset=1)"
+    else
+        fail "modprobe.d/bluetooth-usb.conf missing or wrong"
+    fi
+
+    # 4. Disable kernel zswap (zram-generator owns swap)
+    if [[ -f /etc/tmpfiles.d/disable-zswap.conf ]] \
+       && grep -q '/sys/module/zswap/parameters/enabled' /etc/tmpfiles.d/disable-zswap.conf; then
+        pass "tmpfiles.d/disable-zswap.conf present"
+    else
+        fail "tmpfiles.d/disable-zswap.conf missing"
+    fi
+    local zswap_state
+    zswap_state=$(cat /sys/module/zswap/parameters/enabled 2>/dev/null || echo "?")
+    case "${zswap_state}" in
+        N|0) pass "zswap disabled at runtime" ;;
+        Y|1) fail "zswap still enabled at runtime — tmpfile not applied yet (reboot or systemd-tmpfiles --create)" ;;
+        *)   warn "zswap state unreadable (${zswap_state}) — kernel may not expose /sys/module/zswap" ;;
+    esac
+
+    # 5. NetworkManager unmanaged-lo
+    if [[ -f /etc/NetworkManager/conf.d/unmanaged-lo.conf ]] \
+       && grep -q 'interface-name:lo' /etc/NetworkManager/conf.d/unmanaged-lo.conf; then
+        pass "NetworkManager conf.d/unmanaged-lo.conf present"
+    else
+        fail "NetworkManager conf.d/unmanaged-lo.conf missing"
+    fi
+}
+
 
 check_resolved_config() {
     log_section "systemd-resolved configuration"
@@ -794,6 +868,7 @@ main() {
     check_zram
     check_udev_rules
     check_modprobe_thp
+    check_garuda_imports
     check_permissions
     check_sysctl_security
     check_resolved_config

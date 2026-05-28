@@ -34,6 +34,42 @@
 **Files Modified**
 - `usr/local/bin/kiro-enable-ssh`
 
+---
+
+### Garuda imports — 5 small tuning adoptions (kernel-agnostic)
+
+**What Changed**
+- After comparing edu-system-files against Garuda Mokka's tuning footprint (live ISO over SSH, 2026-05-28), 5 small additions adopted. Everything Garuda ships system-tweaks-wise comes from one tiny package (`garuda-common-settings`); most was already in our set or weaker than ours, but five items were clean wins. Full analysis written to `kiro-iso/docs/garuda-comparison-2026-05-28.md`.
+- **New project rule:** every Kiro system tuning addition MUST be kernel-agnostic — works on linux-cachyos (default), linux-zen (fallback), or anything the user pacman-installs later. All 5 adoptions verified against this rule.
+
+**Technical Details**
+1. **systemd-oomd** enabled + tuned. Three drop-ins (oomd global + system slice + user slice) plus a `services-systemd.conf` enable line in **both** kiro-calamares-config and kiro-calamares-config-next so the daemon actually runs on installed systems. Policy: `ManagedOOMMemoryPressure=kill` at `80%` pressure for `20s`. Kicks in BEFORE the kernel OOM killer (which only fires when memory is already exhausted), so the desktop stays responsive on 4-8 GiB systems. Not mandatory in services-systemd — kernel OOM is the fallback.
+2. **Intel ME blacklist** (`mei`, `mei_me`). Closes a userspace attack surface that has hosted multiple RCE CVEs (e.g. SA-00086). Does not disable ME itself (only BIOS or `me_cleaner` can), only removes the kernel-side hook. AMD machines load nothing here anyway.
+3. **`options btusb reset=1`**. Fixes the common "BT works on cold boot, dead after suspend/resume" issue on Intel AX2xx and Realtek RTL8822 combo cards.
+4. **Disable kernel zswap** via tmpfile. With zram-generator providing swap, leaving zswap on means double-compression (zswap on cache, then zstd again as it hits zram). Wasted CPU.
+5. **NetworkManager `unmanaged-lo`**. Silences the boot-time warning where NM complains about the loopback interface it shouldn't be managing.
+- New `check_garuda_imports()` function in `kiro-audit` verifying each file's presence/content + that `systemd-oomd` is enabled, active, mei modules aren't loaded, and zswap reads `0` at runtime. Wired into `main()` between `check_modprobe_thp` and `check_permissions`.
+- `--fix` mode added on the systemd-oomd-not-enabled FAIL.
+- All file headers cross-reference the analysis doc in kiro-iso so the rationale chain is one click away.
+- Companion edit in `CLAUDE.md` records the kernel-agnostic rule under script conventions.
+- `bash -n` clean.
+
+**Files Modified**
+- `etc/systemd/oomd.conf.d/10-kiro-oomd.conf` (new)
+- `etc/systemd/system/system.slice.d/10-kiro-oomd-per-slice.conf` (new)
+- `etc/systemd/user/slice.d/10-kiro-oomd-per-slice.conf` (new)
+- `etc/modprobe.d/blacklist-intel-me.conf` (new)
+- `etc/modprobe.d/bluetooth-usb.conf` (new)
+- `etc/tmpfiles.d/disable-zswap.conf` (new)
+- `etc/NetworkManager/conf.d/unmanaged-lo.conf` (new)
+- `usr/local/bin/kiro-audit` (added `check_garuda_imports`)
+- `CLAUDE.md` (new "Kernel-agnostic rule" subsection)
+
+Companion changes outside this repo:
+- `kiro-calamares-config/etc/calamares/modules/services-systemd.conf` (enable systemd-oomd, non-mandatory)
+- `kiro-calamares-config-next/etc/calamares/modules/services-systemd.conf` (same)
+- `kiro-iso/docs/garuda-comparison-2026-05-28.md` (new — full analysis)
+
 ## 2026.05.26
 
 **What Changed**
