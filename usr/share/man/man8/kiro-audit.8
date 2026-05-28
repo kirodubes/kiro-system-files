@@ -1,4 +1,4 @@
-.TH KIRO-AUDIT 8 "2026-05-19" "Kiro" "Kiro System Tools"
+.TH KIRO-AUDIT 8 "2026-05-28" "Kiro" "Kiro System Tools"
 .SH NAME
 kiro-audit \- comprehensive post-install audit of a Kiro system
 .SH SYNOPSIS
@@ -12,11 +12,11 @@ It prints a summary with totals and exits non-zero if any check fails.
 .PP
 Checks performed:
 .IP \(bu 4
-Kernel: linux-lqx running, vmlinuz and initramfs present, headers installed
+Kernel: installed kernel(s) detected at runtime via /usr/lib/modules/*/pkgbase (linux-lqx, linux-zen, linux-hardened, ...); vmlinuz, initramfs, package, and headers verified per kernel
 .IP \(bu 4
 Microcode: correct vendor image in /boot, opposite vendor not installed
 .IP \(bu 4
-mkinitcpio: no archiso hook, microcode and kms hooks present, linux-lqx preset exists
+mkinitcpio: no archiso hook, microcode and kms hooks present, per-kernel mkinitcpio preset exists
 .IP \(bu 4
 Audio: PipeWire stack complete, pulseaudio absent
 .IP \(bu 4

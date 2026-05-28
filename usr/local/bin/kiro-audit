@@ -196,21 +196,48 @@ pkg_missing()    { ! pacman -Q "$1" &>/dev/null; }
 #####################################################################
 # Functions
 #####################################################################
+detect_kernels() {
+    # Emit installed kernel pkgbases, one per line, sorted & deduped.
+    # Source: /usr/lib/modules/*/pkgbase (every Arch kernel package drops one).
+    # Used by check_kernel + check_mkinitcpio so the audit works on whatever
+    # kernel(s) the system ships (linux-lqx / linux-zen / linux-hardened / ...).
+    local f
+    for f in /usr/lib/modules/*/pkgbase; do
+        [[ -f "${f}" ]] && cat "${f}"
+    done | sort -u
+}
+
 check_kernel() {
     log_section "Kernel"
 
-    local running
-    running=$(uname -r)
-    if [[ "${running}" == *lqx* ]]; then
-        pass "Running kernel is linux-lqx: ${running}"
-    else
-        fail "Expected linux-lqx kernel, got: ${running}"
+    local -a kernels=()
+    mapfile -t kernels < <(detect_kernels)
+
+    if [[ ${#kernels[@]} -eq 0 ]]; then
+        fail "No installed kernels detected (no /usr/lib/modules/*/pkgbase)"
+        return
     fi
 
-    [[ -f /boot/vmlinuz-linux-lqx ]]   && pass "/boot/vmlinuz-linux-lqx present"   || fail "/boot/vmlinuz-linux-lqx missing"
-    [[ -f /boot/initramfs-linux-lqx.img ]] && pass "/boot/initramfs-linux-lqx.img present" || fail "/boot/initramfs-linux-lqx.img missing"
-    pkg_installed linux-lqx            && pass "linux-lqx package installed"         || fail "linux-lqx package not installed"
-    pkg_installed linux-lqx-headers    && pass "linux-lqx-headers installed"          || fail "linux-lqx-headers not installed"
+    pass "Installed kernel(s): ${kernels[*]}"
+
+    # Running kernel must have a matching modules tree (catches mid-upgrade boots).
+    local running running_pkgbase
+    running=$(uname -r)
+    if [[ -f "/usr/lib/modules/${running}/pkgbase" ]]; then
+        running_pkgbase=$(<"/usr/lib/modules/${running}/pkgbase")
+        pass "Running kernel: ${running} (${running_pkgbase})"
+    else
+        warn "Running kernel ${running} has no /usr/lib/modules entry — reboot pending after upgrade?"
+    fi
+
+    # Per-kernel artifact + package validation (supports multi-kernel installs).
+    local k
+    for k in "${kernels[@]}"; do
+        [[ -f "/boot/vmlinuz-${k}" ]]        && pass "/boot/vmlinuz-${k} present"        || fail "/boot/vmlinuz-${k} missing"
+        [[ -f "/boot/initramfs-${k}.img" ]]  && pass "/boot/initramfs-${k}.img present"  || fail "/boot/initramfs-${k}.img missing"
+        pkg_installed "${k}"            && pass "${k} package installed"             || fail "${k} package not installed"
+        pkg_installed "${k}-headers"    && pass "${k}-headers installed"             || fail "${k}-headers not installed"
+    done
 }
 
 check_microcode() {
@@ -244,9 +271,26 @@ check_mkinitcpio() {
     echo "${hooks}" | grep -q 'microcode' && pass "microcode hook present" || fail "microcode hook missing from HOOKS"
     echo "${hooks}" | grep -q 'kms'       && pass "kms hook present"       || fail "kms hook missing from HOOKS"
 
-    # Only linux-lqx preset, no plain linux preset
-    [[ -f /etc/mkinitcpio.d/linux-lqx.preset ]] && pass "linux-lqx.preset exists"                     || fail "linux-lqx.preset missing"
-    [[ -f /etc/mkinitcpio.d/linux.preset ]]      && fail "linux.preset leftover not cleaned up"        || pass "linux.preset leftover not present (good)"
+    # Each installed kernel must have its preset (kernel-agnostic).
+    local -a kernels=()
+    mapfile -t kernels < <(detect_kernels)
+    local k
+    for k in "${kernels[@]}"; do
+        [[ -f "/etc/mkinitcpio.d/${k}.preset" ]] \
+            && pass "${k}.preset exists" \
+            || fail "${k}.preset missing"
+    done
+
+    # Stock linux.preset is a leftover only when the linux package isn't installed
+    # (Calamares strip step on Kiro's non-stock kernels). When linux IS installed,
+    # the per-kernel loop above already covered it.
+    if ! pkg_installed linux; then
+        if [[ -f /etc/mkinitcpio.d/linux.preset ]]; then
+            fail "linux.preset leftover not cleaned up (linux package isn't installed)"
+        else
+            pass "linux.preset leftover not present (good)"
+        fi
+    fi
 }
 
 check_audio() {

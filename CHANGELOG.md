@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## 2026.05.28
+
+**What Changed**
+- `kiro-audit` is now **kernel-agnostic**. It used to hardcode `linux-lqx` in `check_kernel` and `check_mkinitcpio`, so any non-lqx Kiro install (linux-zen / linux-hardened / linux-cachyos / multi-kernel) reported 6 spurious FAILs — proven on a CachyOS install 2026-05-27 (`7.0.10-1-cachyos` installed cleanly, audit FAILed on "expected linux-lqx" + missing lqx vmlinuz/initramfs/packages/preset). Detection now happens at runtime; whatever kernel ships, the audit validates it. Last hardcoded component of the kernel-agnostic set — build-side selector (`kiro-iso-next`) and installer (`kiro_kernel` in `kiro-calamares-config-next`) were already done.
+
+**Technical Details**
+- New `detect_kernels()` helper: scans `/usr/lib/modules/*/pkgbase` (every Arch kernel package drops one), emits a sorted/deduped list. Shared by `check_kernel` + `check_mkinitcpio` so both reason from the same source.
+- `check_kernel` rewritten: detects installed kernel(s), reports them, then per-kernel loops over `/boot/vmlinuz-${k}`, `/boot/initramfs-${k}.img`, `${k}` package, `${k}-headers`. The running-kernel match is now anchored on `/usr/lib/modules/$(uname -r)/pkgbase` rather than a substring match on `uname -r` — catches the mid-upgrade-before-reboot case as a WARN (not a hard FAIL).
+- `check_mkinitcpio` preset block rewritten: per-kernel `${k}.preset` check via the same `detect_kernels`. The stock-`linux.preset`-leftover check is preserved but gated on `! pkg_installed linux` — when `linux` is the chosen kernel, the per-kernel loop covers it and the leftover check is skipped (no double-counting, no false FAIL).
+- Man page (`kiro-audit.8`) — kernel section + mkinitcpio bullet rewritten to describe runtime detection; date bumped to 2026-05-28.
+- `bash -n` clean. No script structure / template changes — only `check_kernel`, the preset block in `check_mkinitcpio`, and the new helper.
+
+**Files Modified**
+- `usr/local/bin/kiro-audit`
+- `usr/share/man/man8/kiro-audit.8`
+
 ## 2026.05.26
 
 **What Changed**
