@@ -147,9 +147,7 @@ EOF
             exit 0
             ;;
         -v|--version)
-            pkg=$(pacman -Qqo "$(realpath "${BASH_SOURCE[0]}")" 2>/dev/null) \
-                && pacman -Q "${pkg}" \
-                || echo "kiro-audit (not installed via pacman)"
+            show_version "$(basename "$0")" "${BASH_SOURCE[0]}"
             exit 0
             ;;
         --fix)

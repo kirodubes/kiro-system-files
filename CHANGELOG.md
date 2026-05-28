@@ -9,10 +9,12 @@
 
 **Technical Details**
 - Second parameter to `show_version` is now the script path (defaults to `$0`), so call sites that pass `"$0"` or `"$(basename "$0")"` continue to work; passing `${BASH_SOURCE[0]}` from a caller gives the most accurate resolution under symlinks.
-- Uses `realpath` to follow symlinks before the pacman lookup (matches `kiro-audit`'s working pattern). `kiro-audit`'s inline implementation is left as-is for now — it can be migrated to the helper in a follow-up, no functional difference.
+- Uses `realpath` to follow symlinks before the pacman lookup (matches `kiro-audit`'s working pattern).
+- `kiro-audit`'s inline `-v|--version` block migrated to call `show_version "$(basename "$0")" "${BASH_SOURCE[0]}"` instead of duplicating the pacman-query pattern. Single source of truth across all 18 scripts now.
 
 **Files Modified**
 - `usr/local/lib/kiro-common.sh`
+- `usr/local/bin/kiro-audit`
 
 ---
 
