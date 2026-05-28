@@ -54,6 +54,8 @@
 - Companion edit in `CLAUDE.md` records the kernel-agnostic rule under script conventions.
 - `bash -n` clean.
 
+**Plus:** removed the `multilib missing from pacman.conf` WARN from `check_pacman_repos`. Multilib is intentionally not shipped (32-bit Wine/Steam libs — not Kiro's target audience); users who want it enable it in one click via ATT. The audit row was noise — silence is the correct signal for a deliberate design choice. Replaced with an inline comment explaining the omission. `syscheck.md` updated to retire the "expected WARN" carve-out.
+
 **Files Modified**
 - `etc/systemd/oomd.conf.d/10-kiro-oomd.conf` (new)
 - `etc/systemd/system/system.slice.d/10-kiro-oomd-per-slice.conf` (new)

@@ -398,7 +398,8 @@ check_pacman_repos() {
 
     grep -q '^\[nemesis_repo\]' /etc/pacman.conf && pass "nemesis_repo in pacman.conf" || fail "nemesis_repo missing from pacman.conf"
     grep -q '^\[chaotic-aur\]'  /etc/pacman.conf && pass "chaotic-aur in pacman.conf"  || fail "chaotic-aur missing from pacman.conf"
-    grep -q '^\[multilib\]'     /etc/pacman.conf && pass "multilib in pacman.conf"     || warn "multilib missing from pacman.conf"
+    # multilib is intentionally NOT shipped (gaming-only: Wine/Steam 32-bit libs);
+    # users enable it via one click in ATT. No audit row — silence is correct.
 }
 
 check_desktop() {
