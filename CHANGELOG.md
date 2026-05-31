@@ -11,10 +11,27 @@
 **Technical Details**
 - Detection via `systemd-detect-virt --vm --quiet` in `main()` (local `is_vm`/`vm_type`); `|| true` guards the type lookup against the ERR trap. No new dependency — `systemd-detect-virt` ships with systemd.
 - The closing banner is emitted as the last output, after the PASS/WARN/FAIL summary and the normal completion banner, so it stays visible even when `exit 1` fires on failures. The summary tail was refactored to compute a local `rc` and `exit "${rc}"` once at the end instead of an inline `exit 1`. `bash -n` clean.
+- The closing message is hand-wrapped into short lines (longest ~62 cols) so it fits inside the 76-col banner and the alacritty terminal without wrapping mid-word.
 - Verified live on the VirtualBox live-ISO VM (`liveuser`): `systemd-detect-virt` → `oracle`, banner prints after the 22-failure summary.
+
+### Settings Manager entries — Kiro System Audit + System Information (inxi)
+
+**What Changed**
+- Two new XFCE Settings Manager launchers so Kiro's system tools are reachable from the graphical Settings dialog, not just the terminal:
+  - **Kiro System Audit** → runs `kiro-audit` (Kiro K icon).
+  - **System Information** → runs a complete `inxi -Fxxxz` report (familiar from ArcoLinux).
+- Both open in **alacritty** (the terminal common to every Kiro environment, not only XFCE) and stay open with a `Press Enter to close...` prompt so the output is readable.
+
+**Technical Details**
+- New files `usr/share/applications/kiro-audit.desktop` and `usr/share/applications/kiro-sysinfo.desktop`. Category line `System;Settings;X-XFCE-SettingsDialog;X-XFCE-SystemSettings;` — `X-XFCE-SettingsDialog` is what surfaces them in the Settings Manager, `X-XFCE-SystemSettings` groups them under **System** (without it they land in *Other*).
+- Exec uses `alacritty -e bash -c "<cmd>; echo; read -rp 'Press Enter to close...'"` instead of relying on the XFCE terminal helper (`exo-open`): on the live ISO that helper is set to an undefined `custom-TerminalEmulator`, so `Terminal=true` launchers silently fail. Explicit alacritty sidesteps it and works across DEs.
+- `inxi -Fxxxz`: `-F` full report, `-xxx` maximum extra data, `-z` filters MAC/IP/identifying data. `inxi` already ships in `archiso/packages.x86_64`.
+- Both files pass `desktop-file-validate`; verified live in the Settings Manager under System.
 
 **Files Modified**
 - `usr/local/bin/kiro-audit`
+- `usr/share/applications/kiro-audit.desktop` (new)
+- `usr/share/applications/kiro-sysinfo.desktop` (new)
 
 ## 2026.05.29
 

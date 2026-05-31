@@ -3,7 +3,7 @@ Type=Application
 Version=1.0
 Name=Kiro System Audit
 Comment=Check and repair Kiro system integrity
-Exec=xfce4-terminal --hold --title="Kiro System Audit" --command="kiro-audit"
+Exec=alacritty --title "Kiro System Audit" -e bash -c "kiro-audit; echo; read -rp 'Press Enter to close...'"
 Icon=kiro
 Terminal=false
 Categories=System;Settings;X-XFCE-SettingsDialog;X-XFCE-SystemSettings;

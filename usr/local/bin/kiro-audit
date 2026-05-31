@@ -989,7 +989,10 @@ main() {
     # Keep this last: on a VM the failures above are mostly environment
     # artifacts, so reassure the user rather than let them panic.
     if [[ "${is_vm}" == true ]]; then
-        log_warn "You are running on a virtual machine (${vm_type}) — kiro-audit is intended for real (bare-metal) hardware. Failures above are likely VM/live-environment artifacts, not a broken install."
+        log_warn "You are running on a virtual machine (${vm_type}).
+kiro-audit is intended for real (bare-metal) hardware — the
+failures above are most likely VM / live-environment artifacts,
+not a broken install."
     fi
 
     exit "${rc}"

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=System Information
+Comment=Full system and hardware report (inxi)
+Exec=alacritty --title "System Information" -e bash -c "inxi -Fxxxz; echo; read -rp 'Press Enter to close...'"
+Icon=computer
+Terminal=false
+Categories=System;Settings;X-XFCE-SettingsDialog;X-XFCE-SystemSettings;
+Keywords=inxi;system;hardware;info;information;
