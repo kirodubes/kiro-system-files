@@ -26,6 +26,8 @@ Every script must source this library before doing anything else:
 source /usr/local/lib/kiro-common.sh
 ```
 
+**Documented exception — `usr/local/bin/kiro-skell`.** This one script does **not** source the library; it **inlines** the handful of helpers it needs (colors, `log_info`, `log_success`, `show_help`, `show_version`, `execute_or_dryrun`, the ERR trap). Reason: `kiro-skell` is the single source of truth for ATT's `skell`, which is fetched and shipped to **non-Kiro** systems (stock Arch, Endeavour, CachyOS, Manjaro) where `/usr/local/lib/kiro-common.sh` does not exist. Sourcing it would hard-fail off-Kiro. Keep it self-contained; do not "fix" it to source the library. All its user-facing text uses `"$(basename "$0")"` so a verbatim copy under another name (e.g. `skell`) prints that name unchanged. If `kiro-common.sh`'s log format changes, update the inline copies here by hand.
+
 Key sections and their functions:
 - **Colors** — `$RED`, `$GREEN`, `$YELLOW`, `$BLUE`, `$CYAN`, `$BOLD`, `$RESET` (tput-based, disabled when not a terminal)
 - **Logging** — `log_section`, `log_subsection`, `log_info`, `log_success`, `log_warn`, `log_error`

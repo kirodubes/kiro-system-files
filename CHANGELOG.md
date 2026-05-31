@@ -2,6 +2,20 @@
 
 ## 2026.05.31
 
+### `kiro-skell` made self-contained — single source of truth for ATT's `skell`
+
+**What Changed**
+- `kiro-skell` no longer sources `/usr/local/lib/kiro-common.sh`; it inlines the helpers it uses (colors, `log_info`, `log_success`, `show_help`, `show_version`, `execute_or_dryrun`, ERR trap). It now runs unchanged on any distro. This makes it the **single source of truth** for ATT's `skell` (cross-distro, where `kiro-common.sh` does not exist) — ATT fetches this file verbatim and ships it as `usr/bin/skell`. The copy direction is one-way: ATT pulls from here; this repo stays unaware of ATT.
+- The intro block is now colored (`log_section` + body) instead of a plain `echo` banner, and the whole script names itself via `"$(basename "$0")"`, so the same bytes print `kiro-skell` here and `skell` when ATT ships it — no rewriting on copy.
+
+**Technical Details**
+- Documented exception added to `CLAUDE.md` (Shared library section): `kiro-skell` is the one script that does not source `kiro-common.sh`; keep the inline helpers in step with the library by hand if its log format changes.
+- Verified: `bash -n` clean; `--help`, `--version`, `--dry-run` all work standalone (no library present); run under the name `skell` it prints `skell`.
+
+**Files Modified**
+- `usr/local/bin/kiro-skell`
+- `CLAUDE.md`
+
 ### Renamed `kiro-skel` → `kiro-skell` (single-L → double-L) for naming consistency
 
 **What Changed**
