@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Hardware Probe Report
+Comment=View the hardware probe insight report (HTML)
+Exec=alacritty --title "Hardware Probe Report" -e bash -c "r=\"\$HOME/Documents/hw-probe-report.html\"; if [ -f \"\$r\" ]; then xdg-open \"\$r\"; else echo 'No hardware probe report found in ~/Documents.'; echo 'Generate one with:  sudo kiro-probe --save ~/Documents'; echo; read -rp 'Press Enter to close...'; fi"
+TryExec=kiro-probe-report
+Icon=kiro
+Terminal=false
+Categories=System;Settings;X-XFCE-SettingsDialog;X-XFCE-SystemSettings;
+Keywords=kiro;hardware;probe;report;hw-probe;

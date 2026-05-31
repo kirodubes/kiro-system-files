@@ -83,6 +83,8 @@ main() {
         local report_args=("${SAVE_DIR}/hw.info.txz")
         [[ "${DRY_RUN}" == true ]] && report_args+=(--dry-run)
         execute_or_dryrun "Generate HTML report" "${report_cmd}" "${report_args[@]}"
+
+        [[ "${DRY_RUN}" == false ]] && log_info "We have put the files in your home directory."
     else
         execute_or_dryrun "Run hardware probe and upload" sudo -E /usr/bin/hw-probe -all -upload
     fi
