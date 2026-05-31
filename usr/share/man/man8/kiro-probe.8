@@ -6,6 +6,7 @@ kiro-probe \- upload a hardware probe to linux-hardware.org
 [\fB\-h\fR|\fB\-\-help\fR]
 [\fB\-v\fR|\fB\-\-version\fR]
 [\fB\-d\fR|\fB\-\-dry\-run\fR]
+[\fB\-s\fR|\fB\-\-save\fR [\fIDIR\fR]]
 .SH DESCRIPTION
 .B kiro-probe
 installs
@@ -17,6 +18,16 @@ to collect a full hardware inventory and upload it to
 .PP
 The upload generates a unique probe URL that can be shared for hardware
 compatibility reports and bug reports.
+.PP
+With
+.BR \-\-save ,
+the probe is instead saved locally (an
+.I hw.info
+directory plus an
+.I hw.info.txz
+archive) and a readable HTML insight report is generated from it via
+.BR kiro-probe-report (8).
+This is the offline path: no server contact, no upload.
 .SH OPTIONS
 .TP
 .BR \-h ", " \-\-help
@@ -27,6 +38,13 @@ Print version information and exit.
 .TP
 .BR \-d ", " \-\-dry\-run
 Show what would be executed without making any changes.
+.TP
+.BR \-s ", " "\-\-save " [\fIDIR\fR]
+Save the probe locally to
+.I DIR
+(default: current directory) instead of uploading, then generate an HTML
+insight report from it with
+.BR kiro-probe-report (8).
 .SH FILES
 .TP
 .I /usr/bin/hw-probe
@@ -40,6 +58,7 @@ kiro-probe --dry-run
 kiro-probe
 .EE
 .SH SEE ALSO
+.BR kiro-probe-report (8),
 .BR hw-probe (1),
 .BR pacman (8)
 .SH AUTHOR

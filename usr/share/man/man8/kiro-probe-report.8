@@ -1,0 +1,74 @@
+.TH KIRO-PROBE-REPORT 8 "2026-05-31" "Kiro" "Kiro System Tools"
+.SH NAME
+kiro-probe-report \- generate an HTML insight report from a saved hw-probe package
+.SH SYNOPSIS
+.B kiro-probe-report
+[\fB\-h\fR|\fB\-\-help\fR]
+[\fB\-v\fR|\fB\-\-version\fR]
+[\fB\-d\fR|\fB\-\-dry\-run\fR]
+[\fIPROBE\fR]
+[\fIOUTPUT\fR]
+.SH DESCRIPTION
+.B kiro-probe-report
+turns a saved
+.B hw-probe
+package into a single self-contained, colour-coded HTML page for offline
+hardware insight. It reads the probe's
+.IR host ", " devices " and " logs/
+data and renders a system summary, a device-status overview
+(works / detected / failed), a grouped device table and collapsible raw
+log sections.
+.PP
+A probe is saved with
+.B kiro-probe \-\-save
+(or
+.BR "hw-probe \-all \-save" ).
+This command does not run a probe or contact any server; it only renders an
+existing one, so it needs no root privileges.
+.SH OPTIONS
+.TP
+.BR \-h ", " \-\-help
+Print a help message and exit.
+.TP
+.BR \-v ", " \-\-version
+Print version information and exit.
+.TP
+.BR \-d ", " \-\-dry\-run
+Show what would be executed without writing any file.
+.TP
+.I PROBE
+Path to an
+.I hw.info.txz
+archive or an
+.I hw.info
+directory. Defaults to
+.I ./hw.info.txz
+or
+.I ./hw.info
+in the current directory.
+.TP
+.I OUTPUT
+HTML file to write. Defaults to
+.I hw-probe-report.html
+next to the probe.
+.SH PRIVACY
+The collapsed raw-log sections (dmidecode, smartctl, lsblk) embed hardware
+serial numbers. The report is for local diagnostics and is marked local-only;
+do not publish, upload or share the generated file.
+.SH FILES
+.TP
+.I /usr/local/lib/kiro-probe-report.py
+The HTML generator invoked by this wrapper.
+.TP
+.I /usr/local/lib/kiro-common.sh
+Shared library.
+.SH EXAMPLES
+.EX
+kiro-probe-report ~/Documents/hw.info.txz
+kiro-probe-report ./hw.info report.html
+.EE
+.SH SEE ALSO
+.BR kiro-probe (8),
+.BR hw-probe (1)
+.SH AUTHOR
+Erik Dubois <https://www.erikdubois.be>

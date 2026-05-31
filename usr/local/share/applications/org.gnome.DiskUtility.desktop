@@ -228,7 +228,7 @@ Keywords=disk;drive;volume;harddisk;hdd;disc;cdrom;dvd;partition;iso;image;backu
 Exec=gnome-disks
 TryExec=gnome-disks
 # Translators: Do NOT translate or transliterate this text (this is an icon file name)!
-Icon=org.gnome.DiskUtility
+Icon=drive-harddisk
 Terminal=false
 Type=Application
 StartupNotify=true

@@ -2,6 +2,26 @@
 
 ## 2026.05.31
 
+### `kiro-probe` offline save + `kiro-probe-report` HTML insight page
+
+**What Changed**
+- `kiro-probe` gains `-s`/`--save [DIR]`: instead of uploading to linux-hardware.org, it saves the probe locally (`hw.info` directory + `hw.info.txz`) and generates a readable HTML insight report from it. This is the offline path — useful when the upload server is down (as happened) or when you just want the data as one local file. Default upload behaviour is unchanged when `--save` is absent.
+- New `kiro-probe-report` command turns any saved probe (an `hw.info.txz` archive or `hw.info` directory) into a single self-contained, colour-coded HTML page: system summary cards, a device-status overview (works / detected / failed), a grouped device table, and collapsible raw-log sections (inxi, lscpu, dmidecode, lsblk, smartctl, sensors, glxinfo, lspci, lsusb, nmcli, systemd-analyze, dmesg). Runs without root and contacts no server.
+
+**Technical Details**
+- New `usr/local/lib/kiro-probe-report.py` — the HTML generator (the repo's first Python file). Parses the probe's `host` (key:value) and `devices` (`;`-delimited, with a per-device status field) plus selected `logs/`, and emits one dependency-free HTML file with inline CSS. Status colour-codes green/blue/red. Kept as a silent helper invoked by a bash wrapper, so the user-facing layer still sources `kiro-common.sh` per repo convention. `ruff` clean.
+- New `usr/local/bin/kiro-probe-report` — bash wrapper (sources `kiro-common.sh`, `--help`/`--version`/`--dry-run`). Resolves a `.txz` (extracted to a temp dir cleaned by an EXIT trap) or a directory to the dir holding `host`, then calls the generator. `chown`s the output back to `$SUDO_USER` when run under sudo.
+- Two bugs found and fixed in the wrapper during testing: (1) `resolve_info_dir` originally returned its path via command substitution, so the `WORKDIR` it set lived only in the subshell — the temp dir leaked and parent `WORKDIR` stayed empty. Rewritten to set a global `INFO_DIR` (no subshell). (2) The `cleanup` EXIT-trap function ended on a short-circuited `[[ ... ]] && rm`, returning non-zero when there was nothing to clean; under `set -Euo pipefail` that tripped `kiro-common.sh`'s ERR trap and printed a spurious "ERROR DETECTED" banner (with a misleading stale `BASH_COMMAND`). Added an explicit `return 0`.
+- The HTML carries a prominent local-only privacy banner: the raw-log sections embed hardware serial numbers (dmidecode/smartctl/lsblk), so the file is marked do-not-publish.
+- New man page `kiro-probe-report.8`; `kiro-probe.8` updated for `--save`. Both lint clean (`groff -man -z`). Verified end-to-end against a real saved probe: both `.txz` and directory inputs render identically (132 KB), bad input exits 1, no temp-dir leak, no spurious ERR banner.
+
+**Files Modified**
+- `usr/local/bin/kiro-probe` (added `--save`)
+- `usr/local/bin/kiro-probe-report` (new)
+- `usr/local/lib/kiro-probe-report.py` (new)
+- `usr/share/man/man8/kiro-probe-report.8` (new)
+- `usr/share/man/man8/kiro-probe.8` (updated)
+
 ### `kiro-audit` — detect virtual machine and close with an anti-panic note
 
 **What Changed**
