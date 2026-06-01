@@ -28,7 +28,10 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
 VERSION="1.0.0"
 LOG_FILE="/var/log/Calamares.log"
-PASTE_SERVICE="https://0x0.st"   # curl -F'file=@-' target; swap for your own host
+PASTE_SERVICE="https://paste.c-net.org"   # raw POST body (--data-binary @-) → returns the paste URL; swap for your own host
+# 0x0.st was dropped: it is blanket-blocked as a malware/abuse-hosting domain by
+# threat-intel blocklists (ISP filters like Telenet Safesurf/SAM, Bitdefender, etc.),
+# so --upload failed for most users regardless of network. paste.c-net.org is not flagged.
 
 #####################################################################
 # Colors
@@ -353,12 +356,15 @@ main() {
             log_error "curl not installed — cannot upload."
             exit 1
         fi
-        local url
-        url="$(echo "${report}" | curl -fsS -F'file=@-;filename=kiro-calamares-summary.txt' "${PASTE_SERVICE}" 2>/dev/null || true)"
+        local url err
+        err="$(mktemp)"
+        url="$(echo "${report}" | curl -fsS --data-binary @- "${PASTE_SERVICE}/" 2>"${err}" || true)"
         if [[ -n "${url}" ]]; then
             log_success "Uploaded (scrubbed) to: ${url}"
+            rm -f "${err}"
         else
-            log_error "Upload to ${PASTE_SERVICE} failed."
+            log_error "Upload to ${PASTE_SERVICE} failed: $(tr '\n' ' ' <"${err}")"
+            rm -f "${err}"
             exit 1
         fi
     fi
