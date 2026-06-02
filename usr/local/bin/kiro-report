@@ -1,0 +1,232 @@
+#!/bin/bash
+set -Euo pipefail
+##################################################################################################################
+# Author    : Erik Dubois
+# Website   : https://kiroproject.be
+##################################################################################################################
+#
+#   DO NOT JUST RUN THIS. EXAMINE AND JUDGE. RUN AT YOUR OWN RISK.
+#
+#   Purpose:
+#   Produces a single, public-safe diagnostic log file that a user can paste
+#   into the Kiro Discussions board when asking for help. It reuses the full
+#   kiro-diag snapshot (hardware, GPU, kernel, desktop, ...), adds the graphics
+#   driver packages (xf86-video/input, Mesa, Vulkan, NVIDIA), the full list of
+#   explicitly-installed packages, and the dynamic failure evidence a maintainer
+#   actually needs to debug (failed units, recent journal/kernel errors, recent
+#   pacman transactions, and the Calamares install log when present), then
+#   REDACTS every system-identifying value (IP, MAC, UUID, machine-id, hostname,
+#   username) before writing the file.
+#
+#   Why: a snapshot alone can't debug a real report, and raw logs leak private
+#   data onto a public board. kiro-report bridges both: enough to debug, safe
+#   to share.
+#
+##################################################################################################################
+
+# shellcheck source=/usr/local/lib/kiro-common.sh
+if [[ -f /usr/local/lib/kiro-common.sh ]]; then
+    source /usr/local/lib/kiro-common.sh
+else
+    echo "ERROR: kiro-common.sh not found" >&2
+    exit 1
+fi
+
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+
+OUTPUT_PATH=""
+DISCUSSIONS_URL="https://github.com/kirodubes/kiro-discussions/discussions"
+
+_field() {
+    printf "  ${BOLD}%-26s${RESET} %s\n" "${1}:" "${2}"
+}
+
+##################################################################################################################
+# Redaction — strip every system-identifying value before the file is shared
+##################################################################################################################
+# Order matters: MAC and dashed-UUID first so their hex/colons aren't eaten by
+# the broader machine-id / IPv6 rules. PCI addresses (0000:03:00.0) survive
+# because the IPv6 rule only fires on the "::" double-colon, which PCI never has.
+redact() {
+    local esc host user
+    esc=$(printf '\033')
+    host="$(hostname 2>/dev/null || true)"
+    user="${TARGET_USER}"
+
+    local args=()
+    args+=(-e "s/${esc}\[[0-9;]*m//g")                                              # strip ANSI colors
+    args+=(-e 's/([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}/<mac>/g')                       # MAC address
+    args+=(-e 's/[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}/<uuid>/g')  # UUID
+    args+=(-e 's/\b[0-9a-f]{32}\b/<machine-id>/g')                                  # systemd machine-id
+    args+=(-e 's/\b([0-9]{1,3}\.){3}[0-9]{1,3}\b/<ip>/g')                           # IPv4
+    args+=(-e 's/[0-9A-Fa-f:]*::[0-9A-Fa-f:]*/<ipv6>/g')                            # IPv6 (compressed)
+    args+=(-e "s#/home/${user}#/home/<user>#g")                                     # home path
+    [[ -n "${host}" ]] && args+=(-e "s/\b${host}\b/<host>/g")                       # hostname
+    [[ -n "${user}" ]] && args+=(-e "s/\b${user}\b/<user>/g")                       # username
+
+    sed -E "${args[@]}"
+}
+
+##################################################################################################################
+# Report body
+##################################################################################################################
+
+report_header() {
+    echo "##################################################################"
+    echo "# Kiro diagnostic report"
+    echo "# Generated : $(date)"
+    echo "#"
+    echo "# Sensitive values (IP / MAC / UUID / machine-id / hostname /"
+    echo "# username) have been redacted so this file is safe to paste on"
+    echo "# the public Kiro Discussions board. Glance through it anyway."
+    echo "##################################################################"
+}
+
+section_debug() {
+    log_subsection "Recent Issues (debug)"
+
+    local failed
+    failed=$(systemctl --failed --no-legend --plain 2>/dev/null | awk '{print $1}' | tr '\n' ' ' | xargs || true)
+    _field "Failed units" "${failed:-none}"
+
+    echo
+    echo "  ${BOLD}Journal errors this boot (priority >= err, last 25):${RESET}"
+    local jerr
+    jerr=$(journalctl -p 3 -b --no-pager 2>/dev/null | tail -n 25 || true)
+    [[ -n "${jerr}" ]] && echo "${jerr}" | sed 's/^/    /' || echo "    (none)"
+
+    echo
+    echo "  ${BOLD}Kernel errors (dmesg level err+, last 25):${RESET}"
+    local kerr
+    kerr=$(dmesg --level=err,crit,alert,emerg 2>/dev/null | tail -n 25 || true)
+    [[ -n "${kerr}" ]] && echo "${kerr}" | sed 's/^/    /' || echo "    (none)"
+
+    echo
+    echo "  ${BOLD}Recent pacman actions (last 30):${RESET}"
+    local pacact
+    pacact=$(grep -E '\[ALPM\] (installed|upgraded|removed)' /var/log/pacman.log 2>/dev/null | tail -n 30 || true)
+    [[ -n "${pacact}" ]] && echo "${pacact}" | sed 's/^/    /' || echo "    (none)"
+    echo
+}
+
+# Graphics stack is the most common support topic; list the actual driver
+# packages (Xorg video/input, Mesa, Vulkan, NVIDIA, VA-API) with versions.
+section_drivers() {
+    log_subsection "Graphics / driver packages"
+    local drv
+    drv=$(pacman -Q 2>/dev/null | grep -iE '^(xf86-video-|xf86-input-|xorg-server|mesa|lib32-mesa|vulkan-|lib32-vulkan-|libva|lib32-libva|libvdpau|nvidia|lib32-nvidia|libdrm|intel-media-driver|intel-gmmlib|onevpl|opencl-)' || true)
+    [[ -n "${drv}" ]] && echo "${drv}" | sed 's/^/  /' || echo "  (no matching driver packages)"
+    echo
+}
+
+# Full list of explicitly-installed packages (names + versions only, no PII) —
+# what a maintainer needs to reproduce a user's environment.
+section_packages_full() {
+    log_subsection "Explicitly installed packages"
+    _field "Explicit packages" "$(pacman -Qqe 2>/dev/null | wc -l)"
+    echo
+    pacman -Qe 2>/dev/null | sed 's/^/  /' || true
+    echo
+}
+
+# Only present on systems installed (or being installed) via Calamares — the
+# single most useful artifact when a user reports an install problem.
+section_calamares() {
+    [[ -f /var/log/Calamares.log ]] || return 0
+
+    log_subsection "Calamares install log"
+    _field "File" "/var/log/Calamares.log"
+    _field "Total lines" "$(wc -l < /var/log/Calamares.log 2>/dev/null || echo '?')"
+
+    echo
+    echo "  ${BOLD}Warnings / errors:${RESET}"
+    local cwarn
+    cwarn=$(grep -iE 'warning|error|fail|abort' /var/log/Calamares.log 2>/dev/null | tail -n 40 || true)
+    [[ -n "${cwarn}" ]] && echo "${cwarn}" | sed 's/^/    /' || echo "    (none)"
+
+    echo
+    echo "  ${BOLD}Tail (last 100 lines):${RESET}"
+    local ctail
+    ctail=$(tail -n 100 /var/log/Calamares.log 2>/dev/null || true)
+    [[ -n "${ctail}" ]] && echo "${ctail}" | sed 's/^/    /' || echo "    (unreadable)"
+    echo
+}
+
+build_report() {
+    # Run inside a subshell with colors blanked so the captured text is plain
+    # even though the parent script's stdout is a terminal. kiro-diag is a
+    # separate process whose stdout is this pipe, so it auto-disables color.
+    (
+        RED='' GREEN='' YELLOW='' BLUE='' PURPLE='' CYAN='' BOLD='' RESET=''
+        report_header
+        echo
+        kiro-diag 2>&1 | grep -v 'kiro-diag done' || true
+        section_drivers
+        section_debug
+        section_calamares
+        section_packages_full
+    ) | redact
+}
+
+##################################################################################################################
+# Main
+##################################################################################################################
+
+main() {
+    local -a orig_args=("$@")
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -h|--help)
+                show_help "$(basename "$0")" \
+                    "Generate a public-safe Kiro diagnostic report for Kiro Discussions" \
+                    "[--help] [--version] [--output PATH]" \
+                    "-o, --output PATH   Write the report to PATH instead of the default"
+                exit 0
+                ;;
+            -v|--version)
+                show_version "$(basename "$0")"
+                exit 0
+                ;;
+            -o|--output)
+                OUTPUT_PATH="${2:-}"
+                [[ -z "$OUTPUT_PATH" ]] && { echo "${RED}--output needs a path${RESET}" >&2; exit 1; }
+                shift 2
+                ;;
+            -o=*|--output=*)
+                OUTPUT_PATH="${1#*=}"
+                shift
+                ;;
+            *)
+                echo "${RED}Unknown option: $1${RESET}" >&2
+                exit 1
+                ;;
+        esac
+    done
+
+    ensure_root "${orig_args[@]}"
+
+    local user_home outfile
+    user_home="$(getent passwd "${TARGET_USER}" | cut -d: -f6 || true)"
+    outfile="${OUTPUT_PATH:-${user_home:-/tmp}/kiro-report-$(date +%Y%m%d-%H%M%S).log}"
+
+    log_section "Generating Kiro report"
+    log_info "Collecting diagnostics — this may take a few seconds..."
+
+    build_report > "${outfile}"
+
+    chown "${TARGET_USER}:${TARGET_USER}" "${outfile}" 2>/dev/null || true
+    chmod 644 "${outfile}"
+
+    log_success "Report saved (redacted for public sharing):"
+    echo "  file://${outfile}"
+    echo
+    log_info "Review it, then paste the contents inside a code block (\`\`\`) on:"
+    echo "  ${DISCUSSIONS_URL}"
+    echo
+    echo "${YELLOW}Redaction strips IP / MAC / UUID / machine-id / hostname / username,"
+    echo "but skim it once before posting — automated scrubbing is never perfect.${RESET}"
+
+    log_success "$(basename "$0") done"
+}
+
+main "$@"

@@ -2,7 +2,7 @@
   <img src="kiro.jpg" alt="Kiro" width="220" />
 </p>
 
-# edu-system-files
+# kiro-system-files
 
 System-level files for the Kiro distro — kernel parameters, udev rules, systemd drop-ins, sudoers rules, modprobe blacklists, X11 keyboard maps, sysctl tunings, plus the **`kiro-*` toolchain** of diagnostic and maintenance commands. Owned by Kiro; collisions with personal install scripts (e.g. `arcolinux-nemesis`) are resolved in favour of this repo — see [HQ/ECOSYSTEM.md → cascade rules](../../Insync/Kiro/Kiro-HQ/ECOSYSTEM.md).
 
@@ -36,6 +36,7 @@ System-level files for the Kiro distro — kernel parameters, udev rules, system
 | `kiro-iso-version`     | Print `/etc/dev-rel` and rolling-release marker                      |
 | `kiro-lint`            | Lint Kiro-specific config files for known anti-patterns              |
 | `kiro-probe`           | Inspect hardware / firmware / driver state                           |
+| `kiro-report`          | Public-safe diagnostic bundle (drivers, packages, logs) for support  |
 | `kiro-set-cores`       | Set makepkg.conf MAKEFLAGS to all CPU cores                          |
 | `kiro-set-cores-min1`  | Set makepkg.conf MAKEFLAGS to all cores minus one (1 core free)      |
 | `kiro-set-cores-min2`  | Set makepkg.conf MAKEFLAGS to all cores minus two (2 cores free)     |
@@ -61,7 +62,7 @@ Server = https://erikdubois.github.io/$repo/$arch
 
 ```bash
 sudo pacman -Syu
-sudo pacman -S edu-system-files
+sudo pacman -S kiro-system-files
 ```
 
 This installs the configs into `/etc/` and the `kiro-*` toolchain into `/usr/local/bin/`.
@@ -69,15 +70,15 @@ This installs the configs into `/etc/` and the `kiro-*` toolchain into `/usr/loc
 ### Manual
 
 ```bash
-git clone https://github.com/erikdubois/edu-system-files.git
-cd edu-system-files
+git clone https://github.com/kirodubes/kiro-system-files.git
+cd kiro-system-files
 sudo cp -r etc/.   /etc/
 sudo cp -r usr/.   /usr/
 ```
 
 ## Related
 
-- [edu-dot-files](https://github.com/erikdubois/edu-dot-files) — user-level dotfiles (companion to this system-level repo).
+- [kiro-dot-files](https://github.com/kirodubes/kiro-dot-files) — user-level dotfiles (companion to this system-level repo).
 - [HQ/ECOSYSTEM.md → cascade rules](../../Insync/Kiro/Kiro-HQ/ECOSYSTEM.md) — explicit ownership of paths shared with `arcolinux-nemesis`.
 
 ## Websites

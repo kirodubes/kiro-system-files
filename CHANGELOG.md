@@ -2,6 +2,20 @@
 
 ## 2026.06.01
 
+### New tool: `kiro-report` — one public-safe diagnostic file for Kiro Discussions
+
+**What Changed**
+- Added `usr/local/bin/kiro-report`, which produces a single log file a user can paste into the Kiro Discussions board when asking for help. It bundles the full `kiro-diag` snapshot **plus** the dynamic failure evidence a maintainer actually needs to debug — then redacts every system-identifying value so it is safe to post on a public board. `kiro-diag` itself is left untouched (it stays the live, colored, on-screen tool referenced in ATT).
+- Report contents: the complete `kiro-diag` snapshot; **graphics driver packages** with versions (Xorg `xf86-video-*`/`xf86-input-*`, Mesa, Vulkan, VA-API/VDPAU, NVIDIA); the **full list of explicitly-installed packages** (`pacman -Qe`); **failed systemd units**; **this-boot journal errors** (priority err+); **kernel ring-buffer errors** (`dmesg`); **recent pacman transactions**; and the **Calamares install log** (`/var/log/Calamares.log`) when present.
+- Redaction replaces IPv4/IPv6 addresses, MAC addresses, UUIDs, the systemd machine-id, the hostname, and the username (incl. `/home/<user>`) with placeholders. The file footer reminds the user to skim it once before posting.
+- Flags: `--help` / `--version` / `--output PATH`. Default output `~/kiro-report-YYYYMMDD-HHMMSS.log` (timestamped, never overwrites), chowned back to the invoking user. Ships a man page `usr/share/man/man8/kiro-report.8`; added a `kiro-report(8)` cross-reference to `kiro-diag.8`.
+
+**Technical Details**
+- Reuses `kiro-diag` by invoking it inside a colors-blanked subshell and piping through a single `redact()` `sed -E` filter, so the section logic stays in one place (DRY) rather than duplicated. The subshell blanks the color vars and `redact()` also strips any residual ANSI, so the file is always plain text even though the parent's stdout is a TTY.
+- Redaction order matters: MAC and dashed-UUID rules run before the broader machine-id (`\b[0-9a-f]{32}\b`) and IPv6 (`::`-anchored) rules. The IPv6 rule only fires on the `::` double-colon, so **PCI addresses** (`0000:03:00.0`) survive intact — verified on the dev box that IP/IPv6/machine-id (both the `initrd=` path and `systemd.machine_id=`)/root-UUID/hostname/username are all stripped while PCI IDs, timestamps and Calamares warnings are preserved. Per the agreed privacy line, the partition UUID is redacted but the timezone is kept (coarse, useful for mirror/time-sync issues).
+- All log pulls are guarded with `|| true` so `set -Euo pipefail` + the kiro-common ERR trap don't fire on empty `grep`/`journalctl` results. No PKGBUILD change — the package `cp -a`'s `usr/` wholesale, so the new script + man page are picked up automatically. `bash -n` and `--help` verified; full run needs root (Erik to verify post-build with `sudo kiro-report`).
+- Related: complements the existing `kiro-calamares-log` (Calamares-only summary); `kiro-report` is the all-in-one bundle.
+
 ### New tools: `kiro-set-cores-min1` / `kiro-set-cores-min2` — leave 1–2 cores free for makepkg
 
 **What Changed**
