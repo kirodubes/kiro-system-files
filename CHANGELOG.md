@@ -2,6 +2,17 @@
 
 ## 2026.06.04
 
+### `kiro-audit`: verify `kiro-calamares-tweak-tool` removal (Calamares cleanup)
+
+**What Changed**
+- Added a check to the "Calamares cleanup" section confirming `kiro-calamares-tweak-tool` is removed post-install. It is an install-time-only tool; if not stripped during Calamares it leaks onto the user's installed system. The removal itself was fixed separately (added to the Calamares removal list, 2026-06-04); this is the verification hook so a regression can't pass silently — per the "testcase what we create" rule.
+
+**Technical Details**
+- One line next to the existing `calamares` / `mkinitcpio-archiso` / `memtest86+` checks: `pkg_missing kiro-calamares-tweak-tool` → `fail` on presence (a real leak, not a warn).
+
+**Files Modified**
+- `usr/local/bin/kiro-audit`
+
 ### `kiro-audit`: fix stale `ohmychadwm-git` package name (false FAIL)
 
 **What Changed**
@@ -10,6 +21,7 @@
 **Technical Details**
 - Three references updated: the desktop check (`check_desktop`), the `pacman -Qk` integrity exclude (`ohmychadwm` legitimately reports expected missing files as a local `/usr/local/bin` install), and the man page synopsis.
 - Swept the script and repo for other stale `-git` package names — this was the only one.
+- Also corrected a stale man-page line that claimed the audit checks for `multilib` in pacman.conf — multilib has been off by default since 2026-05-28 and that check was already removed from the script. Man page now reflects the real repo checks (nemesis_repo + chaotic-aur present, cachyos commented out).
 
 **Files Modified**
 - `usr/local/bin/kiro-audit`
