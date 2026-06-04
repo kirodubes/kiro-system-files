@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## 2026.06.04
+
+### `kiro-audit`: btrfs snapshot verification hook
+
+**What Changed**
+- Added a `check_btrfs_snapshots` section to `usr/local/bin/kiro-audit` — the verification hook for the opt-in btrfs snapshot stack that ATT's Btrfs page installs. It confirms the Kiro layout and policy actually landed on a btrfs box, per the "testcase what we create" rule.
+- Behaviour is opt-in-aware so it never produces false failures: a non-btrfs root (incl. the live ISO) passes-and-returns ("not applicable"); a btrfs root with no snapshot stack passes-and-returns ("opt-in via ATT, expected default"). Only once the user has opted in does it verify the full configuration.
+- When set up, it checks: the four-package Garuda stack (`snapper`, `snap-pac`, `btrfs-assistant`, `btrfsmaintenance`); the snapper `root` config; `TIMELINE_CREATE=no` (Kiro policy — no hourly timeline); `snapper-cleanup.timer` enabled; `snapper-timeline.timer` NOT enabled; and `btrfsmaintenance-refresh.path` (warn-only). It also checks the ISO-side `@snapshots → /.snapshots` subvolume that Calamares pre-stages.
+
+**Technical Details**
+- Mirrors the policy in `~/btrfs.md` and the exact setup sequence ATT runs (`launch_btrfs_setup_in_terminal`), so the audit and the installer agree.
+- `--fix` remediations added for the three safe, idempotent policy items: set `TIMELINE_CREATE=no`, enable `snapper-cleanup.timer`, disable `snapper-timeline.timer`. Package install and `create-config` are deliberately left to ATT's interactive flow (not auto-fixed).
+- Root fstype and the `TIMELINE_CREATE` parse are guarded with `|| echo ""` / `|| true` so a missing line can't trip the `set -euo pipefail` ERR trap. `findmnt` is used for fstype + the `/.snapshots` mount check (util-linux, always present); all checks are kernel-agnostic. `bash -n` passes; full run needs a btrfs root + root (Erik to verify post-build).
+
+**Files Modified**
+- `usr/local/bin/kiro-audit`
+
 ## 2026.06.01
 
 ### New tool: `kiro-report` — one public-safe diagnostic file for Kiro Discussions

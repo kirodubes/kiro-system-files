@@ -1002,6 +1002,82 @@ check_btrfs_snapshots() {
     fi
 }
 
+check_disk_format() {
+    log_section "Disk format & encryption"
+
+    # The partitioning/filesystem layout is a user choice in the Calamares
+    # partition step (ext4 or btrfs root, optional full-disk LUKS, optional
+    # encrypted swap). This check reports the chosen layout as INFO, then — only
+    # when LUKS is actually in use — asserts the encryption is sound. On the
+    # default unencrypted install it is a single informational pass.
+    local root_fs root_src
+    root_fs=$(findmnt -no FSTYPE / 2>/dev/null || echo "unknown")
+    root_src=$(findmnt -no SOURCE / 2>/dev/null || echo "")
+
+    local -a luks_devs=()
+    mapfile -t luks_devs < <(lsblk -rpno NAME,FSTYPE 2>/dev/null | awk '$2=="crypto_LUKS"{print $1}')
+
+    if [[ ${#luks_devs[@]} -eq 0 ]]; then
+        echo "  ${CYAN}INFO${RESET}  Root filesystem: ${root_fs} (unencrypted)"
+        pass "No LUKS containers — unencrypted install (expected default)"
+        return
+    fi
+
+    echo "  ${CYAN}INFO${RESET}  Root filesystem: ${root_fs} on ${root_src}"
+    echo "  ${CYAN}INFO${RESET}  LUKS containers: ${#luks_devs[@]} (${luks_devs[*]})"
+    pass "Full-disk encryption in use (${#luks_devs[@]} LUKS container(s))"
+
+    # Each container must be LUKS2 — the modern Calamares default (argon2id PBKDF).
+    # LUKS1 still unlocks but is legacy (PBKDF2), so warn rather than fail. The
+    # cipher is reported as INFO so the audit shows the actual formatting choice.
+    local dev ver cipher
+    for dev in "${luks_devs[@]}"; do
+        ver=$(cryptsetup luksDump "${dev}" 2>/dev/null | awk -F: '/^Version:/{gsub(/[[:space:]]/,"",$2); print $2}')
+        cipher=$(cryptsetup luksDump "${dev}" 2>/dev/null | awk -F: '/[Cc]ipher:/{gsub(/^[[:space:]]+/,"",$2); print $2; exit}')
+        echo "  ${CYAN}INFO${RESET}  ${dev}: cipher ${cipher:-unknown}"
+        case "${ver}" in
+            2) pass "${dev}: LUKS2" ;;
+            1) warn "${dev}: LUKS1 (legacy — Calamares default is LUKS2/argon2id)" ;;
+            *) warn "${dev}: LUKS version undetermined (${ver:-unknown})" ;;
+        esac
+    done
+
+    # An encrypted root needs an initramfs unlock hook or the next mkinitcpio
+    # rebuild would lock the system out. Calamares uses sd-encrypt (systemd init,
+    # Kiro's default) or the busybox encrypt hook — accept either.
+    local hooks
+    hooks=$(grep '^HOOKS=' /etc/mkinitcpio.conf 2>/dev/null | head -1)
+    if echo "${hooks}" | grep -qE '\b(sd-encrypt|encrypt)\b'; then
+        pass "mkinitcpio HOOKS has a LUKS unlock hook (sd-encrypt/encrypt)"
+    else
+        fail "encrypted root but no sd-encrypt/encrypt hook in mkinitcpio HOOKS — next initramfs rebuild would lock the system out"
+    fi
+
+    # Calamares embeds /crypto_keyfile.bin in the initramfs so the passphrase is
+    # typed once at boot. It must never be group/other readable.
+    if [[ -f /crypto_keyfile.bin ]]; then
+        local kf_perm kf_own
+        kf_perm=$(stat -c '%a' /crypto_keyfile.bin)
+        kf_own=$(stat -c '%U:%G' /crypto_keyfile.bin)
+        if [[ "${kf_perm}" =~ ^[46]00$ && "${kf_own}" == "root:root" ]]; then
+            pass "/crypto_keyfile.bin secured (${kf_perm} ${kf_own})"
+        else
+            fail "/crypto_keyfile.bin loose permissions: ${kf_perm} ${kf_own} (expected 600 root:root)"
+            apply_fix "chmod 600 /crypto_keyfile.bin" chmod 600 /crypto_keyfile.bin
+        fi
+    fi
+
+    # Positive confirmation the container(s) are actually unlocked (each real
+    # dm-crypt line carries a tab; "No devices found" does not).
+    local crypt_open
+    crypt_open=$(dmsetup ls --target crypt 2>/dev/null | grep -c $'\t' || true)
+    if [[ "${crypt_open}" -gt 0 ]]; then
+        pass "Active dm-crypt mapping(s): ${crypt_open}"
+    else
+        warn "No active dm-crypt mapping found despite LUKS containers"
+    fi
+}
+
 #####################################################################
 # Main
 #####################################################################
@@ -1044,6 +1120,7 @@ main() {
     check_nvidia
     check_chwd
     check_bootloader
+    check_disk_format
     check_btrfs_snapshots
     check_boot_and_updates
     check_package_integrity
