@@ -152,6 +152,44 @@ section_calamares() {
     echo
 }
 
+# Disk encryption hint — the partitioning/LUKS choice is made in Calamares and
+# is the first thing to know on any boot/unlock/install report. Runs as root, so
+# the LUKS version is available; no device UUIDs are printed (and redact() would
+# scrub them anyway).
+section_encryption() {
+    log_subsection "Disk encryption"
+
+    local root_fs
+    root_fs=$(findmnt -no FSTYPE / 2>/dev/null || echo "unknown")
+
+    local -a luks_devs=()
+    mapfile -t luks_devs < <(lsblk -rpno NAME,FSTYPE 2>/dev/null | awk '$2=="crypto_LUKS"{print $1}')
+
+    if [[ ${#luks_devs[@]} -eq 0 ]]; then
+        _field "Root filesystem" "${root_fs}"
+        _field "Encryption" "none (unencrypted install)"
+        echo
+        return
+    fi
+
+    # All containers are created together by Calamares, so the first reflects the set.
+    local ver
+    ver=$(cryptsetup luksDump "${luks_devs[0]}" 2>/dev/null | awk -F: '/^Version:/{gsub(/[[:space:]]/,"",$2); print $2}')
+
+    # A dm-crypt device carrying a swap signature = encrypted swap. Detected via
+    # lsblk (not swapon, which reports the active swap as /dev/dm-N, hiding the
+    # crypt layer).
+    local swap_enc="no"
+    if lsblk -rno FSTYPE,TYPE 2>/dev/null | awk '$1=="swap" && $2=="crypt"{f=1} END{exit !f}'; then
+        swap_enc="yes"
+    fi
+
+    _field "Root filesystem" "${root_fs}"
+    _field "Encryption" "LUKS${ver:-?} full-disk (${#luks_devs[@]} container(s))"
+    _field "Encrypted swap" "${swap_enc}"
+    echo
+}
+
 build_report() {
     # Run inside a subshell with colors blanked so the captured text is plain
     # even though the parent script's stdout is a terminal. kiro-diag is a
@@ -161,6 +199,7 @@ build_report() {
         report_header
         echo
         kiro-diag 2>&1 | grep -v 'kiro-diag done' || true
+        section_encryption
         section_drivers
         section_debug
         section_calamares

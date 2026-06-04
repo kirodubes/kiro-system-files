@@ -17,6 +17,33 @@
 **Files Modified**
 - `usr/local/bin/kiro-audit`
 
+### `kiro-audit`: disk format & LUKS encryption verification hook
+
+**What Changed**
+- Added a `check_disk_format` section to `usr/local/bin/kiro-audit` — the verification hook for the partitioning/filesystem choice now offered in Calamares (ext4 or btrfs root, optional full-disk LUKS, optional encrypted swap). Reports the chosen layout as INFO and, when LUKS is in use, asserts the encryption is sound. Closes the gap where nothing in the toolchain confirmed an encrypted install was correctly set up.
+- Conditional/no-false-failure by design: an unencrypted install (the default, and the live ISO) prints one INFO line + a single pass ("no LUKS containers — expected default") and returns. Only when `crypto_LUKS` devices are actually present does it run the encryption asserts.
+- When encrypted, it checks: each LUKS container is **LUKS2** (warn on legacy LUKS1/PBKDF2); the initramfs carries a `sd-encrypt`/`encrypt` unlock hook (else a future `mkinitcpio` rebuild would lock the box out); `/crypto_keyfile.bin` is `600 root:root` (fail + `--fix chmod 600` if loose); and at least one active dm-crypt mapping exists. INFO lines report root fstype/source, container list, and per-container cipher.
+
+**Technical Details**
+- Detection is `lsblk -rpno NAME,FSTYPE | awk '$2=="crypto_LUKS"'`; LUKS version/cipher via `cryptsetup luksDump`. dm-crypt liveness counts the tab-bearing `dmsetup ls --target crypt` lines (skips the "No devices found" string). Kernel-agnostic and util-linux/cryptsetup only.
+- Verified live against all three production-ISO VMs (2026-06-04): unencrypted ext4 → +1 pass; LUKS-ext4 → +5 pass; LUKS-btrfs (2 containers incl. encrypted swap) → +7 pass; all 0 WARN / 0 FAIL. `bash -n` passes. `/kiro-syscheck` already invokes `kiro-audit`, so its summary now carries the encryption asserts with no separate change needed.
+
+**Files Modified**
+- `usr/local/bin/kiro-audit`
+
+### `kiro-report`: disk encryption hint
+
+**What Changed**
+- Added a `section_encryption` block to `usr/local/bin/kiro-report` so a help report states the partitioning/encryption choice up front — the first thing a maintainer needs on any boot/unlock/install issue. Mirrors the new `kiro-audit` `check_disk_format` (the two tools now agree on how encryption is reported).
+- Three fields: root filesystem (ext4/btrfs), encryption (`none` or `LUKS2 full-disk (N container(s))`), and encrypted swap (yes/no). Unencrypted installs print `none` and nothing else.
+
+**Technical Details**
+- kiro-report already runs as root, so the LUKS version comes straight from `cryptsetup luksDump`; no device UUIDs are printed and the output flows through the existing `redact()` (the `luks-<uuid>` mapper names would be scrubbed regardless — verified 0 raw UUIDs in the generated reports).
+- Encrypted-swap detection uses `lsblk -rno FSTYPE,TYPE` matching a `swap`+`crypt` row, **not** `swapon` — the active encrypted swap surfaces as `/dev/dm-N`, which hides the crypt layer. Verified live on all three production-ISO VMs: unencrypted → `none`; LUKS-ext4 → LUKS2, swap no; LUKS-btrfs → LUKS2 (2 containers), swap yes.
+
+**Files Modified**
+- `usr/local/bin/kiro-report`
+
 ## 2026.06.01
 
 ### New tool: `kiro-report` — one public-safe diagnostic file for Kiro Discussions
