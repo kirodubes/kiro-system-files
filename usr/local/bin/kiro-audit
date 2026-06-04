@@ -428,7 +428,7 @@ check_pacman_repos() {
 check_desktop() {
     log_section "Desktop environments"
 
-    pkg_installed ohmychadwm-git && pass "ohmychadwm-git installed" || fail "ohmychadwm-git not installed"
+    pkg_installed ohmychadwm && pass "ohmychadwm installed" || fail "ohmychadwm not installed"
     pkg_installed xfwm4           && pass "xfwm4 installed"          || fail "xfwm4 not installed"
     pkg_missing   edu-chadwm      && pass "edu-chadwm not installed (dropped)" || warn "edu-chadwm still installed — should be removed"
 
@@ -602,7 +602,7 @@ check_package_integrity() {
     missing=$(pacman -Qk 2>/dev/null \
         | grep -v ' 0 missing files$' \
         | grep 'missing files' \
-        | grep -v '^ohmychadwm-git:' \
+        | grep -v '^ohmychadwm:' \
         | grep -v '^bind:' \
         | grep -v '^cups:' \
         | grep -v '^nfs-utils:') || true

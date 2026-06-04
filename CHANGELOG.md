@@ -2,6 +2,19 @@
 
 ## 2026.06.04
 
+### `kiro-audit`: fix stale `ohmychadwm-git` package name (false FAIL)
+
+**What Changed**
+- `kiro-audit` checked for the package `ohmychadwm-git`, but Phase 2 of the Kiro package-naming work dropped the `-git` suffix — the installed package is now `ohmychadwm`. Every installed system (verified on metal boxes picard + riker against ISO `v26.06.04`) reported a spurious `FAIL ohmychadwm-git not installed` even though the WM, binary, and session file are all present. Renamed the check to `ohmychadwm` so the audit reports 0 FAIL on a correct install — important ahead of the betatester ISO, since the audit ships in the image.
+
+**Technical Details**
+- Three references updated: the desktop check (`check_desktop`), the `pacman -Qk` integrity exclude (`ohmychadwm` legitimately reports expected missing files as a local `/usr/local/bin` install), and the man page synopsis.
+- Swept the script and repo for other stale `-git` package names — this was the only one.
+
+**Files Modified**
+- `usr/local/bin/kiro-audit`
+- `usr/share/man/man8/kiro-audit.8`
+
 ### `kiro-audit`: btrfs snapshot verification hook
 
 **What Changed**
