@@ -922,6 +922,86 @@ check_bootloader() {
     fi
 }
 
+check_btrfs_snapshots() {
+    log_section "Btrfs snapshots"
+
+    # Only meaningful on a btrfs root. On ext4/xfs/etc. (and on the live ISO, which
+    # is not btrfs) the snapshot stack simply does not apply — pass and move on.
+    local root_fstype
+    root_fstype=$(findmnt -no FSTYPE / 2>/dev/null || echo "")
+    if [[ "${root_fstype}" != "btrfs" ]]; then
+        pass "Root filesystem is ${root_fstype:-unknown}, not btrfs — snapshot stack not applicable"
+        return
+    fi
+
+    # ISO side: Calamares pre-stages @snapshots -> /.snapshots on every btrfs install
+    # so a later snapper create-config drops in clean instead of nesting inside @.
+    if findmnt -no TARGET /.snapshots &>/dev/null; then
+        pass "/.snapshots subvolume mounted (Kiro layout pre-staged by Calamares)"
+    else
+        warn "/.snapshots not mounted — @snapshots subvolume missing (snapper would nest inside @)"
+    fi
+
+    # The snapshot stack is OPT-IN via ATT (Btrfs page). A btrfs install with none of
+    # it is the expected shipped default, not a failure. Only once the user has opted
+    # in do we verify the configuration matches Kiro policy: snap-pac + cleanup, NO
+    # hourly timeline.
+    local any_installed=false config_present=false pkg
+    for pkg in snapper snap-pac btrfs-assistant btrfsmaintenance; do
+        pkg_installed "${pkg}" && any_installed=true
+    done
+    [[ -f /etc/snapper/configs/root ]] && config_present=true
+
+    if [[ "${any_installed}" == false && "${config_present}" == false ]]; then
+        pass "Snapshot stack not installed — opt-in via ATT > Btrfs (expected default)"
+        return
+    fi
+
+    # User has opted in — verify the whole stack and the Kiro policy landed.
+    for pkg in snapper snap-pac btrfs-assistant btrfsmaintenance; do
+        pkg_installed "${pkg}" && pass "${pkg} installed" || fail "${pkg} not installed (snapshot setup incomplete)"
+    done
+
+    if [[ "${config_present}" == true ]]; then
+        pass "snapper root config present (/etc/snapper/configs/root)"
+
+        # Kiro policy: snapshots fire on pacman actions via snap-pac, NO hourly timeline.
+        local timeline
+        timeline=$(grep -E '^TIMELINE_CREATE=' /etc/snapper/configs/root | head -1 | cut -d= -f2 | tr -d '"' || true)
+        if [[ "${timeline}" == "no" ]]; then
+            pass "TIMELINE_CREATE=no (Kiro policy — snapshots on pacman actions only)"
+        else
+            fail "TIMELINE_CREATE=${timeline:-unset} (expected no — Kiro ships snap-pac without hourly timeline)"
+            apply_fix "snapper -c root set-config TIMELINE_CREATE=no" snapper -c root set-config TIMELINE_CREATE=no
+        fi
+    else
+        fail "Tools installed but no snapper root config — half-configured (run ATT > Btrfs > Enable Kiro snapshots)"
+    fi
+
+    # Cleanup timer prunes the snap-pac pre/post pairs.
+    if systemctl is-enabled snapper-cleanup.timer &>/dev/null; then
+        pass "snapper-cleanup.timer enabled"
+    else
+        fail "snapper-cleanup.timer not enabled (snap-pac pairs will accumulate)"
+        apply_fix "systemctl enable --now snapper-cleanup.timer" systemctl enable --now snapper-cleanup.timer
+    fi
+
+    # Timeline timer must stay OFF (Kiro policy — no hourly snapshots).
+    if systemctl is-enabled snapper-timeline.timer &>/dev/null; then
+        fail "snapper-timeline.timer enabled (Kiro policy is no hourly timeline)"
+        apply_fix "systemctl disable --now snapper-timeline.timer" systemctl disable --now snapper-timeline.timer
+    else
+        pass "snapper-timeline.timer not enabled (Kiro policy)"
+    fi
+
+    # btrfsmaintenance scrub/balance/trim timers are driven by the refresh .path unit.
+    if systemctl is-enabled btrfsmaintenance-refresh.path &>/dev/null; then
+        pass "btrfsmaintenance-refresh.path enabled (scrub · balance · trim)"
+    else
+        warn "btrfsmaintenance-refresh.path not enabled (scrub/balance/trim timers not installed)"
+    fi
+}
+
 #####################################################################
 # Main
 #####################################################################
@@ -964,6 +1044,7 @@ main() {
     check_nvidia
     check_chwd
     check_bootloader
+    check_btrfs_snapshots
     check_boot_and_updates
     check_package_integrity
 
