@@ -1,5 +1,25 @@
 # CHANGELOG
 
+## 2026.06.06
+
+### `99-kiro-optimizations.conf`: refresh stale lqx scheduler comments (kernel-agnostic, accurate)
+
+**What Changed**
+- The commented-out `kernel.sched_*` knobs and the RCU stall timeout in `etc/sysctl.d/99-kiro-optimizations.conf` still carried "Not supported on lqx 7.x kernel" / "Not supported on this kernel" notes. Kiro dropped lqx for `linux-cachyos` (default) + `linux-zen` (fallback) on 2026-05-28, so the comments were stale. Investigated each knob on the live `linux-cachyos 7.0.11` kernel and rewrote the comments to state the real, kernel-agnostic reason each stays disabled.
+- **Net result: nothing was uncommented.** The TODO's hypothesis ("uncomment what cachyos supports") inverted on inspection — every knob either no longer exists as a sysctl on any modern kernel, or is already at its kernel default, so enabling it would be wrong or a no-op.
+
+**Technical Details**
+- `sched_latency_ns` / `sched_min_granularity_ns` / `sched_wakeup_granularity_ns`: removed kernel-wide in 6.6 when EEVDF replaced CFS — absent in both sysctl and debugfs on cachyos/zen/lts/hardened/mainline. EEVDF's nearest equivalent (`base_slice_ns`) is debugfs-only. Comment now documents this; kept commented.
+- `sched_migration_cost_ns` (Optional section): not a sysctl since 5.13 — moved to `/sys/kernel/debug/sched/migration_cost_ns`. Documented as debugfs-only.
+- `sched_autogroup_enabled`: confirmed **present** on cachyos (`CONFIG_SCHED_AUTOGROUP=y`, value 1). Left commented at the kernel default (enabled) on purpose — disabling only helps dedicated audio/RT boxes; per community-first defaults we keep the better general default and let audio users opt in.
+- `sched_rt_runtime_us` / `sched_rt_period_us`: confirmed **present** and already at the exact wanted values (950000 / 1000000 = kernel defaults); `CONFIG_RT_GROUP_SCHED` is off on cachyos. Setting them is a no-op; kept commented.
+- `rcu_cpu_stall_timeout`: it is the `rcupdate` module parameter (set via cmdline / `/sys/module/rcupdate/parameters/`), never a sysctl. Comment corrected.
+- Also generalised one unrelated stale lqx mention: the active `kernel.unprivileged_userns_clone` comment now cites `linux-hardened` instead of lqx as the kernel that defaults it to 0.
+- Verified empirically with `/proc/sys/kernel/`, `/proc/config.gz`, and `sudo ls /sys/kernel/debug/sched/`. No active settings changed — comments only.
+
+**Files Modified**
+- `etc/sysctl.d/99-kiro-optimizations.conf`
+
 ## 2026.06.04
 
 ### `kiro-audit`: verify `kiro-calamares-tweak-tool` removal (Calamares cleanup)
