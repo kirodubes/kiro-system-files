@@ -921,6 +921,27 @@ check_bootloader() {
         pass "System booted via BIOS"
         { [[ -d /boot/grub ]] || pkg_installed grub; } && pass "GRUB BIOS bootloader detected" || warn "BIOS system but no GRUB found"
     fi
+
+    # --- Kiro GRUB boot-safety hooks (kiro-bootloader-grub) ---
+    # grub is part of archiso (always installed), so test the LIVE bootloader,
+    # not package presence. Same discriminator as kiro-grub-is-active.
+    if [[ -f /boot/efi/loader/loader.conf ]]; then
+        # systemd-boot in use -> grub + its hooks must have been stripped
+        { pkg_installed grub || [[ -d /boot/grub ]]; } \
+            && warn "systemd-boot in use but GRUB still present (kiro_final cleanup?)" \
+            || pass "systemd-boot system clean of GRUB"
+        [[ -x /usr/bin/kiro-grub-install ]] \
+            && warn "stray grub boot-safety hooks on a systemd-boot system" \
+            || pass "No stray grub boot-safety hooks"
+    elif [[ -f /boot/grub/grub.cfg ]]; then
+        # GRUB is the live bootloader -> the reflash hooks should be installed
+        if [[ -x /usr/bin/kiro-grub-install && -f /usr/share/libalpm/hooks/kiro-grub-install.hook ]]; then
+            pass "GRUB boot-safety hooks installed (grub-install on grub upgrade)"
+        elif pkg_installed kiro-bootloader-grub || pkg_installed kiro-bootloader-grub-nemesis; then
+            fail "boot-safety package installed but hook/helper missing"
+        fi
+        # else: package not shipped yet (pre-promotion) -> stay silent
+    fi
 }
 
 check_btrfs_snapshots() {

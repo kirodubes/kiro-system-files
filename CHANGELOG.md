@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## 2026.06.08
+
+### `kiro-audit`: verify GRUB boot-safety hooks in `check_bootloader()`
+
+**What Changed**
+- `check_bootloader()` now audits the new `kiro-bootloader-grub` boot-safety hooks. On systemd-boot systems it confirms GRUB and the hooks were stripped (clean); on GRUB systems it confirms `/usr/bin/kiro-grub-install` + the pacman hook are installed.
+
+**Technical Details**
+- Keys on the **live bootloader** (`/boot/efi/loader/loader.conf` for systemd-boot, `/boot/grub/grub.cfg` for GRUB), not on the `grub` package — `grub` is part of archiso so it is always installed and proves nothing.
+- Pre-promotion safe: when GRUB is in use but the boot-safety package isn't shipped yet, the check stays silent (no FAIL/WARN), preserving the clean audit baseline. Name-agnostic for `kiro-bootloader-grub` and `kiro-bootloader-grub-nemesis`.
+- Mirrors what was verified live on VirtualBox (BIOS + UEFI) and on bare metal (worf) for the `kiro-bootloader-grub-nemesis` rollout.
+
+**Files Modified**
+- `usr/local/bin/kiro-audit` — boot-safety block appended to `check_bootloader()`.
+
 ## 2026.06.06
 
 ### `99-kiro-optimizations.conf`: refresh stale lqx scheduler comments (kernel-agnostic, accurate)
