@@ -923,18 +923,11 @@ check_bootloader() {
     fi
 
     # --- Kiro GRUB boot-safety hooks (kiro-bootloader-grub) ---
-    # grub is part of archiso (always installed), so test the LIVE bootloader,
-    # not package presence. Same discriminator as kiro-grub-is-active.
-    if [[ -f /boot/efi/loader/loader.conf ]]; then
-        # systemd-boot in use -> grub + its hooks must have been stripped
-        { pkg_installed grub || [[ -d /boot/grub ]]; } \
-            && warn "systemd-boot in use but GRUB still present (kiro_final cleanup?)" \
-            || pass "systemd-boot system clean of GRUB"
-        [[ -x /usr/bin/kiro-grub-install ]] \
-            && warn "stray grub boot-safety hooks on a systemd-boot system" \
-            || pass "No stray grub boot-safety hooks"
-    elif [[ -f /boot/grub/grub.cfg ]]; then
-        # GRUB is the live bootloader -> the reflash hooks should be installed
+    # Only meaningful when GRUB is the LIVE bootloader (loader.conf absent AND
+    # grub.cfg present — same discriminator as kiro-grub-is-active). grub being
+    # *installed* on a systemd-boot box is NOT a fault: ISO builders legitimately
+    # need it (archiso optdepend), so grub presence is never flagged here.
+    if [[ ! -f /boot/efi/loader/loader.conf && -f /boot/grub/grub.cfg ]]; then
         if [[ -x /usr/bin/kiro-grub-install && -f /usr/share/libalpm/hooks/kiro-grub-install.hook ]]; then
             pass "GRUB boot-safety hooks installed (grub-install on grub upgrade)"
         elif pkg_installed kiro-bootloader-grub || pkg_installed kiro-bootloader-grub-nemesis; then
