@@ -5,7 +5,7 @@
 ### `kiro-audit`: verify GRUB boot-safety hooks in `check_bootloader()`
 
 **What Changed**
-- `check_bootloader()` now audits the new `kiro-bootloader-grub` boot-safety hooks. On systemd-boot systems it confirms GRUB and the hooks were stripped (clean); on GRUB systems it confirms `/usr/bin/kiro-grub-install` + the pacman hook are installed.
+- `check_bootloader()` now audits the new `kiro-bootloader-grub` boot-safety hooks: on systems where **GRUB is the live bootloader** it confirms `/usr/bin/kiro-grub-install` + the pacman hook are installed. It deliberately does **not** flag grub being installed on a systemd-boot system — ISO builders legitimately need the `grub` package (archiso optdepend), so grub presence there is normal, not a cleanup failure.
 
 **Technical Details**
 - Keys on the **live bootloader** (`/boot/efi/loader/loader.conf` for systemd-boot, `/boot/grub/grub.cfg` for GRUB), not on the `grub` package — `grub` is part of archiso so it is always installed and proves nothing.
