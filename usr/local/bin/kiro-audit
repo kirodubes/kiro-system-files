@@ -113,6 +113,7 @@ ensure_root() {
 }
 
 FIX_MODE=false
+FORCE=false
 
 for _arg in "$@"; do
     case "$_arg" in
@@ -121,12 +122,13 @@ for _arg in "$@"; do
 kiro-audit - Kiro ISO installed system audit
 
 Usage:
-    kiro-audit [--help] [--version] [--fix]
+    kiro-audit [--help] [--version] [--fix] [--force]
 
 Options:
     -h, --help     Show this help message and exit
     -v, --version  Show version information and exit
     --fix          Auto-remediate known fixable failures (requires root)
+    --force        Run even in the live ISO (checks assume an installed system)
 
 Description:
     Comprehensive post-install audit of a Kiro system. Checks kernel,
@@ -153,9 +155,26 @@ EOF
         --fix)
             FIX_MODE=true
             ;;
+        --force)
+            FORCE=true
+            ;;
     esac
 done
 unset _arg
+
+# Live-ISO guard: kiro-audit audits an *installed* Kiro system. In the live ISO the root
+# is a read-only squashfs and the archiso packages/config are still present, so most checks
+# FAIL on things that don't apply. Bail before the root prompt unless --force.
+if [[ -d /run/archiso ]] && [[ "${FORCE}" != true ]]; then
+    log_warn "Live ISO detected — kiro-audit is for an INSTALLED Kiro system"
+    echo "  The live ISO root is a read-only squashfs with the archiso packages and config"
+    echo "  still present, so most checks would FAIL on things that don't apply here. Install"
+    echo "  Kiro first, then run kiro-audit on the installed system."
+    echo
+    echo "  Run 'kiro-audit --force' to audit the live environment anyway."
+    echo
+    exit 0
+fi
 
 ensure_root "$@"
 
@@ -380,15 +399,18 @@ check_kiro_final_config() {
     grep -q '^AutoEnable=true' /etc/bluetooth/main.conf 2>/dev/null && pass "Bluetooth AutoEnable=true" || fail "Bluetooth AutoEnable not set in /etc/bluetooth/main.conf"
 
     # makepkg.conf optimizations (kiro_before)
-    local nproc_count makeflags_j
+    local nproc_count makeflags_j lower
     nproc_count=$(nproc)
     makeflags_j=$(grep '^MAKEFLAGS=' /etc/makepkg.conf 2>/dev/null | grep -oP '(?<=-j)\d+' || echo "0")
-    if [[ "${makeflags_j}" -eq "${nproc_count}" ]]; then
-        pass "makepkg.conf MAKEFLAGS=-j${nproc_count} (all CPUs used)"
+    # Kiro deliberately leaves 1–2 CPUs free (the flow scripts set -j to nproc-1 / nproc-2
+    # for headroom), so -j in [nproc-2 .. nproc] is correct here, not a WARN.
+    lower=$(( nproc_count > 2 ? nproc_count - 2 : 1 ))
+    if [[ "${makeflags_j}" -ge "${lower}" && "${makeflags_j}" -le "${nproc_count}" ]]; then
+        pass "makepkg.conf MAKEFLAGS=-j${makeflags_j} (Kiro leaves 1–2 CPUs free; ${nproc_count} total)"
     elif [[ "${makeflags_j}" -gt 0 ]]; then
-        warn "makepkg.conf MAKEFLAGS=-j${makeflags_j} but system has ${nproc_count} CPUs"
+        warn "makepkg.conf MAKEFLAGS=-j${makeflags_j}; expected ${lower}–${nproc_count} on this ${nproc_count}-CPU system"
     else
-        fail "makepkg.conf MAKEFLAGS not set to use all CPUs"
+        fail "makepkg.conf MAKEFLAGS not set"
     fi
     grep -q "^PKGEXT='.pkg.tar.zst'" /etc/makepkg.conf 2>/dev/null && pass "makepkg.conf PKGEXT=.pkg.tar.zst" || fail "makepkg.conf PKGEXT not set to .pkg.tar.zst"
     grep -qP '^OPTIONS=.*!debug' /etc/makepkg.conf 2>/dev/null && pass "makepkg.conf !debug in OPTIONS" || fail "makepkg.conf debug not disabled in OPTIONS"
@@ -400,12 +422,12 @@ check_pacman_repos() {
     grep -q '^\[nemesis_repo\]' /etc/pacman.conf && pass "nemesis_repo in pacman.conf" || fail "nemesis_repo missing from pacman.conf"
     grep -q '^\[chaotic-aur\]'  /etc/pacman.conf && pass "chaotic-aur in pacman.conf"  || fail "chaotic-aur missing from pacman.conf"
 
-    # cachyos is enabled DURING install (chwd pulls drivers from it) then commented
-    # out by kiro_final — shipped disabled/opt-in. chaotic-aur (above) backs
-    # linux-cachyos, so the default kernel keeps updating with cachyos off. An active
-    # [cachyos] here is legitimate only if the user re-enabled it on purpose.
+    # cachyos may legitimately be enabled (chwd drivers during install; and going
+    # forward, cachyos niri / cachyos hyprland packages) or shipped commented — both
+    # are fine, so an active [cachyos] is a PASS, not a WARN. We still verify that an
+    # *enabled* block is backed by its keyring + mirrorlist, or pacman syncs break.
     if grep -q '^\[cachyos\]' /etc/pacman.conf; then
-        warn "cachyos repo is ENABLED (Kiro ships it commented; fine if you re-enabled it on purpose)"
+        pass "cachyos repo enabled (fine — drivers / niri / hyprland come from it)"
         # An active [cachyos] block REQUIRES the keyring (signature verification)
         # and the mirrorlist file (the block's Include= target) — without them
         # every pacman sync fails. ATT's cachyos toggle bootstraps both (bundled
