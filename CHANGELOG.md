@@ -13,6 +13,21 @@
 **Files Modified**
 - `usr/local/bin/kiro-audit`
 
+### `kiro-audit`: live-ISO guard (`--force` to override)
+
+**What Changed**
+- Running `kiro-audit` in the **live ISO** produced a wall of irrelevant FAILs (read-only squashfs root, archiso packages/config present — most installed-system checks don't apply). It now detects the live ISO (`/run/archiso`) and exits early with a clear banner, **before** the root prompt. `--force` runs it anyway for dev inspection. Verified on the live Budgie ISO: bare run → banner + exit; `--force` → full run.
+
+### `kiro-audit`: cachyos-enabled is a PASS, not a WARN
+
+**What Changed**
+- An enabled `[cachyos]` repo no longer WARNs — it's a legitimate state: chwd drivers during install, and going forward `cachyos niri` / `cachyos hyprland` packages (ship the ISO, users do the rest). The keyring + mirrorlist FAIL checks for an *enabled* block stay (without them pacman syncs break).
+
+### `kiro-audit`: MAKEFLAGS accepts Kiro's deliberate `nproc-1`/`nproc-2`
+
+**What Changed**
+- `MAKEFLAGS=-jN` a couple below the CPU count no longer WARNs — the Kiro flow scripts deliberately leave 1–2 CPUs free for headroom. PASS when N is in `[nproc-2 .. nproc]` (e.g. `-j14` on a 16-CPU box); WARN only outside that band; FAIL if unset.
+
 ## 2026.06.08
 
 ### `kiro-audit`: verify GRUB boot-safety hooks in `check_bootloader()`
