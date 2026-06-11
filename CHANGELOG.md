@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 2026.06.11
+
+### `kiro-audit`: edition-agnostic desktop check (Wayland-aware)
+
+**What Changed**
+- `check_desktop()` no longer hardcodes **XFCE + ohmychadwm**. It now passes if **any** valid login session exists, scanning both `/usr/share/xsessions` and `/usr/share/wayland-sessions`. Now that KIB can build any edition (the TWMs, Budgie, …), the old checks threw four false FAILs on every non-default install — e.g. a Budgie install reported `ohmychadwm not installed` / `xfwm4 not installed` / `ohmychadwm.desktop missing` / `xfce.desktop missing` despite being perfectly healthy. Surfaced by the 2026-06-11 Budgie-ISO install test ([kiro-iso/DISTRO_TESTING.md](../../KIRO-ISO-CALAMARES/kiro-iso/DISTRO_TESTING.md)).
+
+**Technical Details**
+- Collects session names from both session dirs into an array; `pass` lists them ("desktop session(s) installed: …"), `fail` only when **none** exist (a system with no desktop is the real fault). Added Wayland session coverage — the first Wayland edition (Budgie) would otherwise be invisible to the audit. Kept the `edu-chadwm` dropped-package check (edition-agnostic). Verified against the Budgie test install (sessions found: `qtile`, `budgie-desktop`, `labwc`, `qtile-wayland`) → PASS, replacing the 4 false FAILs.
+
+**Files Modified**
+- `usr/local/bin/kiro-audit`
+
 ## 2026.06.08
 
 ### `kiro-audit`: verify GRUB boot-safety hooks in `check_bootloader()`

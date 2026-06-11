@@ -429,12 +429,24 @@ check_pacman_repos() {
 check_desktop() {
     log_section "Desktop environments"
 
-    pkg_installed ohmychadwm && pass "ohmychadwm installed" || fail "ohmychadwm not installed"
-    pkg_installed xfwm4           && pass "xfwm4 installed"          || fail "xfwm4 not installed"
-    pkg_missing   edu-chadwm      && pass "edu-chadwm not installed (dropped)" || warn "edu-chadwm still installed — should be removed"
+    # Edition-agnostic: KIB can build any edition (XFCE, ohmychadwm, the TWMs, Budgie, …),
+    # so we don't demand a specific desktop — we verify at least one valid login session
+    # exists, scanning both X11 and Wayland session files.
+    local -a sessions=()
+    local d f
+    for d in /usr/share/xsessions /usr/share/wayland-sessions; do
+        [[ -d "$d" ]] || continue
+        for f in "$d"/*.desktop; do
+            [[ -e "$f" ]] && sessions+=("$(basename "$f" .desktop)")
+        done
+    done
+    if (( ${#sessions[@]} > 0 )); then
+        pass "desktop session(s) installed: ${sessions[*]}"
+    else
+        fail "no desktop session found (none in /usr/share/xsessions or /usr/share/wayland-sessions)"
+    fi
 
-    [[ -f /usr/share/xsessions/ohmychadwm.desktop ]] && pass "ohmychadwm.desktop session file present" || fail "ohmychadwm.desktop missing"
-    [[ -f /usr/share/xsessions/xfce.desktop ]]       && pass "xfce.desktop session file present"       || fail "xfce.desktop missing"
+    pkg_missing edu-chadwm && pass "edu-chadwm not installed (dropped)" || warn "edu-chadwm still installed — should be removed"
 }
 
 check_sddm() {
