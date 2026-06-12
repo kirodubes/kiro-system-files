@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## 2026.06.12
+
+### Kiro onboard themes — 5 branded on-screen-keyboard themes (accessibility)
+
+**What Changed**
+- Added **5 Kiro-branded onboard themes** to ship system-wide: **Kiro Aurora** (signature dark slate, blue→green brand keys), **Kiro Daylight** (light, dark-on-white for bright rooms / low-vision light preference), **Kiro Beacon** (amber-on-black accessibility flagship — flat fills, oversized keys, sharp edges, maximum contrast), **Kiro Emerald** (green brand identity), **Kiro Azure** (blue brand identity). Onboard ships on the ISO (added to `kiro-iso-next` 2026-06-12); its stock themes look dated, so these give the on-screen keyboard a cohesive, readable, on-brand look. Names are deliberately distinct from all 17 stock onboard themes. **Default = Kiro Azure**, set system-wide via a gsettings schema override — but this only changes the *default*: a user who picks another theme in onboard's settings keeps their choice. All five remain discoverable in onboard's theme picker and in ATT's Accessibility page.
+
+**Technical Details**
+- Each theme is an onboard `.theme` (XML: `key_style`, `roundrect_radius`, `key_size`, gradients, shadow) paired with a `.colors` color scheme (XML `format="2.1"`: layered backgrounds + per-`key_group` fill/stroke/label). All designed for label↔fill contrast: white labels on the dark themes, near-black labels on Daylight's white keys, black-on-amber with white-label overrides on Beacon's dark modifier groups. All 10 files XML-validated. Delivered via **kiro-system-files** (no new package): the PKGBUILD copies the `usr/` tree wholesale, so dropping the files under `usr/share/onboard/themes/` installs them to `/usr/share/onboard/themes/` automatically — no PKGBUILD or `packages.x86_64` change needed. The default is set with a glib **gsettings override** (`usr/share/glib-2.0/schemas/zz-kiro-onboard.gschema.override`, `[org.onboard] theme=…/Kiro Azure.theme`); the `glib2` pacman hook compiles it into `gschemas.compiled` at install — no manual `glib-compile-schemas` step. Validated with `glib-compile-schemas --strict --dry-run` against onboard's real schema.
+
+**Files Modified**
+- `usr/share/onboard/themes/Kiro Aurora.theme` + `.colors`
+- `usr/share/onboard/themes/Kiro Daylight.theme` + `.colors`
+- `usr/share/onboard/themes/Kiro Beacon.theme` + `.colors`
+- `usr/share/onboard/themes/Kiro Emerald.theme` + `.colors`
+- `usr/share/onboard/themes/Kiro Azure.theme` + `.colors`
+- `usr/share/glib-2.0/schemas/zz-kiro-onboard.gschema.override` *(new — default theme)*
+
 ## 2026.06.11
 
 ### `kiro-audit`: edition-agnostic desktop check (Wayland-aware)
