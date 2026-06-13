@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 2026.06.13
+
+### kiro-audit — verify package signing (key trust + effective SigLevel)
+- `check_pacman_repos` now audits the package-signing rollout: it checks the **Kiro signing key** is trusted in the pacman keyring (`149ABD0C3A0563EE`), and for `nemesis_repo`/`kiro_repo` resolves the **effective SigLevel** — per-repo override if present, otherwise the global `[options]` value (Kiro ships the repos with no per-repo SigLevel, so they inherit the global `Required DatabaseOptional`).
+- Verdicts: **FAIL** if a repo enforces (`Required`/`Optional`) while the key is absent (the real footgun — pacman rejects every package, syncs break); **PASS** if enforcing + key trusted; **WARN** if still `Never` (transitional). Verified on a fresh v26.06.13 VM: PASS + PASS, 135/0/0.
+
+### Files Modified
+- `usr/local/bin/kiro-audit`
+
 ## 2026.06.12
 
 ### Kiro onboard themes — 5 branded on-screen-keyboard themes (accessibility)

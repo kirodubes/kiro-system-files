@@ -444,6 +444,57 @@ check_pacman_repos() {
         warn "cachyos repo entry absent from pacman.conf (expected present-but-commented)"
     fi
 
+    # ── Package signing (PGP) ──────────────────────────────────────────────
+    # Kiro signs nemesis_repo / kiro_repo packages; the kiro-keyring package ships
+    # and locally-trusts the Kiro signing key. The one dangerous misconfiguration
+    # is a repo at SigLevel = Required/Optional while the key is absent — pacman
+    # then rejects every package from it and syncs break. SigLevel = Never is the
+    # accepted transitional state while the keyring propagates across the fleet.
+    local kiro_key="149ABD0C3A0563EE"
+    local kiro_key_present="no"
+    if pacman-key --list-keys "${kiro_key}" &>/dev/null; then
+        pass "Kiro signing key trusted in pacman keyring (${kiro_key})"
+        kiro_key_present="yes"
+    else
+        warn "Kiro signing key NOT in pacman keyring — (re)install kiro-keyring or run 'pacman-key --populate kiro'"
+    fi
+
+    # Effective SigLevel = per-repo override if present, else the global [options]
+    # value. Kiro deliberately ships the repos with NO per-repo SigLevel so they
+    # inherit the global Required DatabaseOptional — so an empty per-repo line is
+    # correct, not a misconfiguration; resolve to the global before judging.
+    local global_sig
+    global_sig="$(awk '$0=="[options]"{f=1;next} f&&/^\[/{f=0} f&&/^SigLevel/{print $3; exit}' /etc/pacman.conf)"
+
+    local repo siglevel effective src
+    for repo in nemesis_repo kiro_repo; do
+        grep -q "^\[${repo}\]" /etc/pacman.conf || continue
+        siglevel="$(awk -v r="[${repo}]" '$0==r{f=1;next} f&&/^\[/{f=0} f&&/^SigLevel/{print $3; exit}' /etc/pacman.conf)"
+        if [[ -n "${siglevel}" ]]; then
+            effective="${siglevel}"; src="explicit"
+        else
+            effective="${global_sig}"; src="inherited from [options]"
+        fi
+        case "${effective}" in
+            Required|Optional)
+                if [[ "${kiro_key_present}" == "yes" ]]; then
+                    pass "${repo} verifies signatures (SigLevel ${effective}, ${src}) and the Kiro key is trusted"
+                else
+                    fail "${repo} SigLevel=${effective} (${src}) but the Kiro key is absent — pacman will reject every ${repo} package"
+                fi
+                ;;
+            Never)
+                warn "${repo} not verifying signatures (SigLevel Never, ${src}) — transitional; tightens once kiro-keyring is fleet-wide"
+                ;;
+            "")
+                warn "${repo} has no SigLevel and [options] sets none — pacman's built-in default applies; set a global SigLevel"
+                ;;
+            *)
+                warn "${repo} unexpected effective SigLevel '${effective}'"
+                ;;
+        esac
+    done
+
     # multilib is intentionally NOT shipped (gaming-only: Wine/Steam 32-bit libs);
     # users enable it via one click in ATT. No audit row — silence is correct.
 }
