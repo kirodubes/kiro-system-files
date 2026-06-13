@@ -6,8 +6,12 @@
 - `check_pacman_repos` now audits the package-signing rollout: it checks the **Kiro signing key** is trusted in the pacman keyring (`149ABD0C3A0563EE`), and for `nemesis_repo`/`kiro_repo` resolves the **effective SigLevel** — per-repo override if present, otherwise the global `[options]` value (Kiro ships the repos with no per-repo SigLevel, so they inherit the global `Required DatabaseOptional`).
 - Verdicts: **FAIL** if a repo enforces (`Required`/`Optional`) while the key is absent (the real footgun — pacman rejects every package, syncs break); **PASS** if enforcing + key trusted; **WARN** if still `Never` (transitional). Verified on a fresh v26.06.13 VM: PASS + PASS, 135/0/0.
 
+### Restore template — stop reverting nemesis to unsigned
+- `usr/local/share/kiro/pacman.conf` (the restore template `kiro-fix-pacman-conf` / ATT's `att-fix-pacman-conf` copy back; moved here from kiro-dot-files) still carried `[nemesis_repo] SigLevel = Never`, so a "fix pacman.conf" run silently turned signing back off. Removed the per-repo `SigLevel` from **both** `nemesis_repo` and `chaotic-aur` so they inherit the global `Required DatabaseOptional`, matching the shipped config (no per-repo overrides anywhere).
+
 ### Files Modified
 - `usr/local/bin/kiro-audit`
+- `usr/local/share/kiro/pacman.conf` — dropped per-repo `SigLevel` from nemesis_repo + chaotic-aur
 
 ## 2026.06.12
 

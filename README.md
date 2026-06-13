@@ -56,7 +56,6 @@ Bundled system-wide systemd units and Kiro wallpapers.
 
 ```ini
 [nemesis_repo]
-SigLevel = Never
 Server = https://erikdubois.github.io/$repo/$arch
 ```
 
@@ -66,6 +65,12 @@ sudo pacman -S kiro-system-files
 ```
 
 This installs the configs into `/etc/` and the `kiro-*` toolchain into `/usr/local/bin/`.
+
+> **Signed repo.** `nemesis_repo` packages are PGP-signed by the Kiro key. On Kiro
+> the key is already trusted (shipped + locally signed by `kiro-keyring`) and the
+> repo inherits the global `SigLevel = Required DatabaseOptional` — no per-repo line
+> needed. Adding the repo by hand on a non-Kiro box? Install `kiro-keyring` first, or
+> set `SigLevel = Optional` for the repo until it's in place, then verification kicks in.
 
 ### Manual
 
