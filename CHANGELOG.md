@@ -1,5 +1,29 @@
 # CHANGELOG
 
+## 2026.06.15
+
+### Desktop entries — localize Comment + GenericName (14 languages)
+- Added translated `Comment` and a new descriptive `GenericName` to all seven shipped desktop
+  entries, in 14 languages (de, fr, nl, es, it, pt_BR, pt, ru, pl, uk, zh_CN, ja, tr, cs). Brand
+  `Name`s and technical `Keywords` stay English.
+- The four `kiro-link-*` entries keep their URL `Comment` untouched (a URL is not translatable) and
+  receive only a translated `GenericName` ("Web Bookmark").
+- GenericName per entry: kiro-audit → "System Integrity Checker"; kiro-sysinfo → "System Information
+  Viewer"; kiro-probe-report → "Hardware Report"; the four links → "Web Bookmark".
+- **Fixed the `kiro-link-*` menu categories.** The four links had `Categories=X-Kiro;` (no registered
+  main category — catch-all off-Kiro). Now `Network;X-Kiro;`: a proper Internet home everywhere, with
+  `X-Kiro` still placing them in the Kiro submenu (`kiro.menu` includes them by both category and filename).
+- `desktop-file-validate` now clean on all seven (the earlier `Categories` hint is resolved).
+
+### Files Modified
+- `usr/share/applications/kiro-audit.desktop`
+- `usr/share/applications/kiro-sysinfo.desktop`
+- `usr/share/applications/kiro-probe-report.desktop`
+- `usr/share/applications/kiro-link-website.desktop`
+- `usr/share/applications/kiro-link-code.desktop`
+- `usr/share/applications/kiro-link-discussions.desktop`
+- `usr/share/applications/kiro-link-releases.desktop`
+
 ## 2026.06.13
 
 ### kiro-audit — verify package signing (key trust + effective SigLevel)
