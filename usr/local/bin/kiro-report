@@ -47,19 +47,24 @@ _field() {
 # Order matters: MAC and dashed-UUID first so their hex/colons aren't eaten by
 # the broader machine-id / IPv6 rules. PCI addresses (0000:03:00.0) survive
 # because the IPv6 rule only fires on the "::" double-colon, which PCI never has.
+# The IPv4 rule uses 0-255 octets and skips values followed by "-" so package
+# versions (libva 2.23.0-1) aren't mistaken for addresses; the IPv6 rule is
+# anchored on non-alphanumeric boundaries so C++ scope operators (Calamares::Job)
+# survive while real "::" addresses are still scrubbed.
 redact() {
     local esc host user
     esc=$(printf '\033')
     host="$(hostname 2>/dev/null || true)"
     user="${TARGET_USER}"
 
+    local oct='(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])'                              # a valid 0-255 IPv4 octet
     local args=()
     args+=(-e "s/${esc}\[[0-9;]*m//g")                                              # strip ANSI colors
     args+=(-e 's/([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}/<mac>/g')                       # MAC address
     args+=(-e 's/[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}/<uuid>/g')  # UUID
     args+=(-e 's/\b[0-9a-f]{32}\b/<machine-id>/g')                                  # systemd machine-id
-    args+=(-e 's/\b([0-9]{1,3}\.){3}[0-9]{1,3}\b/<ip>/g')                           # IPv4
-    args+=(-e 's/[0-9A-Fa-f:]*::[0-9A-Fa-f:]*/<ipv6>/g')                            # IPv6 (compressed)
+    args+=(-e "s/\b${oct}\.${oct}\.${oct}\.${oct}([^-0-9]|\$)/<ip>\5/g")            # IPv4 (not a version)
+    args+=(-e 's/(^|[^0-9A-Za-z:])([0-9A-Fa-f:]*::[0-9A-Fa-f:]*)([^0-9A-Za-z:]|$)/\1<ipv6>\3/g')  # IPv6 (compressed)
     args+=(-e "s#/home/${user}#/home/<user>#g")                                     # home path
     [[ -n "${host}" ]] && args+=(-e "s/\b${host}\b/<host>/g")                       # hostname
     [[ -n "${user}" ]] && args+=(-e "s/\b${user}\b/<user>/g")                       # username
@@ -140,8 +145,11 @@ section_calamares() {
 
     echo
     echo "  ${BOLD}Warnings / errors:${RESET}"
+    # Drop Qt framework chatter (beginResetModel, QObject::setParent, QIODevice::read,
+    # QLayout, ...) — it's emitted on every install and never points at a real fault.
     local cwarn
-    cwarn=$(grep -iE 'warning|error|fail|abort' /var/log/Calamares.log 2>/dev/null | tail -n 40 || true)
+    cwarn=$(grep -iE 'warning|error|fail|abort' /var/log/Calamares.log 2>/dev/null \
+        | grep -vF '(Qt):' | tail -n 40 || true)
     [[ -n "${cwarn}" ]] && echo "${cwarn}" | sed 's/^/    /' || echo "    (none)"
 
     echo

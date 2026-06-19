@@ -20,8 +20,33 @@
 - Affects only `kiro-system-files` (the sole package shipping `kiro-common.sh`); the change is a strict
   correction — no consumer wants `TARGET_USER=root` under pkexec.
 
+### kiro-common — restore /usr/local/bin on the pkexec PATH
+- **Bug (same pkexec-scrub family):** `pkexec` rewrites PATH to a minimal `/usr/sbin:/usr/bin:/sbin:/bin`
+  that omits `/usr/local/bin`. Scripts that call a sibling tool by bare name then fail under the graphical
+  root path. `kiro-report` hit exactly this — `line 201: kiro-diag: command not found` — so every
+  graphically-generated report was **missing its entire `kiro-diag` section** (hardware, GPU, kernel,
+  desktop). The `sudo` path was fine because sudo's `secure_path` includes `/usr/local/bin`.
+- **Fix:** `ensure_root` now passes an explicit `PATH` (with `/usr/local/sbin:/usr/local/bin` prepended)
+  through the `pkexec env` re-exec, alongside the existing `TERM`. Fixes every Kiro script that shells out
+  to a `/usr/local/bin` sibling, not just kiro-report.
+
+### kiro-report — drop Qt noise + stop mis-redacting versions and C++ "::"
+- The "Warnings / errors" grep surfaced Qt chatter on every install (`beginResetModel`,
+  `QObject::setParent`, `QIODevice::read`, `QLayout`, ...) that never points at a real fault. Now the
+  grep pipes through `grep -vF '(Qt):'` before `tail -n 40`, so the 40-line budget holds *meaningful*
+  warnings (branding/partition/chwd/osprober/EFI/chcon/intel-ucode) instead of being consumed by noise.
+- **Redaction false positives fixed.** The IPv4 rule matched 4-part package versions, printing
+  `libva <ip>-1`, `vulkan-tools <ip>-1`, `imagemagick <ip>-1`, etc.; the IPv6 `::` rule ate every C++
+  scope operator, mangling the Calamares log (`Calamares::JobThread::run` → `Calamares<ipv6>JobThr<ipv6>run`).
+  - IPv4 now uses valid 0-255 octets and skips a quad immediately followed by `-` (the pkgrel separator),
+    so versions survive while real addresses (followed by space/`,`/`.`/`/`/`:`) are still scrubbed.
+  - IPv6 is anchored on non-alphanumeric boundaries, so `Word::Word` survives while real `fe80::…`,
+    `::1`, and `2001:db8::…` addresses are scrubbed. PCI (`0000:03:00.0`) and timestamps (`11:32:56`)
+    are untouched (no `::`). Verified across an 11-case test matrix.
+
 ### Files Modified
-- `usr/local/lib/kiro-common.sh` — `TARGET_USER` now honours `PKEXEC_UID`
+- `usr/local/lib/kiro-common.sh` — `TARGET_USER` honours `PKEXEC_UID`; `ensure_root` passes a PATH with `/usr/local/bin` through pkexec
+- `usr/local/bin/kiro-report` — Calamares warnings exclude `(Qt):`; IPv4/IPv6 redaction tightened
 
 ## 2026.06.15
 

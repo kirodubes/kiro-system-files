@@ -187,8 +187,11 @@ ensure_root() {
     self="$(realpath "${BASH_SOURCE[-1]}")"
     if [[ -n "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ]] && command -v pkexec >/dev/null 2>&1; then
         echo "${YELLOW}$(basename "$self") needs root — requesting your password...${RESET}" >&2
-        # pkexec scrubs the environment; pass TERM through to keep colored output.
-        exec pkexec env TERM="${TERM:-xterm-256color}" "$self" "$@"
+        # pkexec scrubs the environment to a minimal PATH (/usr/sbin:/usr/bin:/sbin:/bin)
+        # that omits /usr/local/bin, so sibling tools called by bare name (e.g. kiro-diag)
+        # would not resolve. Pass TERM (color) and a PATH that includes /usr/local/bin.
+        exec pkexec env TERM="${TERM:-xterm-256color}" \
+            PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" "$self" "$@"
     fi
     echo "${YELLOW}$(basename "$self") needs root — re-running with sudo...${RESET}" >&2
     exec sudo "$self" "$@"
