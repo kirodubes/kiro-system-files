@@ -1,5 +1,28 @@
 # CHANGELOG
 
+## 2026.06.19
+
+### kiro-common — recover the invoking user on the pkexec (graphical root) path
+- **Bug:** `TARGET_USER="${SUDO_USER:-$USER}"` resolved to **root** whenever a script was elevated via
+  `pkexec` (the graphical password dialog from `ensure_root`). `pkexec` scrubs the environment to a
+  minimal safe set — it does not set `SUDO_USER` and sets `USER=root` — so the fallback picked root.
+  Any script writing or chowning user files then targeted `/root` instead of the real user's home.
+- **Symptom that surfaced it:** `kiro-report` wrote its report to `/root/kiro-report-*.log` and printed a
+  `file:///root/...` link the desktop user's browser cannot open (root-only directory).
+- **Fix:** prefer `PKEXEC_UID` (which `pkexec` *does* export — the invoking user's uid) to recover the
+  real user, then fall back to `SUDO_USER`/`USER`. The `sudo` and direct-root paths are unchanged; only
+  the previously-broken pkexec path now resolves to the human who launched the command — matching what
+  `sudo` already did.
+
+### Technical Details
+- `getent passwd "${PKEXEC_UID}" | cut -d: -f1` maps the uid back to a name; empty `PKEXEC_UID` (sudo /
+  real-root) falls through to the original `${SUDO_USER:-$USER}`.
+- Affects only `kiro-system-files` (the sole package shipping `kiro-common.sh`); the change is a strict
+  correction — no consumer wants `TARGET_USER=root` under pkexec.
+
+### Files Modified
+- `usr/local/lib/kiro-common.sh` — `TARGET_USER` now honours `PKEXEC_UID`
+
 ## 2026.06.15
 
 ### Desktop entries — localize Comment + GenericName (14 languages)

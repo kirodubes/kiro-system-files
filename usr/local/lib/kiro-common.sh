@@ -47,7 +47,14 @@ shopt -s nullglob
 ##################################################################################################################################
 # 1. Initialization
 ##################################################################################################################################
-TARGET_USER="${SUDO_USER:-$USER}"
+# pkexec (graphical root path) scrubs the environment and sets USER=root without
+# setting SUDO_USER, so the SUDO_USER/USER fallback would wrongly resolve to root
+# and write user files into /root. pkexec exports the caller's uid as PKEXEC_UID —
+# prefer it so the invoking user is recovered on the graphical path too.
+if [[ -n "${PKEXEC_UID:-}" ]]; then
+    TARGET_USER="$(getent passwd "${PKEXEC_UID}" | cut -d: -f1)"
+fi
+TARGET_USER="${TARGET_USER:-${SUDO_USER:-$USER}}"
 SCRIPT_NAME="$(basename "${0:-.}")"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 
