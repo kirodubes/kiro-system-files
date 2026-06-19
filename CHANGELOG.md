@@ -38,8 +38,9 @@
 - **Redaction false positives fixed.** The IPv4 rule matched 4-part package versions, printing
   `libva <ip>-1`, `vulkan-tools <ip>-1`, `imagemagick <ip>-1`, etc.; the IPv6 `::` rule ate every C++
   scope operator, mangling the Calamares log (`Calamares::JobThread::run` → `Calamares<ipv6>JobThr<ipv6>run`).
-  - IPv4 now uses valid 0-255 octets and skips a quad immediately followed by `-` (the pkgrel separator),
-    so versions survive while real addresses (followed by space/`,`/`.`/`/`/`:`) are still scrubbed.
+  - IPv4 now uses valid 0-255 octets and skips a quad followed by `-` (pkgrel) or `.<letter>` (git-version
+    continuation, e.g. `sddm-git`'s `…-git` hash suffix), so versions survive while real addresses —
+    including one at a sentence end (a trailing-period IP) — are still scrubbed.
   - IPv6 is anchored on non-alphanumeric boundaries, so `Word::Word` survives while real `fe80::…`,
     `::1`, and `2001:db8::…` addresses are scrubbed. PCI (`0000:03:00.0`) and timestamps (`11:32:56`)
     are untouched (no `::`). Verified across an 11-case test matrix.

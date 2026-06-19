@@ -47,8 +47,10 @@ _field() {
 # Order matters: MAC and dashed-UUID first so their hex/colons aren't eaten by
 # the broader machine-id / IPv6 rules. PCI addresses (0000:03:00.0) survive
 # because the IPv6 rule only fires on the "::" double-colon, which PCI never has.
-# The IPv4 rule uses 0-255 octets and skips values followed by "-" so package
-# versions (libva 2.23.0-1) aren't mistaken for addresses; the IPv6 rule is
+# The IPv4 rule uses 0-255 octets and skips a quad followed by "-" or ".<letter>"
+# so package versions (libva 2.23.0-1, sddm-git 0.21.0.123.gd7f8b02-1) aren't
+# mistaken for addresses, while a real IP at a sentence end (...of 10.0.0.5.) is
+# still scrubbed; the IPv6 rule is
 # anchored on non-alphanumeric boundaries so C++ scope operators (Calamares::Job)
 # survive while real "::" addresses are still scrubbed.
 redact() {
@@ -63,7 +65,7 @@ redact() {
     args+=(-e 's/([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}/<mac>/g')                       # MAC address
     args+=(-e 's/[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}/<uuid>/g')  # UUID
     args+=(-e 's/\b[0-9a-f]{32}\b/<machine-id>/g')                                  # systemd machine-id
-    args+=(-e "s/\b${oct}\.${oct}\.${oct}\.${oct}([^-0-9]|\$)/<ip>\5/g")            # IPv4 (not a version)
+    args+=(-e "s/\b${oct}\.${oct}\.${oct}\.${oct}([^-.0-9]|\.[^0-9A-Za-z]|\.\$|\$)/<ip>\5/g")  # IPv4 (not a version)
     args+=(-e 's/(^|[^0-9A-Za-z:])([0-9A-Fa-f:]*::[0-9A-Fa-f:]*)([^0-9A-Za-z:]|$)/\1<ipv6>\3/g')  # IPv6 (compressed)
     args+=(-e "s#/home/${user}#/home/<user>#g")                                     # home path
     [[ -n "${host}" ]] && args+=(-e "s/\b${host}\b/<host>/g")                       # hostname
