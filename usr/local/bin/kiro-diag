@@ -228,24 +228,44 @@ section_kernel() {
     _field "Kernel cmdline" "$(cat /proc/cmdline)"
 }
 
+# Detect the active bootloader from on-disk evidence on the ESP, not from
+# efibootmgr labels: a systemd-boot install reached via the removable fallback
+# path (\EFI\BOOT\BOOTX64.EFI) shows up only as "UEFI OS", and package presence
+# lies too (Kiro ships grub + refind even when systemd-boot is what boots).
+_bl_ver() { pacman -Q "$1" 2>/dev/null | awk '{print $2}' || echo 'installed'; }
+
 section_boot() {
     log_subsection "Bootloader"
 
-    local bl="unknown"
+    # bootctl -p resolves the ESP regardless of layout (/efi, /boot, /boot/efi).
+    local bl="unknown" esp
+    esp="$(bootctl -p 2>/dev/null || true)"
+    if [[ -z "$esp" ]]; then
+        local cand
+        for cand in /efi /boot/efi /boot; do
+            [[ -d "$cand/EFI" ]] && { esp="$cand"; break; }
+        done
+    fi
+
     if [[ -d /sys/firmware/efi ]]; then
-        local efi_entries
-        efi_entries=$(efibootmgr 2>/dev/null || true)
-        if echo "$efi_entries" | grep -qi 'systemd\|linux boot manager'; then
-            bl="systemd-boot ($(pacman -Q systemd 2>/dev/null | awk '{print $2}' || echo 'installed'))"
-        elif echo "$efi_entries" | grep -qi 'grub'; then
-            bl="GRUB ($(pacman -Q grub 2>/dev/null | awk '{print $2}' || echo 'installed'))"
-        elif echo "$efi_entries" | grep -qi 'refind'; then
-            bl="rEFInd ($(pacman -Q refind 2>/dev/null | awk '{print $2}' || echo 'installed'))"
-        elif echo "$efi_entries" | grep -qi 'limine'; then
-            bl="Limine ($(pacman -Q limine 2>/dev/null | awk '{print $2}' || echo 'installed'))"
+        if [[ "$(bootctl is-installed 2>/dev/null || true)" == yes ]] \
+            || [[ -n "$esp" && -e "$esp/EFI/systemd/systemd-bootx64.efi" ]] \
+            || [[ -n "$esp" && -e "$esp/loader/loader.conf" ]]; then
+            bl="systemd-boot ($(_bl_ver systemd))"
+        elif [[ -n "$esp" ]] && { [[ -e "$esp/EFI/refind/refind.conf" ]] || compgen -G "$esp/EFI/refind/refind*.efi" >/dev/null; }; then
+            bl="rEFInd ($(_bl_ver refind))"
+        elif { [[ -n "$esp" ]] && { compgen -G "$esp/EFI/*/limine*.efi" >/dev/null || [[ -e "$esp/limine.conf" ]]; }; } \
+            || [[ -e /boot/limine.conf || -e /boot/limine.cfg ]]; then
+            bl="Limine ($(_bl_ver limine))"
+        elif { [[ -n "$esp" ]] && compgen -G "$esp/EFI/*/grub*.efi" >/dev/null; } || [[ -e /boot/grub/grub.cfg ]]; then
+            bl="GRUB ($(_bl_ver grub))"
         fi
     else
-        [[ -f /boot/grub/grub.cfg ]] && bl="GRUB (legacy BIOS)"
+        if [[ -e /boot/grub/grub.cfg ]]; then
+            bl="GRUB (legacy BIOS)"
+        elif [[ -e /boot/limine.cfg || -e /boot/limine.conf ]]; then
+            bl="Limine (legacy BIOS)"
+        fi
     fi
     _field "Bootloader" "$bl"
 }

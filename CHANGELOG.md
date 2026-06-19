@@ -45,9 +45,24 @@
     `::1`, and `2001:db8::…` addresses are scrubbed. PCI (`0000:03:00.0`) and timestamps (`11:32:56`)
     are untouched (no `::`). Verified across an 11-case test matrix.
 
+### kiro-diag — reliable bootloader detection (systemd-boot / GRUB / Limine / rEFInd)
+- **Bug:** detection parsed `efibootmgr` labels. A systemd-boot install reached via the removable
+  fallback path (`\EFI\BOOT\BOOTX64.EFI`) is labelled only `UEFI OS` by firmware, matching none of the
+  patterns → `Bootloader: unknown`. Package presence was no help either — Kiro ships `grub` + `refind`
+  even when systemd-boot is what actually boots.
+- **Fix:** resolve the ESP with `bootctl -p` (layout-agnostic: `/efi`, `/boot`, `/boot/efi`) and detect from
+  authoritative on-disk evidence, in priority order:
+  - **systemd-boot** — `bootctl is-installed` = yes, or `$ESP/EFI/systemd/systemd-bootx64.efi`, or `$ESP/loader/loader.conf`
+  - **rEFInd** — `$ESP/EFI/refind/refind.conf` or `refind*.efi`
+  - **Limine** — `$ESP/EFI/*/limine*.efi`, `$ESP/limine.conf`, or `/boot/limine.{conf,cfg}` (incl. BIOS)
+  - **GRUB** — `$ESP/EFI/*/grub*.efi` or `/boot/grub/grub.cfg` (incl. legacy BIOS)
+- Version still comes from `pacman -Q`. Verified against synthetic ESP layouts for all four loaders plus the
+  no-match case; on the dev box (`UEFI OS` fallback) it now correctly reports `systemd-boot`.
+
 ### Files Modified
 - `usr/local/lib/kiro-common.sh` — `TARGET_USER` honours `PKEXEC_UID`; `ensure_root` passes a PATH with `/usr/local/bin` through pkexec
 - `usr/local/bin/kiro-report` — Calamares warnings exclude `(Qt):`; IPv4/IPv6 redaction tightened
+- `usr/local/bin/kiro-diag` — bootloader detection rewritten to use ESP evidence, not efibootmgr labels
 
 ## 2026.06.15
 
