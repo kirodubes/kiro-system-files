@@ -2,6 +2,19 @@
 
 ## 2026.06.21
 
+### Remove the systemd-logind.service drop-in (`10-kiro-session.conf`)
+- **What:** deleted `etc/systemd/system/systemd-logind.service.d/10-kiro-session.conf` (and its now-empty
+  `.service.d` dir), plus its expected-config entries in `kiro-audit` and `kiro-verify`.
+- **Why:** the drop-in overrode the deliberately-tuned upstream `systemd-logind.service` —
+  `Restart=always`→`on-failure`, `RestartSec=0`→`5s`, plus `KillMode=mixed` / `KillSignal=SIGTERM`. logind
+  is the seat manager that hands DRM-master to each new session, so upstream runs it `Restart=always` /
+  `RestartSec=0` on purpose; weakening that is risky and the file's own comments were factually wrong
+  ("Restart on failure … ensures session management works" — the opposite is true). Reverting to upstream
+  behaviour is strictly safer. (It was *not* the cause of the Plasma logout black screen — that was
+  `archlinux-logout` running `pkill plasma`; this is an independent correctness fix.)
+- Both `kiro-audit` (`check_systemd_dropins`) and `kiro-verify` config-presence lists updated so they no
+  longer expect the removed file.
+
 ### kiro-audit — new "Kiro Plasma theme/config" check
 - **What:** added a `check_kiro_plasma` section that runs **only when Plasma is installed**. It reports
   two things for the installed `kiro-plasma-*` set: (1) **delivery** — the config each package ships under

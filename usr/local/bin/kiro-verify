@@ -105,7 +105,6 @@ check_config_files() {
         /etc/security/limits.d/99-kiro.conf
         /etc/sudoers.d/dmesg-nopasswd
         /etc/systemd/resolved.conf.d/10-kiro-mdns.conf
-        /etc/systemd/system/systemd-logind.service.d/10-kiro-session.conf
         /etc/tmpfiles.d/thp-tuning.conf
         /etc/udev/rules.d/60-io-scheduler.rules
         /etc/udev/rules.d/60-ioschedulers-tuning.rules

@@ -793,7 +793,6 @@ check_systemd_dropins() {
     log_section "Systemd drop-ins"
 
     local dropins=(
-        /etc/systemd/system/systemd-logind.service.d/10-kiro-session.conf
         /etc/systemd/system.conf.d/10-kiro-system.conf
         /etc/systemd/system.conf.d/90-memory-accounting.conf
         /etc/systemd/journald.conf.d/10-kiro-journal.conf
