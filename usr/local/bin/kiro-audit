@@ -1178,6 +1178,30 @@ check_disk_format() {
     fi
 }
 
+# Resolve the EFFECTIVE X cursor for a user through the real lookup chain and
+# record where it came from. Sets globals CURSOR_VAL / CURSOR_SRC (a command
+# substitution can't set globals, so this returns via globals, not stdout).
+CURSOR_VAL=""
+CURSOR_SRC=""
+resolve_cursor() {
+    local u="$1" h="$2"
+    CURSOR_VAL=""
+    CURSOR_SRC=""
+    CURSOR_VAL=$(sudo -H -u "${u}" kreadconfig6 --file kcminputrc --group Mouse --key cursorTheme 2>/dev/null || true)
+    [[ -n "${CURSOR_VAL}" ]] && { CURSOR_SRC="~/.config/kcminputrc"; return; }
+    if [[ -r "${h}/.icons/default/index.theme" ]]; then
+        CURSOR_VAL=$(awk -F= '/^Inherits=/{print $2; exit}' "${h}/.icons/default/index.theme" 2>/dev/null || true)
+        [[ -n "${CURSOR_VAL}" ]] && { CURSOR_SRC="~/.icons/default/index.theme"; return; }
+    fi
+    if [[ -r /usr/share/icons/default/index.theme ]]; then
+        CURSOR_VAL=$(awk -F= '/^Inherits=/{print $2; exit}' /usr/share/icons/default/index.theme 2>/dev/null || true)
+        local owner
+        owner=$(pacman -Qqo /usr/share/icons/default/index.theme 2>/dev/null || true)
+        [[ -n "${CURSOR_VAL}" ]] && { CURSOR_SRC="/usr/share/icons/default/index.theme${owner:+ (${owner})}"; return; }
+    fi
+    CURSOR_SRC="(none found)"
+}
+
 check_kiro_plasma() {
     # Only relevant on a Plasma install — silent no-op on the tiling/XFCE editions
     pkg_installed plasma-desktop || command -v plasmashell &>/dev/null || return 0
@@ -1220,11 +1244,15 @@ check_kiro_plasma() {
         done <<<"${files}"
     done <<<"${pkgs}"
 
-    # ── 2) Visual correctness: the user's *effective* settings vs the ACTIVE
-    #   Kiro look-and-feel's declared defaults. This is what catches a wrong
-    #   cursor, colour scheme, icons, widget style or window decoration.
-    #   Scoped to the active look-and-feel so several installed theme packages
-    #   don't each report false mismatches.
+    # ── 2) Visual inventory: for each element the ACTIVE Kiro look-and-feel
+    #   declares (cursor, colour scheme, icons, widget style, decoration),
+    #   list what the user's session actually has and whether it is SET to the
+    #   intended value, DIFFERS, or is NOT SET (falling back to a cascade /
+    #   system default). Many of these only apply when the user actively
+    #   selects the Global Theme, so NOT SET is a normal state, not a failure —
+    #   hence warn, never fail. The cursor is resolved through its real lookup
+    #   chain (kcminputrc -> ~/.icons/default -> /usr/share/icons/default) so
+    #   it reports the cursor genuinely in effect, not just the kcminputrc key.
     if ! command -v kreadconfig6 &>/dev/null; then
         warn "kreadconfig6 not found — cannot verify effective Plasma settings"
         return 0
@@ -1237,7 +1265,7 @@ check_kiro_plasma() {
     local active_lnf
     active_lnf=$(sudo -H -u "${user}" kreadconfig6 --file kdeglobals --group KDE --key LookAndFeelPackage 2>/dev/null || true)
 
-    local defaults lnf_id line file group key expected actual found_active=0
+    local defaults lnf_id line file group key expected actual src found_active=0
     local hdr_re='^\[([^][]+)\]\[([^][]+)\]$'
     while IFS= read -r pkg; do
         [[ -n "${pkg}" ]] || continue
@@ -1252,11 +1280,19 @@ check_kiro_plasma() {
             [[ "${line}" == \[* ]] && { file=""; group=""; continue; }
             [[ -n "${file}" && "${line}" == *=* ]] || continue
             key="${line%%=*}"; expected="${line#*=}"
-            actual=$(sudo -H -u "${user}" kreadconfig6 --file "${file}" --group "${group}" --key "${key}" 2>/dev/null || true)
-            if [[ "${actual}" == "${expected}" ]]; then
-                pass "${user}: ${file} [${group}] ${key} = ${expected}"
+            if [[ "${file}" == "kcminputrc" && "${key}" == "cursorTheme" ]]; then
+                resolve_cursor "${user}" "${home_dir}"
+                actual="${CURSOR_VAL}"; src="${CURSOR_SRC}"
             else
-                fail "${user}: ${file} [${group}] ${key} = '${actual:-<unset>}' (expected '${expected}' from ${lnf_id})"
+                actual=$(sudo -H -u "${user}" kreadconfig6 --file "${file}" --group "${group}" --key "${key}" 2>/dev/null || true)
+                src="${file}"
+            fi
+            if [[ -z "${actual}" ]]; then
+                warn "NOT SET  ${file} [${group}] ${key} — Kiro-Sweet wants '${expected}' (using cascade/system fallback)"
+            elif [[ "${actual}" == "${expected}" ]]; then
+                pass "SET      ${file} [${group}] ${key} = ${expected}"
+            else
+                warn "DIFFERS  ${file} [${group}] ${key} = '${actual}' — Kiro-Sweet wants '${expected}' (source: ${src})"
             fi
         done <"${defaults}"
     done <<<"${pkgs}"

@@ -3,25 +3,27 @@
 ## 2026.06.21
 
 ### kiro-audit — new "Kiro Plasma theme/config" check
-- **What:** added a `check_kiro_plasma` section that runs **only when Plasma is installed**. For each
-  installed `kiro-plasma-*` package it verifies two things: (1) the config the package ships under
-  `/etc/xdg` (system-default cascade) and `/etc/skel` (new-user seed) is present, and (2) the UID 1000
-  user's *effective* Plasma settings actually match the **active** Kiro look-and-feel — cursor theme,
-  colour scheme, icon theme, widget style and window decoration.
-- **Why:** catches the common drift where a theme package is installed and its defaults are declared, but
-  the user's session doesn't actually show them (e.g. the cursor is still the stock dark `breeze_cursors`
-  instead of the shipped `Breeze_Light`). File-presence alone misses this; only the effective-value check
-  surfaces it.
+- **What:** added a `check_kiro_plasma` section that runs **only when Plasma is installed**. It reports
+  two things for the installed `kiro-plasma-*` set: (1) **delivery** — the config each package ships under
+  `/etc/xdg` (system-default cascade) and `/etc/skel` (new-user seed) is present and seeded; (2) **visual
+  inventory** — for each element the *active* Kiro look-and-feel declares (cursor, colour scheme, icons,
+  widget style, window decoration) it lists the UID 1000 user's actual effective value as **SET** (matches
+  intended), **DIFFERS**, or **NOT SET** (falling back to a cascade/system default).
+- **Why:** surfaces theme drift — what the look-and-feel intends vs what the session actually shows. Most
+  of these only apply when the user actively selects the Global Theme, so NOT SET is a normal state, not a
+  failure; the check uses `warn`, never `fail`, to avoid alarmism on a fresh install.
 
 ### Technical Details
-- Reads effective values with `sudo -H -u <user> kreadconfig6` (the audit runs as root), comparing each
-  `[file][group] key=value` declared in the active look-and-feel's `contents/defaults` against the live
-  value. Scoped to the active look-and-feel so multiple installed theme packages don't each report false
-  mismatches; a non-Kiro active look-and-feel is reported as "no Kiro Plasma theme applied".
-- Report-only (PASS/WARN/FAIL), consistent with the other checks — no `--fix` action for theme state.
-- Note: the parser stores its section-header regex in a variable (`hdr_re='^\[([^][]+)\]...'`); the
-  equivalent inline `[[ =~ ]]` form silently fails to match in Bash.
-- Man page `kiro-audit.8` updated with the new check.
+- Reads effective values with `sudo -H -u <user> kreadconfig6` (the audit runs as root). Scoped to the
+  **active** look-and-feel (`kdeglobals [KDE] LookAndFeelPackage`) so several installed theme packages
+  don't each report false mismatches; a non-Kiro active look-and-feel is reported plainly.
+- **Cursor is resolved through its real lookup chain** — `~/.config/kcminputrc` → `~/.icons/default/index.theme`
+  → `/usr/share/icons/default/index.theme` — and reports the cursor genuinely in effect plus its source
+  package, instead of just reading the (often empty) `kcminputrc` key. On a stock image this correctly
+  shows the `default-cursors` value rather than `<unset>`.
+- The look-and-feel `defaults` parser stores its section-header regex in a variable
+  (`hdr_re='^\[([^][]+)\]...'`); the equivalent inline `[[ =~ ]]` form silently fails to match in Bash.
+- Report-only — no `--fix` action for theme state. Man page `kiro-audit.8` updated with the new check.
 
 
 
