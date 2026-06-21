@@ -1,6 +1,29 @@
 # CHANGELOG
 
-## 2026.06.19
+## 2026.06.21
+
+### kiro-audit — new "Kiro Plasma theme/config" check
+- **What:** added a `check_kiro_plasma` section that runs **only when Plasma is installed**. For each
+  installed `kiro-plasma-*` package it verifies two things: (1) the config the package ships under
+  `/etc/xdg` (system-default cascade) and `/etc/skel` (new-user seed) is present, and (2) the UID 1000
+  user's *effective* Plasma settings actually match the **active** Kiro look-and-feel — cursor theme,
+  colour scheme, icon theme, widget style and window decoration.
+- **Why:** catches the common drift where a theme package is installed and its defaults are declared, but
+  the user's session doesn't actually show them (e.g. the cursor is still the stock dark `breeze_cursors`
+  instead of the shipped `Breeze_Light`). File-presence alone misses this; only the effective-value check
+  surfaces it.
+
+### Technical Details
+- Reads effective values with `sudo -H -u <user> kreadconfig6` (the audit runs as root), comparing each
+  `[file][group] key=value` declared in the active look-and-feel's `contents/defaults` against the live
+  value. Scoped to the active look-and-feel so multiple installed theme packages don't each report false
+  mismatches; a non-Kiro active look-and-feel is reported as "no Kiro Plasma theme applied".
+- Report-only (PASS/WARN/FAIL), consistent with the other checks — no `--fix` action for theme state.
+- Note: the parser stores its section-header regex in a variable (`hdr_re='^\[([^][]+)\]...'`); the
+  equivalent inline `[[ =~ ]]` form silently fails to match in Bash.
+- Man page `kiro-audit.8` updated with the new check.
+
+
 
 ### kiro-common — recover the invoking user on the pkexec (graphical root) path
 - **Bug:** `TARGET_USER="${SUDO_USER:-$USER}"` resolved to **root** whenever a script was elevated via
