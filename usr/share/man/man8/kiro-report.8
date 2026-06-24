@@ -6,6 +6,7 @@ kiro-report \- generate a public-safe Kiro diagnostic report for Kiro Discussion
 [\fB\-h\fR|\fB\-\-help\fR]
 [\fB\-v\fR|\fB\-\-version\fR]
 [\fB\-o\fR|\fB\-\-output\fR \fIPATH\fR]
+[\fB\-c\fR|\fB\-\-copy\fR]
 .SH DESCRIPTION
 .B kiro-report
 produces a single log file a user can paste into the Kiro Discussions board
@@ -63,6 +64,18 @@ Write the report to
 .I PATH
 instead of the default
 .IR ~/kiro-report-YYYYMMDD-HHMMSS.log .
+.TP
+.BR \-c ", " \-\-copy
+Also copy the report to the clipboard, wrapped in a Markdown
+.RB ( ``` )
+code fence so it pastes straight into a Discussions code block. The session
+clipboard is reached as the invoking user; needs
+.B wl-copy
+on Wayland or
+.B xclip
+/
+.B xsel
+on X11, and a running graphical session.
 .SH NOTES
 Must be run as root (it re-runs itself via polkit/sudo as needed):
 .B sudo kiro-report

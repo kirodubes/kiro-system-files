@@ -1,5 +1,28 @@
 # CHANGELOG
 
+## 2026.06.24
+
+### kiro-report — `--copy` flag (copy the report to the clipboard)
+
+- **What Changed:** added `-c`/`--copy` to `kiro-report`. After writing the redacted log file it now also
+  copies the report to the clipboard, wrapped in a Markdown ```` ``` ```` code fence so it pastes straight
+  into a Kiro Discussions code block. The support flow becomes "run → paste" instead of "open file → select
+  all → copy". Inspired by MX Linux's quick-system-info-gui "Copy for forum" button, but kept as a CLI flag
+  on the existing tool (kiro-report already exceeds QSI on content + PII redaction; only the one-click
+  clipboard convenience was missing).
+- **Technical Details:** `kiro-report` re-execs as root via `ensure_root`, so a clipboard tool run in that
+  context would target root's empty session. The new `copy_to_clipboard()` helper instead harvests the
+  invoking user's live session variables (`WAYLAND_DISPLAY` / `DISPLAY` / `XAUTHORITY` / `XDG_RUNTIME_DIR`)
+  straight from a graphical process's `/proc/<pid>/environ` — robust against random `/tmp` `XAUTHORITY`
+  paths — then runs the tool as that user with `sudo -u`. Wayland (`wl-copy`) is tried first, then X11
+  (`xclip`, then `xsel`). Degrades gracefully: when no clipboard tool or graphical session is found it logs
+  a warning and the file path still stands. Man page synopsis/options updated.
+- **Heads-up (not yet done):** the package declares no clipboard dependency and none of
+  `wl-clipboard`/`xclip`/`xsel` ship in the kiro-iso package list, so `--copy` will warn-and-skip on a stock
+  install. To make it actually copy, add `wl-clipboard`/`xclip` as `optdepends` (or to the ISO package list)
+  — left for Erik to decide.
+- **Files Modified:** `usr/local/bin/kiro-report`, `usr/share/man/man8/kiro-report.8`
+
 ## 2026.06.21
 
 ### Remove the systemd-logind.service drop-in (`10-kiro-session.conf`)

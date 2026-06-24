@@ -35,6 +35,7 @@ fi
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
 OUTPUT_PATH=""
+COPY_TO_CLIPBOARD=false
 DISCUSSIONS_URL="https://github.com/kirodubes/kiro-discussions/discussions"
 
 _field() {
@@ -218,6 +219,59 @@ build_report() {
 }
 
 ##################################################################################################################
+# Clipboard — push the report straight to the user's clipboard (--copy)
+##################################################################################################################
+# ensure_root has already re-exec'd us as root with a scrubbed environment, so a
+# clipboard tool run here would target root's (empty) session. Because we are
+# root we can read the invoking user's live session variables straight out of a
+# graphical process's /proc/<pid>/environ — far more robust than guessing socket
+# names or Xauthority paths (XAUTHORITY is often a random /tmp file). We then run
+# the clipboard tool AS that user: Wayland first (Kiro defaults to Wayland), then
+# X11. Returns non-zero when no working method exists (no wl-copy/xclip/xsel, or
+# no graphical session to copy into).
+copy_to_clipboard() {
+    local payload="$1"
+    local uid
+    uid="$(id -u "${TARGET_USER}" 2>/dev/null || true)"
+    [[ -z "${uid}" ]] && return 1
+
+    # Harvest the session env from the first user process that carries a display.
+    local pid environ vars wl display xauth runtime
+    for pid in $(pgrep -u "${uid}" 2>/dev/null || true); do
+        environ="/proc/${pid}/environ"
+        [[ -r "${environ}" ]] || continue
+        vars="$(tr '\0' '\n' < "${environ}" 2>/dev/null || true)"
+        grep -qE '^(WAYLAND_DISPLAY|DISPLAY)=.' <<<"${vars}" || continue
+        wl="$(grep -E '^WAYLAND_DISPLAY=' <<<"${vars}" | head -n1 | cut -d= -f2- || true)"
+        display="$(grep -E '^DISPLAY=' <<<"${vars}" | head -n1 | cut -d= -f2- || true)"
+        xauth="$(grep -E '^XAUTHORITY=' <<<"${vars}" | head -n1 | cut -d= -f2- || true)"
+        runtime="$(grep -E '^XDG_RUNTIME_DIR=' <<<"${vars}" | head -n1 | cut -d= -f2- || true)"
+        break
+    done
+    runtime="${runtime:-/run/user/${uid}}"
+
+    # Wayland first.
+    if [[ -n "${wl:-}" ]] && command -v wl-copy >/dev/null 2>&1; then
+        printf '%s' "${payload}" | sudo -u "${TARGET_USER}" \
+            env XDG_RUNTIME_DIR="${runtime}" WAYLAND_DISPLAY="${wl}" wl-copy 2>/dev/null && return 0
+    fi
+
+    # X11 (xclip / xsel) against the harvested display and X authority.
+    if [[ -n "${display:-}" ]]; then
+        local x11env=(DISPLAY="${display}")
+        [[ -n "${xauth:-}" ]] && x11env+=(XAUTHORITY="${xauth}")
+        if command -v xclip >/dev/null 2>&1; then
+            printf '%s' "${payload}" | sudo -u "${TARGET_USER}" env "${x11env[@]}" xclip -selection clipboard 2>/dev/null && return 0
+        fi
+        if command -v xsel >/dev/null 2>&1; then
+            printf '%s' "${payload}" | sudo -u "${TARGET_USER}" env "${x11env[@]}" xsel --clipboard --input 2>/dev/null && return 0
+        fi
+    fi
+
+    return 1
+}
+
+##################################################################################################################
 # Main
 ##################################################################################################################
 
@@ -228,8 +282,9 @@ main() {
             -h|--help)
                 show_help "$(basename "$0")" \
                     "Generate a public-safe Kiro diagnostic report for Kiro Discussions" \
-                    "[--help] [--version] [--output PATH]" \
-                    "-o, --output PATH   Write the report to PATH instead of the default"
+                    "[--help] [--version] [--output PATH] [--copy]" \
+                    "-o, --output PATH   Write the report to PATH instead of the default
+    -c, --copy          Also copy the report to the clipboard (fenced for Discussions)"
                 exit 0
                 ;;
             -v|--version)
@@ -243,6 +298,10 @@ main() {
                 ;;
             -o=*|--output=*)
                 OUTPUT_PATH="${1#*=}"
+                shift
+                ;;
+            -c|--copy)
+                COPY_TO_CLIPBOARD=true
                 shift
                 ;;
             *)
@@ -269,6 +328,20 @@ main() {
     log_success "Report saved (redacted for public sharing):"
     echo "  file://${outfile}"
     echo
+
+    if [[ "${COPY_TO_CLIPBOARD}" == true ]]; then
+        # GitHub Discussions renders Markdown, so wrap the report in a ``` fence
+        # — pasting then drops straight into a code block.
+        local fenced
+        fenced="$(printf '```\n%s\n```\n' "$(cat "${outfile}")")"
+        if copy_to_clipboard "${fenced}"; then
+            log_success "Report copied to the clipboard (fenced for Discussions) — just paste it."
+        else
+            log_warn "Could not reach the clipboard (no wl-copy/xclip/xsel, or no graphical session)."
+        fi
+        echo
+    fi
+
     log_info "Review it, then paste the contents inside a code block (\`\`\`) on:"
     echo "  ${DISCUSSIONS_URL}"
     echo
