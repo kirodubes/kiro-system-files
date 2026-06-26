@@ -1,5 +1,27 @@
 # CHANGELOG
 
+## 2026.06.26
+
+### System tuning — adopt two CachyOS improvements (live diff vs clean CachyOS)
+
+- **What Changed:** compared `kiro-system-files` against a clean CachyOS rolling install
+  (`cachyos-settings`) and adopted the two genuine deltas where CachyOS was ahead. (1) Added
+  `etc/modules-load.d/ntsync.conf` to autoload the `ntsync` module — NT synchronization primitives
+  that significantly speed up Wine/Proton; the module ships in our default `linux-cachyos` kernel
+  (and `linux-zen`) but was never loaded. (2) Fixed `etc/tmpfiles.d/thp-tuning.conf`:
+  `khugepaged/max_ptes_none` was set to `511`, which is the kernel default and therefore a no-op —
+  changed to `409` (split any THP >80% zero-filled) so the THP shrinker actually reduces RSS
+  over-provisioning under `THP=always`, matching CachyOS.
+- **Technical Details:** both tweaks are kernel-agnostic per the repo rule — `systemd-modules-load`
+  silently skips `ntsync` on kernels that lack it, and `max_ptes_none=409` is valid on every 6.12+
+  kernel (older kernels harmlessly fail the tmpfiles write). The wider diff confirmed Kiro is
+  otherwise a superset of CachyOS (sysctl, limits, journald, systemd-oomd, ananicy-cpp all already
+  ahead). Two items intentionally left for a separate decision: zram `min(ram/2, 4096)` cap vs
+  CachyOS's `zram-size = ram`, and the swappiness=150 comment that miscredits CachyOS (it uses 100).
+- **Files Modified:**
+  - `etc/modules-load.d/ntsync.conf` (new)
+  - `etc/tmpfiles.d/thp-tuning.conf`
+
 ## 2026.06.24
 
 ### kiro-report — `--copy` flag (copy the report to the clipboard)
