@@ -16,11 +16,29 @@
   silently skips `ntsync` on kernels that lack it, and `max_ptes_none=409` is valid on every 6.12+
   kernel (older kernels harmlessly fail the tmpfiles write). The wider diff confirmed Kiro is
   otherwise a superset of CachyOS (sysctl, limits, journald, systemd-oomd, ananicy-cpp all already
-  ahead). Two items intentionally left for a separate decision: zram `min(ram/2, 4096)` cap vs
-  CachyOS's `zram-size = ram`, and the swappiness=150 comment that miscredits CachyOS (it uses 100).
+  ahead). Two items were left for a separate decision at the time — both now resolved in the
+  follow-up below: the zram cap and the swappiness comment.
 - **Files Modified:**
   - `etc/modules-load.d/ntsync.conf` (new)
   - `etc/tmpfiles.d/thp-tuning.conf`
+
+### ZRAM sizing + swappiness comment accuracy (follow-up to the CachyOS diff)
+
+- **What Changed:** (1) Raised the ZRAM device size from `min(ram / 2, 4096)` to `min(ram, 8192)`
+  in `etc/systemd/zram-generator.conf`. The old 4 GiB cap under-served 16 GB+ machines and clashed
+  with our aggressive `vm.swappiness = 150` — we told the kernel to swap eagerly but handed it a
+  small target. ZRAM size is a *cap*, not a reservation (real RAM is consumed only as pages are
+  actually swapped, and compressed), so a generous size is cheap; low/mid-RAM boxes now get
+  ZRAM == RAM. (2) Corrected the `vm.swappiness` comment in
+  `etc/sysctl.d/99-kiro-optimizations.conf`: it claimed "150 is the modern Arch ZRAM standard
+  (CachyOS…)", but a clean CachyOS install actually ships `vm.swappiness = 100`. Reworded to state
+  that 150 is our deliberate aggressive choice (kernel cap is 200 since 5.8), not a copied convention.
+- **Technical Details:** kept an 8 GiB ceiling rather than CachyOS's unbounded `zram-size = ram`
+  so very-high-RAM machines don't allocate pointless device metadata; the value change is
+  kernel-agnostic. No functional change to swappiness — comment-only fix for accuracy.
+- **Files Modified:**
+  - `etc/systemd/zram-generator.conf`
+  - `etc/sysctl.d/99-kiro-optimizations.conf`
 
 ## 2026.06.24
 
