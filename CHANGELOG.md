@@ -9,8 +9,17 @@
   directory file the menu references, matching how the existing `kiro.directory` is
   shipped here.
 
+- **Removed four Internet-menu link launchers** — `kiro-link-website`,
+  `kiro-link-releases`, `kiro-link-discussions`, and `kiro-link-code`. These were
+  plain web-link `.desktop` entries (Kiro Website / Releases / Discussions / Source
+  Code) cluttering the Internet category; dropped at Erik's request.
+
 ### Files Modified
 - `usr/share/desktop-directories/kiro-apps.directory` (new)
+- `usr/share/applications/kiro-link-website.desktop` (removed)
+- `usr/share/applications/kiro-link-releases.desktop` (removed)
+- `usr/share/applications/kiro-link-discussions.desktop` (removed)
+- `usr/share/applications/kiro-link-code.desktop` (removed)
 
 ## 2026.06.26
 
