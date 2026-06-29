@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 2026.06.29
+
+### What Changed
+- **Added `kiro-apps.directory`** — the freedesktop directory entry backing the new
+  "Kiro Apps" application menu (Name=Kiro Apps, Icon=applications-utilities). The menu
+  definition itself lives in `kiro-dot-files` (`kiro.menu`); this package ships the
+  directory file the menu references, matching how the existing `kiro.directory` is
+  shipped here.
+
+### Files Modified
+- `usr/share/desktop-directories/kiro-apps.directory` (new)
+
 ## 2026.06.26
 
 ### System tuning — adopt two CachyOS improvements (live diff vs clean CachyOS)
