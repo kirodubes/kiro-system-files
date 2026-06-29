@@ -9,17 +9,19 @@
   directory file the menu references, matching how the existing `kiro.directory` is
   shipped here.
 
-- **Removed four Internet-menu link launchers** — `kiro-link-website`,
-  `kiro-link-releases`, `kiro-link-discussions`, and `kiro-link-code`. These were
-  plain web-link `.desktop` entries (Kiro Website / Releases / Discussions / Source
-  Code) cluttering the Internet category; dropped at Erik's request.
+- **Moved four web-link launchers out of the Internet menu into the Kiro menu** —
+  `kiro-link-website`, `kiro-link-releases`, `kiro-link-discussions`, and
+  `kiro-link-code` (Kiro Website / Releases / Discussions / Source Code). They carried
+  `Categories=Network;X-Kiro;`, so they appeared in *both* Internet and Kiro; dropped
+  `Network` → `Categories=X-Kiro;` so they now live only under the Kiro menu. (An
+  earlier 115 build deleted them outright — this restores them, relocated.)
 
 ### Files Modified
 - `usr/share/desktop-directories/kiro-apps.directory` (new)
-- `usr/share/applications/kiro-link-website.desktop` (removed)
-- `usr/share/applications/kiro-link-releases.desktop` (removed)
-- `usr/share/applications/kiro-link-discussions.desktop` (removed)
-- `usr/share/applications/kiro-link-code.desktop` (removed)
+- `usr/share/applications/kiro-link-website.desktop` (Categories → X-Kiro only)
+- `usr/share/applications/kiro-link-releases.desktop` (Categories → X-Kiro only)
+- `usr/share/applications/kiro-link-discussions.desktop` (Categories → X-Kiro only)
+- `usr/share/applications/kiro-link-code.desktop` (Categories → X-Kiro only)
 
 ## 2026.06.26
 
