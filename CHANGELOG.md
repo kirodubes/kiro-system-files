@@ -30,6 +30,76 @@
   uses `ensure_root` (skipped for the read-only status check) and
   `execute_or_dryrun` for `--dry-run` support.
 
+### Bug Fixes (found during interactive testing on a VirtualBox VM)
+- **`ensure_root` re-exec dropped the interactively-chosen option** — picking 2)
+  Restore Xorg at the menu prompt, then entering the sudo/pkexec password, looped
+  back to an empty menu instead of proceeding. `ensure_root "$@"` re-execs the
+  script via `sudo`/`pkexec` using the *original* command-line args, which are
+  empty when the choice came from the interactive prompt rather than a flag. Fixed
+  by building an explicit `reexec_args` array (`choice` + `--dry-run` if set) and
+  passing that to `ensure_root` instead of `"$@"`.
+- **`--dry-run` silently mutated `/etc/pacman.conf` for real** — `append_repo_to_pacman`
+  and `remove_repo_from_pacman` (`kiro-common.sh`) have no `DRY_RUN` awareness at
+  all; calling them unconditionally meant `--xlibre --dry-run` / `--rollback
+  --dry-run` would actually add/remove the `[xlibre]` repo entry despite the
+  documented "no changes will be made" promise — worse, `confirm_with_dryrun`
+  auto-confirms in dry-run mode, so this happened with no prompt at all. Fixed by
+  explicitly branching on `DRY_RUN` around both calls (and around
+  `backup_package_list`'s write) instead of relying on the shared helpers.
+- Fixed the X-server version banner match: XLibre's `-version` banner is
+  `XLibre X Server`, not `X11Libre` — the wrong string also happened to
+  substring-match the report-a-bug URL in the same output
+  (`.../X11Libre/xserver`), causing `check_x_server_status` to report a garbage
+  "Binary reports" line instead of the real banner.
+- Choosing menu option 3 (status) after status was made to auto-display at
+  script start had become a silent no-op — fixed so picking it explicitly still
+  shows the check again, since a user who chose it expects to see output.
+- **`--rollback` failed with "unresolvable package conflicts detected"** on real
+  VM testing: `pacman -S --noconfirm xorg-server xf86-input-libinput ...` hit a
+  cross-conflict between `xf86-input-libinput` and the ABI version
+  `xlibre-xserver` provides, whose removal prompt defaults to `N` — `--noconfirm`
+  picks that default instead of resolving it, aborting the whole transaction
+  (confirmed atomically rolled back, no partial damage). Fixed by explicitly
+  removing every installed `xlibre-*` package (`pacman -Rdd --noconfirm`) before
+  reinstalling Xorg's packages, rather than relying on `pacman -S`'s conflict
+  auto-resolution. Applied the same defensive removal to `install_xlibre()` for
+  `xorg-server-*`/`xf86-*` packages, even though that direction worked in
+  testing — the same conflict-prompt-default asymmetry could bite users with
+  different driver combos (NVIDIA/AMD) not covered by this Intel-only VM test.
+- **The base `xorg-server`↔`xlibre-xserver` conflict has the exact same
+  no-confirm-defaults-to-no problem** as the driver-level conflict above —
+  confirmed on a second real-VM failure ("xlibre-xserver and xorg-server are in
+  conflict. Remove xorg-server?" aborted the whole install). Extended
+  `install_xlibre()`'s explicit pre-removal to include the base `xorg-server`
+  package itself, not just its `xf86-*`/`xorg-server-<suffix>` drivers.
+- **Found and fixed a serious, previously-undetected bug**: every
+  `mapfile -t arr < <(pacman -Qq | grep ... [| while read ...])` call in this
+  script silently corrupted its own result whenever the `grep` found zero
+  matches (a completely normal case — e.g. no extra `xf86-*` drivers
+  installed). Root cause: under this script's `pipefail` + the global ERR trap
+  (`kiro-common.sh`), a `grep` returning no-match makes the whole pipeline
+  report non-zero, which fires the ERR trap *inside* the process-substitution
+  subshell; since `log_error()` writes its banner via plain `echo` to stdout
+  (not stderr), that banner text got captured by `mapfile` right alongside the
+  real output, injecting garbage "package names" — reproduced live: a real run
+  had `pacman -S` reject the literal error-banner text ("ERROR DETECTED",
+  line numbers, etc.) as package names, aborting with "target not found" for
+  each line of it. Verified `check_x_server_status()`'s
+  `var="$(...)" || fallback` pattern is unaffected (commands on the left of
+  `||` are exempted from the ERR trap per bash's documented behavior) — only
+  the four `mapfile < <(...)` call sites needed a trailing `|| true` to
+  neutralize the pipeline's exit status without losing real output.
+- One of the corrupted runs above left the VM in a genuinely dangerous state:
+  `/usr/lib/Xorg` itself got deleted (a still-running X process kept working
+  only because Linux preserves an already-open file's contents after
+  unlinking) — the next crash/restart/reboot would have had no X server
+  binary to launch at all. Recovered by hand before any further testing.
+- All fixes verified end-to-end by directly driving the VM's shell
+  non-interactively rather than relying on manual re-testing: both
+  `--xlibre` and `--rollback` now complete cleanly with a correct final
+  `check_x_server_status()` report and no leftover `[xlibre]` pacman.conf
+  entry after rollback.
+
 ### Files Modified
 - `usr/local/bin/kiro-xlibre-swap` (new)
 - `usr/share/man/man8/kiro-xlibre-swap.8` (new)

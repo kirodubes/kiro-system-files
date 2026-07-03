@@ -68,8 +68,12 @@ check_x_server_status() {
 
 backup_package_list() {
     log_subsection "Backing up current package list"
-    pacman -Qe > "${BACKUP_FILE}"
-    log_success "Saved to ${BACKUP_FILE}"
+    if [[ "${DRY_RUN}" == "true" ]]; then
+        log_info "[DRY-RUN] Would save 'pacman -Qe' output to ${BACKUP_FILE}"
+    else
+        pacman -Qe > "${BACKUP_FILE}"
+        log_success "Saved to ${BACKUP_FILE}"
+    fi
 }
 
 warn_proprietary_nvidia() {
@@ -94,11 +98,19 @@ add_xlibre_repo() {
         execute_or_dryrun "Locally sign XLibre key" sudo pacman-key --lsign-key "${XLIBRE_REPO_KEY}"
     fi
 
-    if ! grep -q '^\[xlibre\]' /etc/pacman.conf && [[ "${DRY_RUN}" != "true" ]]; then
+    if ! grep -q '^\[xlibre\]' /etc/pacman.conf; then
         execute_or_dryrun "Backup pacman.conf" sudo cp /etc/pacman.conf "${PACMAN_CONF_BACKUP}"
     fi
-    append_repo_to_pacman "xlibre" "[xlibre]
+
+    # append_repo_to_pacman (kiro-common.sh) has no DRY_RUN awareness — it
+    # writes to /etc/pacman.conf unconditionally. Guard it explicitly here
+    # so --dry-run actually makes no changes, matching every other step.
+    if [[ "${DRY_RUN}" == "true" ]]; then
+        log_info "[DRY-RUN] Would add '[xlibre]' repository to /etc/pacman.conf"
+    else
+        append_repo_to_pacman "xlibre" "[xlibre]
 Server = ${XLIBRE_REPO_URL}"
+    fi
 
     execute_or_dryrun "Refresh pacman databases" sudo pacman -Syy
 }
@@ -106,6 +118,16 @@ Server = ${XLIBRE_REPO_URL}"
 # Per x11libre.net's own README: every installed xf86-* driver package
 # (and any xorg-server-<suffix> subpackage) needs its xlibre- counterpart,
 # or pacman won't resolve the swap via conflicts.
+#
+# The trailing `|| true` matters: under this script's `pipefail` + ERR trap
+# (from kiro-common.sh), a `while read` pipeline that finds zero matches —
+# a completely normal case — still reports non-zero (read hits EOF), which
+# fires the ERR trap *inside* this function's process-substitution subshell.
+# Since log_error() writes via plain `echo` to stdout, that error banner
+# text gets captured by mapfile right along with the real output, silently
+# injecting garbage "package names" into the install/removal list (this
+# broke a real run: the ERROR DETECTED banner text got passed to
+# `pacman -S`, which then reported "target not found" for each line of it).
 find_xlibre_driver_replacements() {
     local pkg
     pacman -Qq | grep -E '^xorg-server-.+|^xf86-' | while read -r pkg; do
@@ -114,7 +136,7 @@ find_xlibre_driver_replacements() {
         else
             echo "xlibre-${pkg#xf86-}"
         fi
-    done
+    done || true
 }
 
 install_xlibre() {
@@ -129,6 +151,22 @@ install_xlibre() {
         log_info "No installed xf86-* driver packages found — nothing extra to match"
     fi
 
+    # Remove every installed xorg-server(-*)/xf86-* package explicitly first —
+    # pacman's "Remove conflicting package?" prompt defaults to N, and
+    # --noconfirm accepts that default instead of forcing the removal, so
+    # `pacman -S` alone cannot be trusted to swap out the base xorg-server
+    # package or its drivers (confirmed on real VM testing: a --noconfirm
+    # install of xlibre-xserver failed with "xlibre-xserver and xorg-server
+    # are in conflict" and aborted the whole transaction). See the matching
+    # comment in perform_rollback(). Safe to reinstall right after since
+    # --needed just no-ops anything already at the target version.
+    local xorg_installed=()
+    mapfile -t xorg_installed < <(pacman -Qq | grep -E '^xorg-server(-.+)?$|^xf86-' || true)
+    if [[ "${#xorg_installed[@]}" -gt 0 ]]; then
+        log_info "Removing Xorg packages first: ${xorg_installed[*]}"
+        execute_or_dryrun "Remove Xorg packages" sudo pacman -Rdd --noconfirm "${xorg_installed[@]}"
+    fi
+
     log_subsection "Installing XLibre: ${packages[*]}"
     execute_or_dryrun "Install XLibre packages" sudo pacman -S --noconfirm --needed "${packages[@]}"
 }
@@ -137,6 +175,7 @@ install_xlibre() {
 # xlibre-xserver-*/xlibre-input-*/xlibre-video-* package (beyond the core
 # xlibre-xserver/xlibre-input-libinput, which xorg-server/xf86-input-libinput
 # already conflict with) back to its xorg-server-*/xf86-* counterpart.
+# Trailing `|| true` — see the comment on find_xlibre_driver_replacements().
 find_xorg_driver_replacements() {
     local pkg
     pacman -Qq | grep -E '^xlibre-xserver-.+|^xlibre-(input|video)-' \
@@ -146,7 +185,7 @@ find_xorg_driver_replacements() {
         else
             echo "xf86-${pkg#xlibre-}"
         fi
-    done
+    done || true
 }
 
 perform_rollback() {
@@ -160,9 +199,28 @@ perform_rollback() {
         log_info "Restoring matching xf86 drivers: ${xorg_replacements[*]}"
     fi
 
+    # Remove every installed xlibre-* package explicitly first, rather than
+    # relying on `pacman -S`'s automatic conflict resolution: that failed in
+    # testing on a cross-conflict (xf86-input-libinput vs. the ABI version
+    # xlibre-xserver provides) whose removal prompt defaults to N even under
+    # --noconfirm, aborting the whole transaction. With no xlibre-* package
+    # left installed, there's nothing left to conflict with Xorg's packages.
+    local xlibre_installed=()
+    mapfile -t xlibre_installed < <(pacman -Qq | grep -E '^xlibre-(xserver|input|video)' || true)
+    if [[ "${#xlibre_installed[@]}" -gt 0 ]]; then
+        log_info "Removing XLibre packages first: ${xlibre_installed[*]}"
+        execute_or_dryrun "Remove XLibre packages" sudo pacman -Rdd --noconfirm "${xlibre_installed[@]}"
+    fi
+
     execute_or_dryrun "Reinstall Xorg packages" sudo pacman -S --noconfirm --needed "${packages[@]}"
 
-    remove_repo_from_pacman "xlibre"
+    # remove_repo_from_pacman (kiro-common.sh) has no DRY_RUN awareness either
+    # — same guard as add_xlibre_repo above.
+    if [[ "${DRY_RUN}" == "true" ]]; then
+        log_info "[DRY-RUN] Would remove '[xlibre]' repository from /etc/pacman.conf"
+    else
+        remove_repo_from_pacman "xlibre"
+    fi
     if [[ -f "${PACMAN_CONF_BACKUP}" ]]; then
         execute_or_dryrun "Remove pacman.conf backup" sudo rm -f "${PACMAN_CONF_BACKUP}"
     fi
@@ -250,10 +308,18 @@ main() {
     fi
 
     if [[ "${choice}" == "3" ]]; then
+        check_x_server_status
         exit 0
     fi
 
-    ensure_root "$@"
+    # ensure_root re-execs this script via sudo/pkexec. Pass the resolved
+    # choice (and dry-run flag) explicitly, not the original "$@" — the
+    # original args are empty when the choice came from the interactive
+    # prompt, and re-execing with empty args would just show the menu
+    # again instead of proceeding with what was already chosen.
+    local reexec_args=("${choice}")
+    [[ "${DRY_RUN}" == "true" ]] && reexec_args+=("--dry-run")
+    ensure_root "${reexec_args[@]}"
 
     case "${choice}" in
         1) do_install ;;
