@@ -1,0 +1,269 @@
+#!/bin/bash
+set -euo pipefail
+#####################################################################
+# Author    : Erik Dubois
+# Website   : https://kiroproject.be
+#####################################################################
+#
+#   DO NOT JUST RUN THIS. EXAMINE AND JUDGE. RUN AT YOUR OWN RISK.
+#
+#   Purpose:
+#   Presents a menu: 1) install XLibre, 2) restore Xorg, or 3) show which
+#   X server is currently active. Installing adds x11libre.net's official
+#   signed [xlibre] pacman repo and installs xlibre-xserver +
+#   xlibre-input-libinput + a matching xlibre-* package for every
+#   currently installed xf86-* driver. Restoring reverses that and
+#   removes the [xlibre] repo again.
+#
+#   Why: the AUR xlibre-*-bin packages are a stale third-party wrapper
+#   pinned to abandoned version numbers that 404 against x11libre.net's
+#   current repo layout. Installing straight from x11libre.net's own
+#   signed pacman repo is the method XLibre's maintainer documents and
+#   is the safest path, avoiding the AUR wrapper's makepkg breakage.
+#
+#####################################################################
+
+# shellcheck source=/usr/local/lib/kiro-common.sh
+if [[ -f /usr/local/lib/kiro-common.sh ]]; then
+    source /usr/local/lib/kiro-common.sh
+else
+    echo "ERROR: kiro-common.sh not found" >&2
+    exit 1
+fi
+
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+DRY_RUN=false
+
+XLIBRE_REPO_URL="https://x11libre.net/repo/arch_based/x86_64"
+XLIBRE_REPO_KEY="73580DE2EDDFA6D6"
+PACMAN_CONF_BACKUP="/etc/pacman.conf.pre-xlibre.bak"
+BACKUP_FILE="/var/log/kiro-xlibre-swap-packages.txt"
+
+#####################################################################
+# Functions
+#####################################################################
+
+# Shows which X server is actually installed and running, via the two
+# most direct checks: which package owns the Xorg binary, and the
+# version banner the binary itself reports (X11Libre vs X.Org).
+check_x_server_status() {
+    log_subsection "Current X server"
+
+    local owner
+    owner="$(pacman -Qo /usr/lib/Xorg 2>/dev/null | awk '{print $NF, $(NF-1)}')" || owner="unknown"
+    echo "  Package: ${owner}"
+
+    local banner
+    banner="$(/usr/lib/Xorg -version 2>&1 | grep -iE 'X11Libre|X\.Org X Server' | head -1)" || banner="unknown"
+    echo "  Binary reports: ${banner}"
+
+    if echo "${owner}" | grep -qi xlibre; then
+        log_success "Running XLibre"
+    elif echo "${owner}" | grep -qi xorg-server; then
+        log_info "Running stock Xorg"
+    else
+        log_warn "Could not determine which X server is installed"
+    fi
+}
+
+backup_package_list() {
+    log_subsection "Backing up current package list"
+    pacman -Qe > "${BACKUP_FILE}"
+    log_success "Saved to ${BACKUP_FILE}"
+}
+
+warn_proprietary_nvidia() {
+    if pkg_installed nvidia-utils; then
+        log_warn "Proprietary nvidia-utils detected. Before xlibre-xserver 26.0.0.16,
+its X driver ABI may lag XLibre's. If X fails to start after the swap, add:
+    /etc/X11/xorg.conf.d/xlibre.conf
+        Section \"ServerFlags\"
+            Option \"IgnoreABI\" \"true\"
+        EndSection
+See: https://github.com/X11Libre/xserver/wiki/Compatibility-of-XLibre#nvidia-proprietary-driver"
+    fi
+}
+
+add_xlibre_repo() {
+    log_subsection "Adding the [xlibre] pacman repo"
+
+    if ! pacman-key -f "${XLIBRE_REPO_KEY}" >/dev/null 2>&1; then
+        log_info "Importing and locally signing the XLibre packaging key"
+        execute_or_dryrun "Import XLibre key" bash -c \
+            "curl -sS '${XLIBRE_REPO_URL}/0x${XLIBRE_REPO_KEY}.gpg' | sudo pacman-key --add -"
+        execute_or_dryrun "Locally sign XLibre key" sudo pacman-key --lsign-key "${XLIBRE_REPO_KEY}"
+    fi
+
+    if ! grep -q '^\[xlibre\]' /etc/pacman.conf && [[ "${DRY_RUN}" != "true" ]]; then
+        execute_or_dryrun "Backup pacman.conf" sudo cp /etc/pacman.conf "${PACMAN_CONF_BACKUP}"
+    fi
+    append_repo_to_pacman "xlibre" "[xlibre]
+Server = ${XLIBRE_REPO_URL}"
+
+    execute_or_dryrun "Refresh pacman databases" sudo pacman -Syy
+}
+
+# Per x11libre.net's own README: every installed xf86-* driver package
+# (and any xorg-server-<suffix> subpackage) needs its xlibre- counterpart,
+# or pacman won't resolve the swap via conflicts.
+find_xlibre_driver_replacements() {
+    local pkg
+    pacman -Qq | grep -E '^xorg-server-.+|^xf86-' | while read -r pkg; do
+        if [[ "${pkg}" == xorg-server-* ]]; then
+            echo "xlibre-xserver-${pkg#xorg-server-}"
+        else
+            echo "xlibre-${pkg#xf86-}"
+        fi
+    done
+}
+
+install_xlibre() {
+    local packages=("xlibre-xserver" "xlibre-input-libinput")
+    local driver_replacements=()
+    mapfile -t driver_replacements < <(find_xlibre_driver_replacements)
+
+    if [[ "${#driver_replacements[@]}" -gt 0 ]]; then
+        packages+=("${driver_replacements[@]}")
+        log_info "Matching installed xf86-*/xorg-server-* packages to: ${driver_replacements[*]}"
+    else
+        log_info "No installed xf86-* driver packages found — nothing extra to match"
+    fi
+
+    log_subsection "Installing XLibre: ${packages[*]}"
+    execute_or_dryrun "Install XLibre packages" sudo pacman -S --noconfirm --needed "${packages[@]}"
+}
+
+# Reverse of find_xlibre_driver_replacements(): maps any installed
+# xlibre-xserver-*/xlibre-input-*/xlibre-video-* package (beyond the core
+# xlibre-xserver/xlibre-input-libinput, which xorg-server/xf86-input-libinput
+# already conflict with) back to its xorg-server-*/xf86-* counterpart.
+find_xorg_driver_replacements() {
+    local pkg
+    pacman -Qq | grep -E '^xlibre-xserver-.+|^xlibre-(input|video)-' \
+        | grep -v '^xlibre-input-libinput$' | while read -r pkg; do
+        if [[ "${pkg}" == xlibre-xserver-* ]]; then
+            echo "xorg-server-${pkg#xlibre-xserver-}"
+        else
+            echo "xf86-${pkg#xlibre-}"
+        fi
+    done
+}
+
+perform_rollback() {
+    log_subsection "Rolling back to Xorg"
+    local packages=("xorg-server" "xf86-input-libinput")
+    local xorg_replacements=()
+    mapfile -t xorg_replacements < <(find_xorg_driver_replacements)
+
+    if [[ "${#xorg_replacements[@]}" -gt 0 ]]; then
+        packages+=("${xorg_replacements[@]}")
+        log_info "Restoring matching xf86 drivers: ${xorg_replacements[*]}"
+    fi
+
+    execute_or_dryrun "Reinstall Xorg packages" sudo pacman -S --noconfirm --needed "${packages[@]}"
+
+    remove_repo_from_pacman "xlibre"
+    if [[ -f "${PACMAN_CONF_BACKUP}" ]]; then
+        execute_or_dryrun "Remove pacman.conf backup" sudo rm -f "${PACMAN_CONF_BACKUP}"
+    fi
+    execute_or_dryrun "Refresh pacman databases" sudo pacman -Syy
+
+    log_success "Xorg restored"
+}
+
+show_menu() {
+    log_warn "This script swaps your X display server. A bad swap can leave you
+without a graphical session — know how to reach a TTY (Ctrl+Alt+F2) and
+log in there before choosing either option."
+    log_section "XLibre / Xorg swap"
+    echo "  1) Install XLibre — adds the official x11libre.net pacman repo,"
+    echo "     removes xorg-server, installs xlibre-xserver + drivers"
+    echo "  2) Restore Xorg — removes XLibre, reinstalls xorg-server + drivers,"
+    echo "     removes the [xlibre] pacman repo"
+    echo "  3) Check status — show which X server is currently installed"
+    echo
+}
+
+do_install() {
+    backup_package_list
+    warn_proprietary_nvidia
+    confirm_with_dryrun "This will add the third-party [xlibre] repo and replace xorg-server
+with XLibre. Make sure you have a TTY fallback (Ctrl+Alt+F2). Continue?" || exit 0
+    add_xlibre_repo
+    install_xlibre
+    check_x_server_status
+    log_info "To roll back later, run: sudo $(basename "$0") --rollback
+Pre-swap package list: ${BACKUP_FILE}
+Note: XLibre enables the 'TearFree' option by default, unlike Xorg."
+}
+
+do_rollback() {
+    confirm_with_dryrun "This will remove XLibre, restore xorg-server, and remove the
+[xlibre] pacman repo. Make sure you have a TTY fallback (Ctrl+Alt+F2). Continue?" || exit 0
+    perform_rollback
+    check_x_server_status
+}
+
+main() {
+    local choice=""
+
+    for arg in "$@"; do
+        case "${arg}" in
+            -h|--help)
+                show_help "$(basename "$0")" \
+                    "swap between Xorg and XLibre via the official x11libre.net pacman repo" \
+                    "[1|--xlibre] [2|--rollback] [3|--status] [--help] [--version] [--dry-run]" \
+                    "1, --xlibre        Install XLibre
+    2, --rollback      Restore Xorg
+    3, --status        Show which X server is currently installed"
+                exit 0
+                ;;
+            -v|--version)
+                show_version "$(basename "$0")"
+                exit 0
+                ;;
+            -d|--dry-run)
+                DRY_RUN=true
+                log_info "Dry-run mode enabled — no changes will be made"
+                ;;
+            1|--xlibre)
+                choice="1"
+                ;;
+            2|--rollback)
+                choice="2"
+                ;;
+            3|--status)
+                choice="3"
+                ;;
+            *)
+                echo "${RED}Unknown option: ${arg}${RESET}" >&2
+                exit 1
+                ;;
+        esac
+    done
+
+    if [[ -z "${choice}" ]]; then
+        show_menu
+        read -r -p "Choose [1/2/3]: " choice
+    fi
+
+    if [[ "${choice}" == "3" ]]; then
+        check_x_server_status
+        exit 0
+    fi
+
+    ensure_root "$@"
+
+    case "${choice}" in
+        1) do_install ;;
+        2) do_rollback ;;
+        *)
+            log_warn "Invalid choice: ${choice}"
+            exit 1
+            ;;
+    esac
+
+    log_success "$(basename "$0") done"
+}
+
+main "$@"

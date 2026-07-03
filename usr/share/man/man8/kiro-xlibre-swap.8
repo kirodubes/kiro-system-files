@@ -1,0 +1,180 @@
+.TH KIRO-XLIBRE-SWAP 8 "2026-07-03" "Kiro" "Kiro System Tools"
+.SH NAME
+kiro-xlibre-swap \- swap between Xorg and XLibre via the official x11libre.net pacman repo
+.SH SYNOPSIS
+.B kiro-xlibre-swap
+[\fB1\fR|\fB\-\-xlibre\fR]
+[\fB2\fR|\fB\-\-rollback\fR]
+[\fB3\fR|\fB\-\-status\fR]
+[\fB\-h\fR|\fB\-\-help\fR]
+[\fB\-v\fR|\fB\-\-version\fR]
+[\fB\-d\fR|\fB\-\-dry\-run\fR]
+.SH DESCRIPTION
+.B kiro-xlibre-swap
+switches the running system between the stock
+.B xorg-server
+and
+.BR XLibre ,
+a drop-in fork of X.Org (\fIhttps://xlibre.net\fR), by adding x11libre.net's
+official signed
+.B [xlibre]
+pacman repository and installing
+.B xlibre-xserver
+plus
+.B xlibre-input-libinput
+and a matching
+.I xlibre-*
+package for every currently installed
+.I xf86-*
+driver.
+.PP
+Run with no arguments to get an interactive menu; pass
+.B 1
+or
+.B --xlibre
+to install XLibre directly,
+.B 2
+or
+.B --rollback
+to reverse the swap and restore Xorg, or
+.B 3
+or
+.B --status
+to just report which X server is currently installed without changing
+anything.
+.PP
+Options 1 and 2 must be run as root (the script re-execs itself via
+.B sudo
+or a graphical polkit prompt when not already root); option 3 does not
+require root.
+.PP
+The AUR
+.I xlibre-*-bin
+packages are a stale third-party wrapper pinned to abandoned version
+numbers that 404 against x11libre.net's current repo layout \(em installing
+from the official pacman repo directly, as this script does, is the method
+XLibre's own maintainer documents and avoids that breakage entirely.
+.SH OPTIONS
+.TP
+.BR 1 ", " \-\-xlibre
+Install XLibre: back up the current package list, add the
+.B [xlibre]
+repo, install
+.B xlibre-xserver
+and matching drivers, replacing
+.B xorg-server
+and its
+.I xf86-*
+drivers. Then reports which X server is now installed.
+.TP
+.BR 2 ", " \-\-rollback
+Restore Xorg: reinstall
+.B xorg-server
+and matching
+.I xf86-*
+drivers, then remove the
+.B [xlibre]
+repo entry from
+.IR /etc/pacman.conf .
+Then reports which X server is now installed.
+.TP
+.BR 3 ", " \-\-status
+Report which X server is currently installed, via
+.B "pacman -Qo /usr/lib/Xorg"
+(which package owns the server binary) and
+.B "/usr/lib/Xorg -version"
+(the banner the binary itself reports). Makes no changes.
+.TP
+.BR \-h ", " \-\-help
+Print a help message and exit.
+.TP
+.BR \-v ", " \-\-version
+Print version information and exit.
+.TP
+.BR \-d ", " \-\-dry\-run
+Print every command that would be executed without making any changes to
+the system. Still shows the interactive menu and confirmation prompt,
+but skips them non-interactively when combined with a numeric/flag
+choice.
+.SH DANGER
+This script replaces the system's display server. A failed or partial
+swap can leave the system without a graphical session. Before running
+option 1 or 2, know how to reach a TTY
+.RI ( Ctrl+Alt+F2 )
+and log in there. Both options require confirmation at an interactive
+prompt before making any change.
+.PP
+Proprietary GPU drivers (e.g.
+.BR nvidia-utils )
+may need an
+.B IgnoreABI
+workaround in
+.IR /etc/X11/xorg.conf.d/xlibre.conf ;
+see the warning the script prints when
+.B nvidia-utils
+is detected.
+.SH EXIT STATUS
+.TP
+.B 0
+Swap, rollback, or status check completed (or simulated in dry-run mode),
+or help/version was printed.
+.TP
+.B 1
+An unknown or invalid option/choice was supplied.
+.SH FILES
+.TP
+.I /usr/local/lib/kiro-common.sh
+Shared library providing logging, colour output, root escalation, and
+.B execute_or_dryrun
+support.
+.TP
+.I /var/log/kiro-xlibre-swap-packages.txt
+Snapshot of
+.B pacman -Qe
+taken before installing XLibre.
+.TP
+.I /etc/pacman.conf.pre-xlibre.bak
+Backup of
+.I /etc/pacman.conf
+taken before the
+.B [xlibre]
+repo entry is added; removed again on rollback.
+.SH EXAMPLES
+Interactive menu:
+.PP
+.RS 4
+.EX
+sudo kiro-xlibre-swap
+.EE
+.RE
+.PP
+Install XLibre without the menu:
+.PP
+.RS 4
+.EX
+sudo kiro-xlibre-swap --xlibre
+.EE
+.RE
+.PP
+Check which X server is active:
+.PP
+.RS 4
+.EX
+kiro-xlibre-swap --status
+.EE
+.RE
+.PP
+Roll back to Xorg:
+.PP
+.RS 4
+.EX
+sudo kiro-xlibre-swap --rollback
+.EE
+.RE
+.SH SEE ALSO
+.BR pacman (8),
+.BR pacman-key (8),
+.BR pacman.conf (5),
+.BR Xorg (1)
+.SH AUTHOR
+Erik Dubois <https://www.erikdubois.be>

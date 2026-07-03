@@ -1,5 +1,39 @@
 # CHANGELOG
 
+## 2026.07.03
+
+### What Changed
+- **Added `kiro-xlibre-swap`** — a new admin tool letting users switch the running
+  system between stock `xorg-server` and XLibre (https://xlibre.net, a drop-in fork
+  of X.Org), or switch back. Presents a menu (install / restore / check status) and
+  can also be driven non-interactively.
+
+### Technical Details
+- Installs XLibre from x11libre.net's own official signed `[xlibre]` pacman repo,
+  added/removed via `append_repo_to_pacman`/`remove_repo_from_pacman` from
+  `kiro-common.sh`, rather than through the AUR `xlibre-*-bin` packages — those were
+  found to be a stale third-party wrapper pinned to abandoned version numbers that
+  404 against x11libre.net's current repo layout.
+- Every installed `xf86-*` driver package (and any `xorg-server-<suffix>`
+  subpackage) is mapped to its `xlibre-*` counterpart and installed alongside
+  `xlibre-xserver` + `xlibre-input-libinput`, per x11libre.net's own documented
+  install method — `xlibre-xserver` provides `xorg-server` as a virtual package so
+  dependents (SDDM, WMs) keep resolving.
+- Backs up `pacman -Qe` output and `/etc/pacman.conf` before making changes;
+  `--rollback` reverses both the package swap and the `[xlibre]` repo entry.
+- `--status` (and menu option 3) reports which server is actually active via
+  `pacman -Qo /usr/lib/Xorg` and `/usr/lib/Xorg -version` (calling the binary
+  directly, not the `Xorg` PATH entry — that resolves to the suid `Xorg.wrap`, which
+  refuses to run outside an active console session even for `-version`). Requires no
+  root, unlike options 1/2.
+- Follows the `kiro-enable-ssh` pattern: sources `/usr/local/lib/kiro-common.sh`,
+  uses `ensure_root` (skipped for the read-only status check) and
+  `execute_or_dryrun` for `--dry-run` support.
+
+### Files Modified
+- `usr/local/bin/kiro-xlibre-swap` (new)
+- `usr/share/man/man8/kiro-xlibre-swap.8` (new)
+
 ## 2026.06.29
 
 ### What Changed
