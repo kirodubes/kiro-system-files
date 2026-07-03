@@ -45,7 +45,7 @@ BACKUP_FILE="/var/log/kiro-xlibre-swap-packages.txt"
 
 # Shows which X server is actually installed and running, via the two
 # most direct checks: which package owns the Xorg binary, and the
-# version banner the binary itself reports (X11Libre vs X.Org).
+# version banner the binary itself reports (XLibre vs X.Org).
 check_x_server_status() {
     log_subsection "Current X server"
 
@@ -54,7 +54,7 @@ check_x_server_status() {
     echo "  Package: ${owner}"
 
     local banner
-    banner="$(/usr/lib/Xorg -version 2>&1 | grep -iE 'X11Libre|X\.Org X Server' | head -1)" || banner="unknown"
+    banner="$(/usr/lib/Xorg -version 2>&1 | grep -E '^(XLibre|X\.Org) X Server' | head -1)" || banner="unknown"
     echo "  Binary reports: ${banner}"
 
     if echo "${owner}" | grep -qi xlibre; then
@@ -242,13 +242,14 @@ main() {
         esac
     done
 
+    check_x_server_status
+
     if [[ -z "${choice}" ]]; then
         show_menu
         read -r -p "Choose [1/2/3]: " choice
     fi
 
     if [[ "${choice}" == "3" ]]; then
-        check_x_server_status
         exit 0
     fi
 
