@@ -9,15 +9,15 @@ set -euo pipefail
 #
 #   Purpose:
 #   Presents a menu: 1) install XLibre, 2) restore Xorg, or 3) show which
-#   X server is currently active. Installing adds x11libre.net's official
+#   X server is currently active. Installing adds xlibre.net's official
 #   signed [xlibre] pacman repo and installs xlibre-xserver +
 #   xlibre-input-libinput + a matching xlibre-* package for every
 #   currently installed xf86-* driver. Restoring reverses that and
 #   removes the [xlibre] repo again.
 #
 #   Why: the AUR xlibre-*-bin packages are a stale third-party wrapper
-#   pinned to abandoned version numbers that 404 against x11libre.net's
-#   current repo layout. Installing straight from x11libre.net's own
+#   pinned to abandoned version numbers that 404 against xlibre.net's
+#   current repo layout. Installing straight from xlibre.net's own
 #   signed pacman repo is the method XLibre's maintainer documents and
 #   is the safest path, avoiding the AUR wrapper's makepkg breakage.
 #
@@ -34,8 +34,12 @@ fi
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 DRY_RUN=false
 
-XLIBRE_REPO_URL="https://x11libre.net/repo/arch_based/x86_64"
-XLIBRE_REPO_KEY="73580DE2EDDFA6D6"
+# Full fingerprint of "XLibre for Arch Linux Maintainers", the key that
+# signs every package in the [xlibre] repo. pacman-key resolves it to the
+# 6A87EB02CFBFDB4F signing subkey at verification time. Use the full
+# fingerprint (not a short/long ID) so --recv-keys/--lsign-key are unambiguous.
+XLIBRE_REPO_URL="https://xlibre.net/repo/arch_based/x86_64"
+XLIBRE_REPO_KEY="0C92313001CFCA27627B9098B97F7C613F359424"
 PACMAN_CONF_BACKUP="/etc/pacman.conf.pre-xlibre.bak"
 BACKUP_FILE="/var/log/kiro-xlibre-swap-packages.txt"
 
@@ -91,12 +95,16 @@ See: https://github.com/X11Libre/xserver/wiki/Compatibility-of-XLibre#nvidia-pro
 add_xlibre_repo() {
     log_subsection "Adding the [xlibre] pacman repo"
 
-    if ! pacman-key -f "${XLIBRE_REPO_KEY}" >/dev/null 2>&1; then
-        log_info "Importing and locally signing the XLibre packaging key"
-        execute_or_dryrun "Import XLibre key" bash -c \
-            "curl -sS '${XLIBRE_REPO_URL}/0x${XLIBRE_REPO_KEY}.gpg' | sudo pacman-key --add -"
-        execute_or_dryrun "Locally sign XLibre key" sudo pacman-key --lsign-key "${XLIBRE_REPO_KEY}"
-    fi
+    # Always receive + locally sign — never gate on `pacman-key -f`. pacman's
+    # own transaction-time prompt (or a prior run) can leave the key in the
+    # keyring at *unknown* trust, so a presence check passes while the key is
+    # still untrusted, and the package integrity step then fails with
+    # "signature is unknown trust". Both commands are idempotent, so running
+    # them unconditionally is safe. The repo publishes no standalone key file,
+    # so the key comes from the default keyserver, exactly as pacman fetches it.
+    log_info "Receiving and locally signing the XLibre packaging key"
+    execute_or_dryrun "Receive XLibre key" sudo pacman-key --recv-keys "${XLIBRE_REPO_KEY}"
+    execute_or_dryrun "Locally sign XLibre key" sudo pacman-key --lsign-key "${XLIBRE_REPO_KEY}"
 
     if ! grep -q '^\[xlibre\]' /etc/pacman.conf; then
         execute_or_dryrun "Backup pacman.conf" sudo cp /etc/pacman.conf "${PACMAN_CONF_BACKUP}"
@@ -115,7 +123,7 @@ Server = ${XLIBRE_REPO_URL}"
     execute_or_dryrun "Refresh pacman databases" sudo pacman -Syy
 }
 
-# Per x11libre.net's own README: every installed xf86-* driver package
+# Per xlibre.net's own README: every installed xf86-* driver package
 # (and any xorg-server-<suffix> subpackage) needs its xlibre- counterpart,
 # or pacman won't resolve the swap via conflicts.
 #
@@ -234,7 +242,7 @@ show_menu() {
 without a graphical session — know how to reach a TTY (Ctrl+Alt+F2) and
 log in there before choosing either option."
     log_section "XLibre / Xorg swap"
-    echo "  1) Install XLibre — adds the official x11libre.net pacman repo,"
+    echo "  1) Install XLibre — adds the official xlibre.net pacman repo,"
     echo "     removes xorg-server, installs xlibre-xserver + drivers"
     echo "  2) Restore Xorg — removes XLibre, reinstalls xorg-server + drivers,"
     echo "     removes the [xlibre] pacman repo"
@@ -269,7 +277,7 @@ main() {
         case "${arg}" in
             -h|--help)
                 show_help "$(basename "$0")" \
-                    "swap between Xorg and XLibre via the official x11libre.net pacman repo" \
+                    "swap between Xorg and XLibre via the official xlibre.net pacman repo" \
                     "[1|--xlibre] [2|--rollback] [3|--status] [--help] [--version] [--dry-run]" \
                     "1, --xlibre        Install XLibre
     2, --rollback      Restore Xorg

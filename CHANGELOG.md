@@ -1,5 +1,40 @@
 # CHANGELOG
 
+## 2026.07.07
+
+### What Changed
+- **Fixed `kiro-xlibre-swap` PGP-key handling** — installing XLibre failed at the
+  package-integrity step with `signature ... is unknown trust` and pacman offered to
+  delete every downloaded `xlibre-*` package. The XLibre signing key was never
+  locally signed, so the swap could not complete.
+
+### Technical Details
+- Root cause was a **wrong key ID**: the script hardcoded `73580DE2EDDFA6D6`, which
+  is the Artix Linux `artist` packaging key, not XLibre's. Because that key already
+  exists and is trusted in the keyring, the guard
+  `if ! pacman-key -f "${XLIBRE_REPO_KEY}"` evaluated false and skipped the whole
+  import + local-sign block, leaving the real XLibre key untrusted.
+- Corrected the key to the full fingerprint of "XLibre for Arch Linux Maintainers"
+  — `0C92313001CFCA27627B9098B97F7C613F359424` (resolves to signing subkey
+  `6A87EB02CFBFDB4F`).
+- Replaced the key-acquisition method: the old `curl "$URL/0x<key>.gpg" | pacman-key
+  --add` targeted a file the repo does not publish (the repo dir holds only
+  `xlibre.db*`/`xlibre.files*`). Now uses `pacman-key --recv-keys` from the default
+  keyserver — exactly how pacman itself fetches it — then `--lsign-key`.
+- Made receive + local-sign run **unconditionally** (both are idempotent). Gating on
+  key *existence* was the bug: pacman's transaction-time import prompt can leave the
+  key present but at unknown trust, so a presence check passes while the key is still
+  untrusted.
+- Updated the moved domain `x11libre.net` → `xlibre.net` (the old host now only
+  301-redirects) across the script, help text, and man page.
+- Verified end-to-end on the Kiro VM from a cleaned keyring: `--recv-keys` imports,
+  `--lsign-key` is idempotent across re-runs, and `pacman -Sw xlibre-xserver` passes
+  the integrity check that previously failed.
+
+### Files Modified
+- `usr/local/bin/kiro-xlibre-swap`
+- `usr/share/man/man8/kiro-xlibre-swap.8`
+
 ## 2026.07.03
 
 ### What Changed
