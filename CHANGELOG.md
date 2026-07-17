@@ -1,5 +1,27 @@
 # CHANGELOG
 
+## 2026.07.17
+
+### What Changed
+- **Added a `skell` short alias for `kiro-skell`** — users kept reaching for the
+  unprefixed name (`man skell`, `skell --help`). Both now work: `skell` is a real
+  command and `man skell` opens a full page.
+
+### Technical Details
+- Created `usr/local/bin/skell` as a relative symlink to `kiro-skell`. The script
+  was already written to run under any filename (every user-facing string uses
+  `$(basename "$0")`), so `skell --help`, `skell -v`, and `skell --dry-run` all
+  print `skell` throughout with no code changes.
+- Wrote a full-substance `usr/share/man/man8/skell.8` (not a `.so` redirect) so
+  `man skell` documents the command in its own name: DESCRIPTION with Scoped
+  backup / Overwrite step / Interaction subsections, OPTIONS, FILES, EXAMPLES
+  (including TTY recovery), EXIT STATUS, and a NOTES section flagging it as a
+  symlink to `kiro-skell(8)`.
+
+### Files Modified
+- `usr/local/bin/skell` (new symlink → `kiro-skell`)
+- `usr/share/man/man8/skell.8` (new)
+
 ## 2026.07.07
 
 ### What Changed

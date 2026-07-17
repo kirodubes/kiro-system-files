@@ -1,0 +1,168 @@
+.TH SKELL 8 "2026-07-17" "Kiro" "Kiro System Tools"
+.SH NAME
+skell \- restore default configuration from /etc/skel, backing up only the configs it overwrites
+.SH SYNOPSIS
+.B skell
+[\fB\-h\fR|\fB\-\-help\fR]
+[\fB\-v\fR|\fB\-\-version\fR]
+[\fB\-d\fR|\fB\-\-dry\-run\fR]
+.SH DESCRIPTION
+.B skell
+is the short alias for
+.BR kiro-skell (8).
+It copies the system skeleton directory
+.RI ( /etc/skel )
+into the current user's home directory, bringing new default configuration
+files into use without permanently losing existing customisations.
+.PP
+New or updated defaults for the shipped desktops, tiling window managers and
+applications land in
+.I /etc/skel
+as the distribution evolves.
+.B skell
+is the tool that pulls those defaults into an already-installed account, which
+otherwise keeps whatever configuration it was created with.
+.SS Scoped backup
+Before copying, and this is the point of the tool,
+.B skell
+backs up
+.I only
+the
+.I ~/.config
+entries that
+.I /etc/skel/.config
+is about to overwrite \(em not the whole
+.IR ~/.config ,
+which can hold gigabytes of browser and application cache. For each top-level
+entry present in
+.I /etc/skel/.config
+that also exists under
+.IR ~/.config ,
+that entry is copied into a timestamped backup at
+.IP
+.I ~/.config-backup-YYYY.MM.DD-HH.MM.SS/.config/
+.PP
+so the previous state of the overwritten configs can be restored by hand if a
+new default is not to your liking. Entries in
+.I ~/.config
+that
+.I /etc/skel
+does not touch are left completely alone and are
+.I not
+copied \(em that is what keeps the operation fast.
+.PP
+For a full, unconditional backup of the entire
+.I ~/.config
+tree before overwriting, use
+.BR kiro-skell-all (8)
+instead.
+.SS Overwrite step
+After the scoped backup, the copy itself is unconditional: the complete
+contents of
+.I /etc/skel
+(dotfiles and directories alike) are copied over the top of the home directory
+with
+.RB ' "cp -r /etc/skel/. $HOME" '.
+Existing files with the same path are overwritten. This is intentional \(em
+.B skell
+restores the shipped defaults.
+.SS Interaction and safety
+In interactive mode (no
+.BR \-\-dry\-run )
+.B skell
+prints a summary of what it is about to do and prompts for a single
+yes/no confirmation before any file is touched. Answering anything other than
+.B y
+or
+.B Y
+aborts with nothing changed.
+.PP
+In
+.B \-\-dry\-run
+mode the confirmation prompt is skipped and every action \(em both the backup
+and the overwrite \(em is printed rather than performed, so you can preview the
+exact commands first.
+.PP
+Because it needs no graphical session,
+.B skell
+is the standard recovery step when a tiling window manager will not start after
+a broken configuration change: switch to a TTY, run
+.BR skell ,
+and log back in with the shipped defaults restored.
+.SH OPTIONS
+.TP
+.BR \-h ", " \-\-help
+Print a help message and exit.
+.TP
+.BR \-v ", " \-\-version
+Print version information (the owning pacman package and version, when
+installed that way) and exit.
+.TP
+.BR \-d ", " \-\-dry\-run
+Show what would be executed without making any changes. Implies non-interactive
+operation \(em the confirmation prompt is skipped.
+.SH FILES
+.TP
+.I /etc/skel/
+Source skeleton directory; its entire contents are copied into the home
+directory.
+.TP
+.I ~/.config/
+The entries whose names also appear under
+.I /etc/skel/.config
+are backed up before being overwritten; all other entries are untouched.
+.TP
+.I ~/.config-backup-YYYY.MM.DD-HH.MM.SS/
+Timestamped backup directory created for the overwritten
+.I ~/.config
+entries.
+.SH EXAMPLES
+Preview exactly what would be copied and backed up, changing nothing:
+.PP
+.RS 4
+.EX
+skell --dry-run
+.EE
+.RE
+.PP
+Restore the shipped defaults interactively (prompts before touching anything):
+.PP
+.RS 4
+.EX
+skell
+.EE
+.RE
+.PP
+Recover a crashing tiling window manager from a TTY:
+.PP
+.RS 4
+.EX
+# switch to a text console with Ctrl+Alt+F3, log in, then:
+skell
+.EE
+.RE
+.SH EXIT STATUS
+.TP
+.B 0
+Success, or the user declined at the confirmation prompt (nothing changed).
+.TP
+.B 1
+An unknown option was supplied.
+.SH NOTES
+.B skell
+is a symlink to
+.BR kiro-skell (8);
+the two are the same program. All of its user-facing output derives from the
+name it is invoked as, so running it as
+.B skell
+prints
+.B skell
+throughout. The script is self-contained and does not depend on
+.IR /usr/local/lib/kiro-common.sh ,
+so a verbatim copy runs unchanged on any distribution.
+.SH SEE ALSO
+.BR kiro-skell (8),
+.BR kiro-skell-all (8),
+.BR cp (1)
+.SH AUTHOR
+Erik Dubois <https://www.erikdubois.be>
