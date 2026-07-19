@@ -1,5 +1,42 @@
 # CHANGELOG
 
+## 2026.07.19
+
+### What Changed
+- **`kiro-report` now includes the `kiro-audit` findings.** The report already
+  covered every input a maintainer needs to debug a user's system remotely —
+  kernel, drivers, journal, failed units, hardware, recent pacman transactions —
+  with one exception: Kiro's own install-correctness audit was absent. That is
+  arguably the highest-signal section for a *Kiro* install (archiso leftovers,
+  kernel/mkinitcpio sanity, expected units), so a report could look clean while
+  `kiro-audit` was flagging the actual cause. Closes the long-open "support-probe
+  sufficiency" question — the probe now collects the full checklist.
+
+### Technical Details
+- New `section_audit()` in `usr/local/bin/kiro-report`, called from
+  `build_report()` between `section_debug` and `section_calamares` (failure
+  evidence first, then install correctness, then the install log).
+- **FAIL/WARN lines only, plus counts.** A full `kiro-audit` run is mostly `PASS`
+  output; pasting all of it on Discussions would bury the real findings. `PASS`
+  and `FIX?` hint lines are filtered out.
+- **Live-ISO guard mirrors kiro-audit's own.** `kiro-audit` audits an *installed*
+  system and bails on `/run/archiso` by design. The section skips there and says
+  so rather than passing `--force`, which would emit failures for things that
+  don't apply to a read-only squashfs.
+- **Two robustness details:** `kiro-audit` exits non-zero when it finds failures,
+  so the capture is `|| true`-guarded (the script runs `set -Euo pipefail`); and
+  the output is ANSI-stripped before matching, so the `FAIL`/`WARN` match can't
+  break on a stray escape even though colors are already off in a pipe.
+- Verified both paths against a simulated `kiro-audit` under `set -Euo pipefail`:
+  mixed output → correct counts, `PASS`/`FIX?` excluded, colors stripped;
+  all-pass output → zero counts, "(none — all checks passed)", exit 0.
+- Man page `kiro-report.8` collection list updated with the new bullet.
+
+### Files Modified
+- `usr/local/bin/kiro-report`
+- `usr/share/man/man8/kiro-report.8`
+- `CHANGELOG.md`
+
 ## 2026.07.17
 
 ### What Changed

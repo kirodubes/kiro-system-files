@@ -14,7 +14,8 @@ set -Euo pipefail
 #   driver packages (xf86-video/input, Mesa, Vulkan, NVIDIA), the full list of
 #   explicitly-installed packages, and the dynamic failure evidence a maintainer
 #   actually needs to debug (failed units, recent journal/kernel errors, recent
-#   pacman transactions, and the Calamares install log when present), then
+#   pacman transactions, the kiro-audit install-correctness findings, and the
+#   Calamares install log when present), then
 #   REDACTS every system-identifying value (IP, MAC, UUID, machine-id, hostname,
 #   username) before writing the file.
 #
@@ -137,6 +138,42 @@ section_packages_full() {
     echo
 }
 
+# kiro-audit is Kiro's own install-correctness checker (archiso leftovers, kernel
+# and mkinitcpio sanity, expected units) — the highest-signal Kiro-specific
+# evidence in the report. Only FAIL/WARN lines are kept: a full run is mostly
+# PASS output that would bury the real findings in a pasted report.
+section_audit() {
+    command -v kiro-audit >/dev/null 2>&1 || return 0
+
+    log_subsection "Install audit (kiro-audit)"
+
+    # kiro-audit audits an *installed* system and bails on the live ISO by design
+    # (read-only squashfs, archiso packages still present → most checks FAIL on
+    # things that don't apply). Don't --force it; the output would be noise.
+    if [[ -d /run/archiso ]]; then
+        _field "Audit" "skipped (live ISO — kiro-audit audits an installed system)"
+        echo
+        return 0
+    fi
+
+    # Exits non-zero when it finds failures, so guard the pipeline. Colors are
+    # already off (stdout is not a terminal here), the sed is belt-and-braces so
+    # the FAIL/WARN match can't be broken by a stray escape.
+    local out
+    out=$(kiro-audit 2>&1 | sed -E "s/$(printf '\033')\[[0-9;]*m//g" || true)
+
+    _field "Failures" "$(grep -cE '^[[:space:]]*FAIL[[:space:]]' <<<"${out}" || true)"
+    _field "Warnings" "$(grep -cE '^[[:space:]]*WARN[[:space:]]' <<<"${out}" || true)"
+
+    local issues
+    issues=$(grep -E '^[[:space:]]*(FAIL|WARN)[[:space:]]' <<<"${out}" || true)
+
+    echo
+    echo "  ${BOLD}Failures / warnings:${RESET}"
+    [[ -n "${issues}" ]] && echo "${issues}" | sed 's/^ */    /' || echo "    (none — all checks passed)"
+    echo
+}
+
 # Only present on systems installed (or being installed) via Calamares — the
 # single most useful artifact when a user reports an install problem.
 section_calamares() {
@@ -213,6 +250,7 @@ build_report() {
         section_encryption
         section_drivers
         section_debug
+        section_audit
         section_calamares
         section_packages_full
     ) | redact
