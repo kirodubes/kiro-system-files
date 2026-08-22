@@ -1,5 +1,29 @@
 # CHANGELOG
 
+## 2026.08.22
+
+### What Changed
+- **Removed the orphaned `kiro-install-tools` documentation.** The script itself was
+  deliberately deleted on 2026-06-01 (commit `26bbee9`, which touched nothing else), but its
+  man page and its row in the README survived the removal. The result was a package that
+  shipped `man kiro-install-tools` describing a command that does not exist anywhere — not in
+  this repo, not on a built system. `man -w kiro-install-tools` resolved; `command -v` did not.
+- Found by `/kiro-check` while auditing the installed system; the man-page-without-binary sweep
+  that caught it has been added to the check so the class of defect can't recur silently.
+
+### Technical Details
+- Deleted `usr/share/man/man8/kiro-install-tools.8`.
+- Dropped the `kiro-install-tools` row from the command table in `README.md`.
+- Historical `CHANGELOG.md` references to the script are left as-is — they are an accurate
+  record of when it existed.
+- **`skell.8` is not affected and is not an orphan**: `usr/local/bin/skell` is a real symlink to
+  `kiro-skell`, and `skell.8` documents that alias deliberately. Only `kiro-install-tools.8`
+  pointed at nothing.
+
+### Files Modified
+- `usr/share/man/man8/kiro-install-tools.8` (deleted)
+- `README.md`
+
 ## 2026.07.19
 
 ### What Changed

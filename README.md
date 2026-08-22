@@ -32,7 +32,6 @@ System-level files for the Kiro distro — kernel parameters, udev rules, system
 | `kiro-fix-pacman-conf` | Restore Kiro's `pacman.conf` defaults                                |
 | `kiro-fix-pacman-keys` | Re-init + re-populate pacman keyring                                 |
 | `kiro-get-mirrors`     | Refresh fast mirror list via reflector                               |
-| `kiro-install-tools`   | Install Kiro's recommended additional packages                       |
 | `kiro-iso-version`     | Print `/etc/dev-rel` and rolling-release marker                      |
 | `kiro-lint`            | Lint Kiro-specific config files for known anti-patterns              |
 | `kiro-probe`           | Inspect hardware / firmware / driver state                           |
