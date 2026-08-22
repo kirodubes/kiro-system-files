@@ -2,6 +2,37 @@
 
 ## 2026.08.22
 
+### `kiro-audit` — stop reporting a false microcode FAIL on real metal
+
+**What Changed**
+
+`check_microcode()` reported `FAIL  No microcode image found in /boot` on a correctly
+configured real-metal install. The check only looked for a standalone `/boot/intel-ucode.img`
+or `/boot/amd-ucode.img`, and only excused their absence inside a VM. Arch's `microcode`
+mkinitcpio hook embeds the vendor blob in the initramfs **early cpio** instead, which makes the
+standalone image unnecessary — so every real machine using the modern hook layout failed a check
+it was actually passing.
+
+Caught on a v26.08.22 real-metal install: `intel-ucode 20260812-1` installed,
+`kernel/x86/microcode/GenuineIntel.bin` present in the early cpio, and the kernel log showing
+`microcode: Updated early from: 0x000000e2` to `Current revision: 0x00000100` — microcode
+demonstrably loading while the audit called it missing.
+
+**Technical Details**
+
+- New `microcode_in_initramfs()` helper: requires `microcode` in the `HOOKS=` line of
+  `/etc/mkinitcpio.conf`, then confirms with `lsinitcpio --early` that a non-fallback initramfs
+  really carries `kernel/x86/microcode/`. Config alone is not treated as proof — the blob has to
+  be in the image.
+- `check_microcode()` gains that branch **before** the VM escape hatch, so a VM using the hook is
+  now reported accurately rather than being waved through as "expected in a VM".
+- Deliberately not "fixed" by reinstalling `intel-ucode`: `/boot/intel-ucode.img` is absent
+  precisely because `kiro_ucode`'s anti-downgrade guard correctly skips the `pacman -U`, and that
+  file is unused under the hook layout. `pacman -Qkk` flagging it as one altered file is cosmetic.
+
+**Files Modified**
+- `usr/local/bin/kiro-audit`
+
 ### What Changed
 - **Removed the orphaned `kiro-install-tools` documentation.** The script itself was
   deliberately deleted on 2026-06-01 (commit `26bbee9`, which touched nothing else), but its

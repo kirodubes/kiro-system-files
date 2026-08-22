@@ -257,6 +257,21 @@ check_kernel() {
     done
 }
 
+# Arch's mkinitcpio "microcode" hook embeds the CPU vendor blob in the initramfs
+# early cpio, which makes the standalone /boot/*-ucode.img obsolete. Detect that
+# layout so a correctly configured real-metal install is not reported as failing.
+microcode_in_initramfs() {
+    grep '^HOOKS=' /etc/mkinitcpio.conf 2>/dev/null | grep -qw microcode || return 1
+
+    local img
+    for img in /boot/initramfs-*.img; do
+        [[ -f "${img}" ]] || continue
+        [[ "${img}" == *-fallback.img ]] && continue
+        lsinitcpio --early "${img}" 2>/dev/null | grep -q '^kernel/x86/microcode/' && return 0
+    done
+    return 1
+}
+
 check_microcode() {
     log_section "Microcode"
 
@@ -266,6 +281,8 @@ check_microcode() {
     elif [[ -f /boot/amd-ucode.img ]]; then
         pass "amd-ucode.img present in /boot"
         pkg_missing intel-ucode && pass "intel-ucode not installed (AMD system)" || warn "intel-ucode also installed on AMD system"
+    elif microcode_in_initramfs; then
+        pass "Microcode embedded in the initramfs by the mkinitcpio 'microcode' hook"
     elif systemd-detect-virt --vm --quiet 2>/dev/null; then
         pass "No microcode image in /boot — expected, this is a virtual machine (not real metal)"
     else
