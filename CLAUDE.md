@@ -56,7 +56,7 @@ This means:
 - When reviewing a new tweak, ask: "does this break on linux-lts?" If yes, redesign or skip.
 - `kiro-audit` itself is kernel-agnostic (see `detect_kernels()` and `check_kernel`).
 
-Past examples of this rule applied: `kiro-audit` rewrite 2026-05-28; the 5 Garuda imports same day (systemd-oomd, mei blacklist, btusb reset, zswap disable, NM-lo) were all verified kernel-agnostic before adoption.
+Past examples of this rule applied: `kiro-audit` rewrite 2026-05-28; the 5 hardening/tuning imports same day (systemd-oomd, mei blacklist, btusb reset, zswap disable, NM-lo) were all verified kernel-agnostic before adoption.
 
 ## Configuration file locations
 

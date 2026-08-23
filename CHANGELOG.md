@@ -22,9 +22,14 @@ threshold, or path changed — output text and one function name only.
   (mei/mei_me), `bluetooth-usb.conf` (btusb reset=1), `disable-zswap.conf` + runtime zswap state,
   and NetworkManager `unmanaged-lo.conf`.
 
+Same pass: the kernel-agnostic rule in `CLAUDE.md` referred to the batch by the source distro's
+name; it now calls them "the 5 hardening/tuning imports" with the same five items listed. `CLAUDE.md`
+is a tracked file in a public repo, so that line was published.
+
 **Files Modified**
 
 - `usr/local/bin/kiro-audit`
+- `CLAUDE.md`
 
 ## 2026.08.22
 
