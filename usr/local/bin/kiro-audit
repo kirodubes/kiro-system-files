@@ -835,10 +835,9 @@ check_modprobe_thp() {
         || fail "tmpfiles.d/thp-tuning.conf missing"
 }
 
-check_garuda_imports() {
-    # 5 items adopted from Garuda 2026-05-28
-    # See: kiro-iso/docs/garuda-comparison-2026-05-28.md
-    log_section "Garuda imports (2026-05-28)"
+check_hardening_tuning() {
+    # 5 hardening / tuning items adopted 2026-05-28, each verified kernel-agnostic
+    log_section "Hardening & tuning (2026-05-28)"
 
     # 1. systemd-oomd — config drop-ins + active daemon
     local oomd_files=(
@@ -1350,7 +1349,7 @@ main() {
     check_zram
     check_udev_rules
     check_modprobe_thp
-    check_garuda_imports
+    check_hardening_tuning
     check_permissions
     check_sysctl_security
     check_resolved_config

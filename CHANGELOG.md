@@ -1,5 +1,31 @@
 # CHANGELOG
 
+## 2026.08.23
+
+### `kiro-audit` — drop the other-distro name from the hardening section
+
+**What Changed**
+
+The audit section headed `Garuda imports (2026-05-28)` named another distribution in
+user-visible output. The five checks it runs are Kiro's own configuration now, so the section
+is renamed to describe what it verifies instead of where the ideas came from. No check logic,
+threshold, or path changed — output text and one function name only.
+
+**Technical Details**
+
+- `check_garuda_imports()` renamed to `check_hardening_tuning()` (definition + call site in `main`).
+- Section header now reads `Hardening & tuning (2026-05-28)`; the date is kept so the block still
+  maps to the batch it was added in.
+- Removed the `See: kiro-iso/docs/garuda-comparison-2026-05-28.md` comment — that file does not
+  exist in `kiro-iso/docs/`, so it was a dead pointer.
+- The five checks are unchanged: systemd-oomd drop-ins + unit state, `blacklist-intel-me.conf`
+  (mei/mei_me), `bluetooth-usb.conf` (btusb reset=1), `disable-zswap.conf` + runtime zswap state,
+  and NetworkManager `unmanaged-lo.conf`.
+
+**Files Modified**
+
+- `usr/local/bin/kiro-audit`
+
 ## 2026.08.22
 
 ### `kiro-audit` — stop reporting a false microcode FAIL on real metal
