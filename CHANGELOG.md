@@ -26,10 +26,30 @@ Same pass: the kernel-agnostic rule in `CLAUDE.md` referred to the batch by the 
 name; it now calls them "the 5 hardening/tuning imports" with the same five items listed. `CLAUDE.md`
 is a tracked file in a public repo, so that line was published.
 
+Same pass again for the shipped configs: the seven files that make up those five imports each
+opened with an "Adopted from <distro>'s …" header and a `See: kiro-iso/docs/garuda-comparison-2026-05-28.md`
+pointer to a file that was never committed. Attribution lines and the dead pointer removed; every
+"why", tradeoff, and kernel-agnostic note kept verbatim. These files install to `/etc` on every
+Kiro system, so they were the most widely published copy of the name.
+
+Two prose lines rewritten rather than deleted: the oomd `DefaultMemoryPressureDurationSec` comment
+now justifies 20s on its own merits, and the Intel-ME blacklist rationale now says "common
+privacy-hardening defaults (Whonix, Tails)".
+
+Historical CHANGELOG entries from 2026-05-28 are deliberately left as they are — they record what
+actually happened at the time.
+
 **Files Modified**
 
 - `usr/local/bin/kiro-audit`
 - `CLAUDE.md`
+- `etc/systemd/oomd.conf.d/10-kiro-oomd.conf`
+- `etc/systemd/system/system.slice.d/10-kiro-oomd-per-slice.conf`
+- `etc/systemd/user/slice.d/10-kiro-oomd-per-slice.conf`
+- `etc/modprobe.d/blacklist-intel-me.conf`
+- `etc/modprobe.d/bluetooth-usb.conf`
+- `etc/NetworkManager/conf.d/unmanaged-lo.conf`
+- `etc/tmpfiles.d/disable-zswap.conf`
 
 ## 2026.08.22
 
