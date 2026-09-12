@@ -2,6 +2,44 @@
 
 ## 2026.09.12
 
+### `netdev_budget_usecs` no longer fails `systemd-sysctl` on linux-lts
+
+**What Changed**
+
+`net.core.netdev_budget_usecs = 2000` in `etc/sysctl.d/99-kiro-optimizations.conf` gained a `-`
+prefix, which tells `systemd-sysctl` to skip the key on failure instead of failing the unit.
+
+On **linux-lts the write is rejected**, and one rejected key makes the whole
+`systemd-sysctl.service` unit end in `failed` on every boot — visible in `systemctl --failed` and
+counted by `kiro-audit` as `FAIL 1 failed systemd unit(s)`.
+
+**Technical Details**
+
+- The kernel enforces a floor of **2 jiffies**, i.e. `2 * (1000000 / CONFIG_HZ)`:
+  - `CONFIG_HZ=1000` (linux-zen, linux-cachyos) → floor 2000us, so `2000` is accepted — exactly at
+    the limit.
+  - `CONFIG_HZ=300` (linux-lts) → floor **6666us**, so `2000` is rejected.
+- Probed on a linux-lts 6.18.51 install to find the boundary rather than inferring it:
+  `1000 / 2000 / 4000` rejected, `8000 / 10000 / 20000` accepted, running default 6666.
+- **Why this went unnoticed.** Every previous install test booted a 7.2.4 HZ=1000 kernel
+  (linux-cachyos or linux-zen), where the value sits precisely on the floor and succeeds. It first
+  surfaced on 2026-09-12 when a `linux-lts linux-zen` ISO was installed with **lts as the primary**
+  kernel — a pairing built to test the boot-entry sort-key work, which incidentally became the first
+  install to boot lts. The upcoming October `linux linux-lts` pairing would have shipped it.
+- The blast radius was limited: `systemd-sysctl` continues past a rejected key, so
+  `netdev_budget = 300`, `vm.swappiness = 150` and `netdev_max_backlog = 5000` all applied. The cost
+  was a permanently failed unit, not lost tuning.
+- `-` chosen over the alternatives deliberately: dropping the line loses the 2ms intent on HZ=1000
+  kernels, and raising it to a universally valid `8000` abandons that intent everywhere. The prefix
+  keeps the tuning where the kernel accepts it and stays quiet where it does not.
+- **Verified on the failing kernel**: with the prefix applied and the unit restarted,
+  `systemd-sysctl.service` reports `active`, `systemctl --failed` is empty, and the other keys are
+  still in effect.
+
+**Files Modified**
+
+- `etc/sysctl.d/99-kiro-optimizations.conf`
+
 ### New `kernel-install` plugin: the primary kernel's boot entry sorts first
 
 **What Changed**
