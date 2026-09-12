@@ -1,5 +1,47 @@
 # CHANGELOG
 
+## 2026.09.12
+
+### New `kernel-install` plugin: the primary kernel's boot entry sorts first
+
+**What Changed**
+
+Adds `etc/kernel/install.d/95-kiro-sort-key.install`. After Arch's `90-loaderentry` writes a
+boot-loader-specification entry, this plugin rewrites that entry's `sort-key` — `kiro-0` for the
+primary kernel, `kiro-1` for every other kernel.
+
+It exists because systemd-boot's `default <machine-id>*` glob resolves to the **first entry in
+sort order**, and `90-loaderentry` derives its sort-key from `IMAGE_ID` in `/etc/os-release`.
+Kiro ships `IMAGE_ID=kiro`, so every installed kernel got the identical key `kiro` and the tie
+fell to the version string — making which kernel boots by default a coincidence rather than a
+choice. Differentiating the keys settles it deterministically.
+
+**Technical Details**
+
+- The primary kernel package is read from `/etc/kiro/primary-kernel`, written at install time by
+  the Calamares `kiro_kernel` module (the kernel the live session actually booted).
+- The incoming kernel version is mapped back to its package via
+  `/usr/lib/modules/<version>/pkgbase`. This is the only mapping that works for **all** kernels:
+  the plain `linux` package builds `<ver>-arch1-N`, which carries no package name, so no amount
+  of suffix matching can identify it.
+- Running as a `kernel-install` plugin rather than a pacman hook is the point — `kernel-install`
+  invokes it on every kernel add, so the choice survives kernel upgrades and newly installed
+  kernels with no extra machinery.
+- **Exits 0 on every inapplicable path** (non-`add` command, non-BLS layout, missing
+  `primary-kernel`, missing `pkgbase`). A non-zero exit would make `kernel-install` report a
+  failed kernel installation, turning a missing optional file into a pacman error during an
+  ordinary upgrade. For the same reason it deliberately omits `set -e` — recorded in
+  [Kiro-HQ/TEMPLATE_EXCLUSIONS.md](../../Insync/Kiro/Kiro-HQ/TEMPLATE_EXCLUSIONS.md).
+- Handles boot counting: the entry file may be `<token>-<version>+<tries>.conf`, so both spellings
+  are matched. Appends a `sort-key` line when the entry has none rather than assuming one exists.
+- Tested against six cases in a sandbox before shipping: primary = `linux` (the October pairing),
+  primary = `linux-zen`, an entry with no `sort-key` line, a boot-counting `+3` entry name, a
+  missing `primary-kernel` file, and the `remove` command. All behaved as intended.
+
+**Files Modified**
+
+- `etc/kernel/install.d/95-kiro-sort-key.install` (new)
+
 ## 2026.08.23
 
 ### `kiro-audit` — drop the other-distro name from the hardening section

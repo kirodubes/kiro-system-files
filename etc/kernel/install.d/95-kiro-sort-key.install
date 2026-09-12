@@ -1,0 +1,70 @@
+#!/bin/sh
+#####################################################################
+# Author    : Erik Dubois
+# Website   : https://kiroproject.be
+#
+#   DO NOT JUST RUN THIS. EXAMINE AND JUDGE. RUN AT YOUR OWN RISK.
+#
+# Purpose:
+#   kernel-install plugin. After 90-loaderentry has written a
+#   boot-loader-specification entry, rewrite that entry's sort-key so the
+#   primary kernel sorts ahead of every other installed kernel:
+#   'kiro-0' for the primary, 'kiro-1' for the rest.
+#
+#   The primary kernel package is recorded in /etc/kiro/primary-kernel by
+#   the Calamares kiro_kernel module at install time.
+#
+# Why:
+#   systemd-boot's 'default <machine-id>*' glob resolves to the FIRST
+#   entry in sort order. Arch's 90-loaderentry derives the sort-key from
+#   IMAGE_ID in os-release, so every Kiro kernel gets the identical key
+#   'kiro' and the tie falls to the version string - meaning which kernel
+#   boots by default is incidental rather than chosen. Running here, on
+#   every kernel-install, keeps the choice correct across kernel updates
+#   and newly installed kernels without a separate pacman hook.
+#####################################################################
+
+COMMAND="${1:?}"
+KERNEL_VERSION="${2:?}"
+
+[ "$COMMAND" = "add" ] || exit 0
+[ "$KERNEL_INSTALL_LAYOUT" = "bls" ] || exit 0
+
+PRIMARY_KERNEL_FILE="/etc/kiro/primary-kernel"
+[ -r "$PRIMARY_KERNEL_FILE" ] || exit 0
+primary="$(cat "$PRIMARY_KERNEL_FILE")"
+[ -n "$primary" ] || exit 0
+
+# Maps the kernel version back to its package. The plain 'linux' package
+# builds '<ver>-arch1-N', so the version string alone cannot identify it.
+pkgbase_file="/usr/lib/modules/${KERNEL_VERSION}/pkgbase"
+[ -r "$pkgbase_file" ] || exit 0
+pkgbase="$(cat "$pkgbase_file")"
+
+if [ "$pkgbase" = "$primary" ]; then
+    sort_key="kiro-0"
+else
+    sort_key="kiro-1"
+fi
+
+entry_token="${KERNEL_INSTALL_ENTRY_TOKEN:?}"
+boot_root="${KERNEL_INSTALL_BOOT_ROOT:?}"
+
+# Boot counting appends '+<tries>' to the file name, so match both spellings.
+for entry in \
+    "${boot_root}/loader/entries/${entry_token}-${KERNEL_VERSION}.conf" \
+    "${boot_root}/loader/entries/${entry_token}-${KERNEL_VERSION}+"*.conf; do
+
+    [ -f "$entry" ] || continue
+
+    if grep -q '^sort-key' "$entry"; then
+        sed -i "s/^sort-key.*/sort-key   ${sort_key}/" "$entry"
+    else
+        printf 'sort-key   %s\n' "$sort_key" >> "$entry"
+    fi
+
+    [ "${KERNEL_INSTALL_VERBOSE:-0}" -gt 0 ] && \
+        echo "95-kiro-sort-key: ${pkgbase} -> sort-key ${sort_key} in ${entry}"
+done
+
+exit 0
