@@ -1,5 +1,41 @@
 # CHANGELOG
 
+## 2026.09.14
+
+### `kiro-audit` now checks for the `10-archiso.conf` sshd leftover
+
+**What Changed**
+
+`check_calamares_cleanup()` gained a sixth archiso-leftover check, for
+`/etc/ssh/sshd_config.d/10-archiso.conf`, with a matching `apply_fix` remediation.
+
+`sshd_config.d` is **first-match-wins**, so a leftover `10-` file overrides the hardened defaults in
+`99-archlinux.conf` and restores `PermitRootLogin yes` + `PasswordAuthentication yes`. It was the
+highest-severity of the six live-only artifacts and the only one the audit did not cover.
+
+**Technical Details**
+
+- `kiro_final`'s `paths_to_remove` list has six security-relevant entries; `kiro-audit` mirrored
+  exactly five of them (`.automated_script.sh`, `.zlogin`, the `getty@tty1` drop-in, `g_wheel`,
+  `49-nopasswd_global.rules`). This closes the gap.
+- **Current installs were never exposed.** `kiro_final` has removed the file at install time since
+  `84d9ca7` (2026-05-19); an installed VM was verified to carry only `20-systemd-userdb.conf` and
+  `99-archlinux.conf`. The residual case is systems installed from a **v26.05.01 or older** ISO —
+  which is exactly why the other five checks exist.
+- Verified on a throwaway VM rather than reasoned about: baseline `PASS`, file planted → `FAIL` plus
+  the `FIX?` offer, `--fix` → file removed, re-audit → `PASS`. `sshd` was deliberately **not**
+  reloaded while the file existed; creating and auditing it is inert, reloading would have genuinely
+  enabled root login on the VM.
+- **Corrects an earlier CHANGELOG claim.** The 2026-07 entry announcing `--fix` said "8 fixable
+  checks wired: 6 archiso leftover file/dir deletions (`10-archiso.conf`, ...)". That was an
+  overcount — only five ever shipped, and `10-archiso.conf` was named but never wired. The old entry
+  is left as written; the correction is recorded here.
+
+**Files Modified**
+
+- `usr/local/bin/kiro-audit`
+- `CHANGELOG.md`
+
 ## 2026.09.12
 
 ### `netdev_budget_usecs` no longer fails `systemd-sysctl` on linux-lts

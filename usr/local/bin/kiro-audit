@@ -389,6 +389,15 @@ check_calamares_cleanup() {
         pass "49-nopasswd_global.rules removed (good)"
     fi
 
+    # sshd_config.d is first-match-wins, so a leftover 10- file overrides the
+    # hardened 99-archlinux.conf defaults with PermitRootLogin/PasswordAuthentication yes
+    if [[ -f /etc/ssh/sshd_config.d/10-archiso.conf ]]; then
+        fail "10-archiso.conf archiso leftover present (permits root login + password auth)"
+        apply_fix "rm /etc/ssh/sshd_config.d/10-archiso.conf" rm /etc/ssh/sshd_config.d/10-archiso.conf
+    else
+        pass "No /etc/ssh/sshd_config.d/10-archiso.conf (good)"
+    fi
+
 }
 
 check_kiro_final_config() {
