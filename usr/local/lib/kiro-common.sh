@@ -87,7 +87,10 @@ fi
 ##################################################################################################################################
 
 # Log a major section header
+# In --json mode (JSON_MODE=true), scripts keep stdout as pure JSON — these
+# banners are pure narrative, so this is a no-op rather than routed elsewhere.
 log_section() {
+    [[ "${JSON_MODE:-false}" == true ]] && return 0
     echo
     echo "${GREEN}################################################################################${RESET}"
     echo "${BOLD}${GREEN}$1${RESET}"
@@ -97,6 +100,7 @@ log_section() {
 
 # Log a subsection header
 log_subsection() {
+    [[ "${JSON_MODE:-false}" == true ]] && return 0
     echo
     echo "${CYAN}########################################################################${RESET}"
     echo "${BOLD}${CYAN}$1${RESET}"
@@ -106,16 +110,19 @@ log_subsection() {
 
 # Log an informational message
 log_info() {
+    [[ "${JSON_MODE:-false}" == true ]] && return 0
     echo "${BLUE}ℹ ${1}${RESET}"
 }
 
 # Log a success message
 log_success() {
+    [[ "${JSON_MODE:-false}" == true ]] && return 0
     echo "${GREEN}✓ ${1}${RESET}"
 }
 
 # Log a warning message
 log_warn() {
+    [[ "${JSON_MODE:-false}" == true ]] && return 0
     echo
     echo "${YELLOW}########################################################################${RESET}"
     echo "${BOLD}${YELLOW}⚠️  WARNING${RESET}"
@@ -320,13 +327,31 @@ execute_or_dryrun() {
 # Confirm operation, respecting dry-run mode
 confirm_with_dryrun() {
     local prompt="$1"
-    
+
     if [[ "${DRY_RUN:-false}" == "true" ]]; then
         log_info "[DRY-RUN] ${prompt}"
         return 0
     fi
-    
+
     confirm_yes_no "${prompt}"
+}
+
+# Escape a string for embedding in a JSON string value
+json_escape() {
+    local s=$1
+    s=${s//\\/\\\\}; s=${s//\"/\\\"}
+    s=${s//$'\n'/\\n}; s=${s//$'\t'/\\t}
+    printf '%s' "$s"
+}
+
+# Name of the nearest calling check_*/section_* function, for JSON --json output
+json_component() {
+    local i=1 name
+    while name="${FUNCNAME[$i]:-}"; [[ -n "$name" ]]; do
+        case "$name" in check_*|section_*) printf '%s' "$name"; return ;; esac
+        ((i++))
+    done
+    printf '%s' "main"
 }
 
 ##################################################################################################################################

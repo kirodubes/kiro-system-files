@@ -40,7 +40,10 @@ fi
 #####################################################################
 # Logging
 #####################################################################
+# In --json mode (JSON_MODE=true), stdout stays pure JSON, so these
+# narrative banners become no-ops rather than routed elsewhere.
 log_section() {
+    [[ "${JSON_MODE:-false}" == true ]] && return 0
     echo
     echo "${GREEN}############################################################################${RESET}"
     echo "$1"
@@ -49,6 +52,7 @@ log_section() {
 }
 
 log_info() {
+    [[ "${JSON_MODE:-false}" == true ]] && return 0
     echo
     echo "${BLUE}############################################################################${RESET}"
     echo "$1"
@@ -57,6 +61,7 @@ log_info() {
 }
 
 log_warn() {
+    [[ "${JSON_MODE:-false}" == true ]] && return 0
     echo
     echo "${YELLOW}############################################################################${RESET}"
     echo "$1"
@@ -65,6 +70,7 @@ log_warn() {
 }
 
 log_error() {
+    [[ "${JSON_MODE:-false}" == true ]] && return 0
     echo
     echo "${RED}############################################################################${RESET}"
     echo "$1"
@@ -73,6 +79,7 @@ log_error() {
 }
 
 log_success() {
+    [[ "${JSON_MODE:-false}" == true ]] && return 0
     echo
     echo "${GREEN}############################################################################${RESET}"
     echo "$1"
@@ -98,7 +105,23 @@ trap 'on_error "$LINENO" "$BASH_COMMAND"' ERR
 # Privilege — re-exec as root (polkit popup in a GUI, sudo over SSH/tty)
 #####################################################################
 # kiro-audit is self-contained and does NOT source kiro-common.sh, so it
-# carries its own copy of this helper. Keep it in sync with kiro-common.sh.
+# carries its own copies of these helpers. Keep them in sync with kiro-common.sh.
+json_escape() {
+    local s=$1
+    s=${s//\\/\\\\}; s=${s//\"/\\\"}
+    s=${s//$'\n'/\\n}; s=${s//$'\t'/\\t}
+    printf '%s' "$s"
+}
+
+json_component() {
+    local i=1 name
+    while name="${FUNCNAME[$i]:-}"; [[ -n "$name" ]]; do
+        case "$name" in check_*) printf '%s' "$name"; return ;; esac
+        ((i++))
+    done
+    printf '%s' "main"
+}
+
 ensure_root() {
     [[ $EUID -eq 0 ]] && return 0
     trap - ERR
@@ -114,6 +137,8 @@ ensure_root() {
 
 FIX_MODE=false
 FORCE=false
+JSON_MODE=false
+JSON_RESULTS=()
 
 for _arg in "$@"; do
     case "$_arg" in
@@ -122,13 +147,14 @@ for _arg in "$@"; do
 kiro-audit - Kiro ISO installed system audit
 
 Usage:
-    kiro-audit [--help] [--version] [--fix] [--force]
+    kiro-audit [--help] [--version] [--fix] [--force] [--json]
 
 Options:
     -h, --help     Show this help message and exit
     -v, --version  Show version information and exit
     --fix          Auto-remediate known fixable failures (requires root)
     --force        Run even in the live ISO (checks assume an installed system)
+    --json         Output results as a single JSON document
 
 Description:
     Comprehensive post-install audit of a Kiro system. Checks kernel,
@@ -158,6 +184,9 @@ EOF
         --force)
             FORCE=true
             ;;
+        --json)
+            JSON_MODE=true
+            ;;
     esac
 done
 unset _arg
@@ -166,13 +195,17 @@ unset _arg
 # is a read-only squashfs and the archiso packages/config are still present, so most checks
 # FAIL on things that don't apply. Bail before the root prompt unless --force.
 if [[ -d /run/archiso ]] && [[ "${FORCE}" != true ]]; then
-    log_warn "Live ISO detected — kiro-audit is for an INSTALLED Kiro system"
-    echo "  The live ISO root is a read-only squashfs with the archiso packages and config"
-    echo "  still present, so most checks would FAIL on things that don't apply here. Install"
-    echo "  Kiro first, then run kiro-audit on the installed system."
-    echo
-    echo "  Run 'kiro-audit --force' to audit the live environment anyway."
-    echo
+    if [[ "${JSON_MODE}" == true ]]; then
+        printf '{"script":"kiro-audit","generated":"%s","error":"live ISO detected, use --force to audit anyway"}\n' "$(date -Iseconds)"
+    else
+        log_warn "Live ISO detected — kiro-audit is for an INSTALLED Kiro system"
+        echo "  The live ISO root is a read-only squashfs with the archiso packages and config"
+        echo "  still present, so most checks would FAIL on things that don't apply here. Install"
+        echo "  Kiro first, then run kiro-audit on the installed system."
+        echo
+        echo "  Run 'kiro-audit --force' to audit the live environment anyway."
+        echo
+    fi
     exit 0
 fi
 
@@ -186,9 +219,45 @@ FAIL=0
 WARN=0
 FIXED=0
 
-pass() { echo "  ${GREEN}PASS${RESET}  $1"; PASS=$((PASS + 1)); }
-fail() { echo "  ${RED}FAIL${RESET}  $1"; FAIL=$((FAIL + 1)); }
-warn() { echo "  ${YELLOW}WARN${RESET}  $1"; WARN=$((WARN + 1)); }
+pass() {
+    if [[ "${JSON_MODE}" == true ]]; then
+        JSON_RESULTS+=("{\"component\":\"$(json_component)\",\"status\":\"pass\",\"message\":\"$(json_escape "$1")\"}")
+    else
+        echo "  ${GREEN}PASS${RESET}  $1"
+    fi
+    PASS=$((PASS + 1))
+}
+fail() {
+    if [[ "${JSON_MODE}" == true ]]; then
+        JSON_RESULTS+=("{\"component\":\"$(json_component)\",\"status\":\"fail\",\"message\":\"$(json_escape "$1")\"}")
+    else
+        echo "  ${RED}FAIL${RESET}  $1"
+    fi
+    FAIL=$((FAIL + 1))
+}
+warn() {
+    if [[ "${JSON_MODE}" == true ]]; then
+        JSON_RESULTS+=("{\"component\":\"$(json_component)\",\"status\":\"warn\",\"message\":\"$(json_escape "$1")\"}")
+    else
+        echo "  ${YELLOW}WARN${RESET}  $1"
+    fi
+    WARN=$((WARN + 1))
+}
+# info()/info_warn(): non-counted informational lines (no PASS/FAIL/WARN tally)
+info() {
+    if [[ "${JSON_MODE}" == true ]]; then
+        JSON_RESULTS+=("{\"component\":\"$(json_component)\",\"status\":\"info\",\"message\":\"$(json_escape "$1")\"}")
+    else
+        echo "  ${CYAN}INFO${RESET}  $1"
+    fi
+}
+info_warn() {
+    if [[ "${JSON_MODE}" == true ]]; then
+        JSON_RESULTS+=("{\"component\":\"$(json_component)\",\"status\":\"info\",\"message\":\"$(json_escape "$1")\"}")
+    else
+        echo "  ${YELLOW}INFO${RESET}  $1"
+    fi
+}
 
 # apply_fix "description" cmd [args...]
 # --fix mode: prints description and runs cmd; increments FIXED on success.
@@ -196,13 +265,20 @@ warn() { echo "  ${YELLOW}WARN${RESET}  $1"; WARN=$((WARN + 1)); }
 apply_fix() {
     local msg="$1"; shift
     if [[ "${FIX_MODE}" == true ]]; then
-        echo "  ${CYAN}FIX${RESET}   ${msg}"
+        if [[ "${JSON_MODE}" != true ]]; then echo "  ${CYAN}FIX${RESET}   ${msg}"; fi
         if "$@"; then
             FIXED=$((FIXED + 1))
+            if [[ "${JSON_MODE}" == true ]]; then
+                JSON_RESULTS+=("{\"component\":\"$(json_component)\",\"status\":\"fixed\",\"message\":\"$(json_escape "$msg")\"}")
+            fi
         else
-            echo "  ${RED}ERR${RESET}   fix failed: $*"
+            if [[ "${JSON_MODE}" == true ]]; then
+                JSON_RESULTS+=("{\"component\":\"$(json_component)\",\"status\":\"fix-failed\",\"message\":\"$(json_escape "$msg")\"}")
+            else
+                echo "  ${RED}ERR${RESET}   fix failed: $*"
+            fi
         fi
-    else
+    elif [[ "${JSON_MODE}" != true ]]; then
         echo "  ${CYAN}FIX?${RESET}  --fix: ${msg}"
     fi
 }
@@ -670,7 +746,7 @@ check_dev_rel() {
 
     if [[ -f /etc/dev-rel ]]; then
         pass "/etc/dev-rel present"
-        echo "  ${CYAN}INFO${RESET}  $(cat /etc/dev-rel)"
+        info "$(cat /etc/dev-rel)"
     else
         fail "/etc/dev-rel missing"
     fi
@@ -699,9 +775,11 @@ check_chwd() {
     local marker="/var/log/kiro-chwd-skipped.log"
     if [[ -f "${marker}" ]]; then
         warn "chwd was skipped during install — open driver in use (see ${marker})"
-        while read -r line; do
-            echo "        ${line}"
-        done < "${marker}"
+        if [[ "${JSON_MODE}" != true ]]; then
+            while read -r line; do
+                echo "        ${line}"
+            done < "${marker}"
+        fi
     else
         pass "No chwd skip marker (driver autoconfigure completed, or driver=free)"
     fi
@@ -721,6 +799,8 @@ check_package_integrity() {
 
     if [[ -z "${missing}" ]]; then
         pass "All packages have no missing files"
+    elif [[ "${JSON_MODE}" == true ]]; then
+        fail "Packages with missing files: $(echo "${missing}" | tr '\n' '; ')"
     else
         fail "Packages with missing files:"
         echo "${missing}" | while read -r line; do
@@ -990,6 +1070,8 @@ check_failed_units() {
 
     if [[ "${failed_count}" -eq 0 ]]; then
         pass "No failed systemd units"
+    elif [[ "${JSON_MODE}" == true ]]; then
+        fail "${failed_count} failed systemd unit(s): $(systemctl --failed --no-legend | awk '{print $1}' | tr '\n' '; ')"
     else
         fail "${failed_count} failed systemd unit(s):"
         systemctl --failed --no-legend | while read -r line; do
@@ -1003,14 +1085,14 @@ check_boot_and_updates() {
 
     local boot_summary
     boot_summary=$(systemd-analyze 2>/dev/null | head -1)
-    echo "  ${CYAN}INFO${RESET}  Boot: ${boot_summary}"
+    info "Boot: ${boot_summary}"
 
     local update_count
     update_count=$(checkupdates 2>/dev/null | wc -l || true)
     if [[ "${update_count}" -eq 0 ]]; then
-        echo "  ${CYAN}INFO${RESET}  Pending updates: 0"
+        info "Pending updates: 0"
     else
-        echo "  ${YELLOW}INFO${RESET}  Pending updates: ${update_count} package(s) available"
+        info_warn "Pending updates: ${update_count} package(s) available"
     fi
 }
 
@@ -1142,13 +1224,13 @@ check_disk_format() {
     mapfile -t luks_devs < <(lsblk -rpno NAME,FSTYPE 2>/dev/null | awk '$2=="crypto_LUKS"{print $1}')
 
     if [[ ${#luks_devs[@]} -eq 0 ]]; then
-        echo "  ${CYAN}INFO${RESET}  Root filesystem: ${root_fs} (unencrypted)"
+        info "Root filesystem: ${root_fs} (unencrypted)"
         pass "No LUKS containers — unencrypted install (expected default)"
         return
     fi
 
-    echo "  ${CYAN}INFO${RESET}  Root filesystem: ${root_fs} on ${root_src}"
-    echo "  ${CYAN}INFO${RESET}  LUKS containers: ${#luks_devs[@]} (${luks_devs[*]})"
+    info "Root filesystem: ${root_fs} on ${root_src}"
+    info "LUKS containers: ${#luks_devs[@]} (${luks_devs[*]})"
     pass "Full-disk encryption in use (${#luks_devs[@]} LUKS container(s))"
 
     # Each container must be LUKS2 — the modern Calamares default (argon2id PBKDF).
@@ -1158,7 +1240,7 @@ check_disk_format() {
     for dev in "${luks_devs[@]}"; do
         ver=$(cryptsetup luksDump "${dev}" 2>/dev/null | awk -F: '/^Version:/{gsub(/[[:space:]]/,"",$2); print $2}')
         cipher=$(cryptsetup luksDump "${dev}" 2>/dev/null | awk -F: '/[Cc]ipher:/{gsub(/^[[:space:]]+/,"",$2); print $2; exit}')
-        echo "  ${CYAN}INFO${RESET}  ${dev}: cipher ${cipher:-unknown}"
+        info "${dev}: cipher ${cipher:-unknown}"
         case "${ver}" in
             2) pass "${dev}: LUKS2" ;;
             1) warn "${dev}: LUKS1 (legacy — Calamares default is LUKS2/argon2id)" ;;
@@ -1331,15 +1413,17 @@ check_kiro_plasma() {
 #####################################################################
 main() {
     log_section "Kiro ISO — Installed System Audit"
-    echo "  Host   : $(hostname)"
-    echo "  Kernel : $(uname -r)"
-    echo "  Date   : $(date)"
+    if [[ "${JSON_MODE}" != true ]]; then
+        echo "  Host   : $(hostname)"
+        echo "  Kernel : $(uname -r)"
+        echo "  Date   : $(date)"
+    fi
 
     local is_vm=false vm_type=""
     if systemd-detect-virt --vm --quiet 2>/dev/null; then
         is_vm=true
         vm_type="$(systemd-detect-virt --vm 2>/dev/null || true)"
-        echo "  Virt   : ${vm_type} (virtual machine)"
+        if [[ "${JSON_MODE}" != true ]]; then echo "  Virt   : ${vm_type} (virtual machine)"; fi
     fi
 
     check_kernel
@@ -1374,12 +1458,14 @@ main() {
     check_boot_and_updates
     check_package_integrity
 
-    log_section "Audit Summary"
-    echo "  ${GREEN}PASS: ${PASS}${RESET}"
-    echo "  ${YELLOW}WARN: ${WARN}${RESET}"
-    echo "  ${RED}FAIL: ${FAIL}${RESET}"
-    [[ "${FIX_MODE}" == true ]] && echo "  ${CYAN}FIXED: ${FIXED}${RESET}"
-    echo
+    if [[ "${JSON_MODE}" != true ]]; then
+        log_section "Audit Summary"
+        echo "  ${GREEN}PASS: ${PASS}${RESET}"
+        echo "  ${YELLOW}WARN: ${WARN}${RESET}"
+        echo "  ${RED}FAIL: ${FAIL}${RESET}"
+        [[ "${FIX_MODE}" == true ]] && echo "  ${CYAN}FIXED: ${FIXED}${RESET}"
+        echo
+    fi
 
     local rc=0
     if [[ ${FAIL} -gt 0 ]]; then
@@ -1402,6 +1488,16 @@ main() {
 kiro-audit is intended for real (bare-metal) hardware — the
 failures above are most likely VM / live-environment artifacts,
 not a broken install."
+    fi
+
+    if [[ "${JSON_MODE}" == true ]]; then
+        local joined summary
+        joined=$(IFS=,; echo "${JSON_RESULTS[*]}")
+        summary="\"pass\":${PASS},\"warn\":${WARN},\"fail\":${FAIL}"
+        [[ "${FIX_MODE}" == true ]] && summary="${summary},\"fixed\":${FIXED}"
+        printf '{"script":"kiro-audit","generated":"%s","host":"%s","kernel":"%s","is_vm":%s,"summary":{%s},"results":[%s]}\n' \
+            "$(date -Iseconds)" "$(json_escape "$(hostname)")" "$(json_escape "$(uname -r)")" \
+            "${is_vm}" "${summary}" "${joined}"
     fi
 
     exit "${rc}"

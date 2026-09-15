@@ -1,5 +1,49 @@
 # CHANGELOG
 
+## 2026.09.15
+
+### `kiro-audit`, `kiro-verify`, `kiro-diag` gained `--json` output
+
+**What Changed**
+
+All three diagnostic commands now accept a `--json` flag that emits a single JSON document
+on stdout instead of colored text — one per-check `{component, status, message}` object plus
+a summary block, so ATT, `kiro-report`, or a future local-AI-explains-diagnostics layer can
+consume the results without scraping/regexing terminal output.
+
+**Technical Details**
+
+- Added `json_escape()` and `json_component()` to `kiro-common.sh`. `json_component()` walks
+  the bash `FUNCNAME` call stack to find the nearest `check_*`/`section_*` frame, so every
+  existing `pass()`/`fail()`/`warn()` (`kiro-audit`), `ok()`/`ko()`/`warn_check()`/`skip_check()`
+  (`kiro-verify`), and `_field()` (`kiro-diag`) call gets a correct JSON `"component"` tag with
+  **zero changes to any of the ~40 check/section function bodies** — only the shared result
+  helpers themselves branch on a new `JSON_MODE` flag.
+- `kiro-audit` is self-contained (does not source `kiro-common.sh`), so it carries its own copy
+  of `json_escape`/`json_component`, following the same "keep in sync" precedent already used
+  for its local `ensure_root()`.
+- `log_section`/`log_subsection`/`log_info`/`log_success`/`log_warn` (shared and kiro-audit's
+  local copies) now no-op under `JSON_MODE=true`, so per-check narrative banners don't leak
+  into the JSON stdout stream. `log_error` (the ERR-trap handler) is untouched — kept visible on
+  a real script bug rather than silenced.
+- A few checks print raw external-command output directly (an `lsblk`/`df`/`sensors` table in
+  `kiro-diag`; a `journalctl`/`dmesg`/`systemctl --failed` detail dump after a `warn`/`fail` in
+  `kiro-verify`/`kiro-audit`; 8 uncounted `INFO`-labeled lines in `kiro-audit`, e.g. LUKS cipher
+  info). These fell outside the pass/fail/`_field` hook, so each was given a small local
+  `JSON_MODE` branch — either folded into the result's `message` field or (for `kiro-audit`'s
+  bare `INFO` echoes) routed through two new `info()`/`info_warn()` helpers. Human-mode output
+  is byte-for-byte unchanged in every case.
+- Exit codes are unchanged in all three scripts — `--json` only changes what's printed, not the
+  process return code, so existing callers checking `$?` are unaffected.
+
+**Files Modified**
+
+- `usr/local/lib/kiro-common.sh`
+- `usr/local/bin/kiro-audit`
+- `usr/local/bin/kiro-verify`
+- `usr/local/bin/kiro-diag`
+- `CHANGELOG.md`
+
 ## 2026.09.14
 
 ### `kiro-audit` now checks for the `10-archiso.conf` sshd leftover

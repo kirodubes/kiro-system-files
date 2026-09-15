@@ -27,8 +27,15 @@ fi
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
+JSON_MODE=false
+JSON_RESULTS=()
+
 _field() {
-    printf "  ${BOLD}%-26s${RESET} %s\n" "${1}:" "${2}"
+    if [[ "${JSON_MODE}" == true ]]; then
+        JSON_RESULTS+=("{\"component\":\"$(json_component)\",\"label\":\"$(json_escape "$1")\",\"value\":\"$(json_escape "$2")\"}")
+    else
+        printf "  ${BOLD}%-26s${RESET} %s\n" "${1}:" "${2}"
+    fi
 }
 
 ##################################################################################################################
@@ -81,11 +88,14 @@ section_hardware() {
     mem_avail=$(free -h --si | awk '/^Mem:/{print $7}')
     _field "RAM" "${mem_total} total, ${mem_avail} available"
 
-    echo
-    lsblk -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINTS 2>/dev/null \
-        | grep -v '^loop' \
-        | sed 's/^/  /' \
-        || true
+    local blockdevs
+    blockdevs=$(lsblk -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINTS 2>/dev/null | grep -v '^loop' || true)
+    if [[ "${JSON_MODE}" == true ]]; then
+        JSON_RESULTS+=("{\"component\":\"$(json_component)\",\"label\":\"Block devices\",\"value\":\"$(json_escape "$blockdevs")\"}")
+    else
+        echo
+        echo "${blockdevs}" | sed 's/^/  /'
+    fi
 }
 
 section_gpu() {
@@ -146,12 +156,16 @@ section_storage() {
     mounts=$(mount | grep '^/dev' | awk '{print $1 "(" $5 ")"}' | tr '\n' '  ')
     _field "Mounted" "$mounts"
 
-    echo
-    df -h --output=target,fstype,size,used,avail,pcent 2>/dev/null \
-        | grep -v '^tmpfs\|^devtmpfs\|^efivarfs\|^Filesystem\|^/dev/loop' \
-        | awk 'NR==1{print "  "$0} NR>1{print "  "$0}' \
-        || true
-    echo
+    local diskusage
+    diskusage=$(df -h --output=target,fstype,size,used,avail,pcent 2>/dev/null \
+        | grep -v '^tmpfs\|^devtmpfs\|^efivarfs\|^Filesystem\|^/dev/loop' || true)
+    if [[ "${JSON_MODE}" == true ]]; then
+        JSON_RESULTS+=("{\"component\":\"$(json_component)\",\"label\":\"Filesystem usage\",\"value\":\"$(json_escape "$diskusage")\"}")
+    else
+        echo
+        echo "${diskusage}" | awk 'NR==1{print "  "$0} NR>1{print "  "$0}'
+        echo
+    fi
 
     local swap
     swap=$(free -h --si | awk '/^Swap:/{print $2 " total, " $3 " used, " $4 " free"}')
@@ -335,9 +349,15 @@ section_temps() {
     log_subsection "Temperatures"
 
     if command -v sensors &>/dev/null; then
-        echo
-        sensors 2>/dev/null | grep -E '°C|temp|fan|rpm' | sed 's/^/  /' || echo "  (no sensor data)"
-        echo
+        local temps
+        temps=$(sensors 2>/dev/null | grep -E '°C|temp|fan|rpm' || echo "(no sensor data)")
+        if [[ "${JSON_MODE}" == true ]]; then
+            JSON_RESULTS+=("{\"component\":\"$(json_component)\",\"label\":\"Sensors\",\"value\":\"$(json_escape "$temps")\"}")
+        else
+            echo
+            echo "${temps}" | sed 's/^/  /'
+            echo
+        fi
     else
         _field "sensors" "lm_sensors not installed"
     fi
@@ -353,13 +373,16 @@ main() {
             -h|--help)
                 show_help "$(basename "$0")" \
                     "Display Kiro system diagnostic information" \
-                    "[--help] [--version]" \
-                    ""
+                    "[--help] [--version] [--json]" \
+                    "    --json          Output results as a single JSON document"
                 exit 0
                 ;;
             -v|--version)
                 show_version "$(basename "$0")"
                 exit 0
+                ;;
+            --json)
+                JSON_MODE=true
                 ;;
             *)
                 echo "${RED}Unknown option: $arg${RESET}" >&2
@@ -385,7 +408,14 @@ main() {
     section_temps
     section_packages
 
-    log_success "$(basename "$0") done"
+    if [[ "${JSON_MODE}" == true ]]; then
+        local joined
+        joined=$(IFS=,; echo "${JSON_RESULTS[*]}")
+        printf '{"script":"%s","generated":"%s","results":[%s]}\n' \
+            "$(basename "$0")" "$(date -Iseconds)" "${joined}"
+    else
+        log_success "$(basename "$0") done"
+    fi
 }
 
 main "$@"

@@ -27,18 +27,24 @@ fi
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
+JSON_MODE=false
+JSON_RESULTS=()
+
 for _arg in "$@"; do
     case "$_arg" in
         -h|--help)
             show_help "$(basename "$0")" \
                 "Verify Kiro system configuration is correctly applied" \
-                "[--help] [--version]" \
-                ""
+                "[--help] [--version] [--json]" \
+                "    --json          Output results as a single JSON document"
             exit 0
             ;;
         -v|--version)
             show_version "$(basename "$0")"
             exit 0
+            ;;
+        --json)
+            JSON_MODE=true
             ;;
     esac
 done
@@ -58,22 +64,38 @@ SKIP=0
 # Result helpers
 ##################################################################################################################
 ok() {
-    echo "${GREEN}  [PASS]${RESET} $1"
+    if [[ "${JSON_MODE}" == true ]]; then
+        JSON_RESULTS+=("{\"component\":\"$(json_component)\",\"status\":\"pass\",\"message\":\"$(json_escape "$1")\"}")
+    else
+        echo "${GREEN}  [PASS]${RESET} $1"
+    fi
     PASS=$((PASS + 1))
 }
 
 ko() {
-    echo "${RED}  [FAIL]${RESET} $1"
+    if [[ "${JSON_MODE}" == true ]]; then
+        JSON_RESULTS+=("{\"component\":\"$(json_component)\",\"status\":\"fail\",\"message\":\"$(json_escape "$1")\"}")
+    else
+        echo "${RED}  [FAIL]${RESET} $1"
+    fi
     FAIL=$((FAIL + 1))
 }
 
 warn_check() {
-    echo "${YELLOW}  [WARN]${RESET} $1"
+    if [[ "${JSON_MODE}" == true ]]; then
+        JSON_RESULTS+=("{\"component\":\"$(json_component)\",\"status\":\"warn\",\"message\":\"$(json_escape "$1")\"}")
+    else
+        echo "${YELLOW}  [WARN]${RESET} $1"
+    fi
     WARN=$((WARN + 1))
 }
 
 skip_check() {
-    echo "${CYAN}  [SKIP]${RESET} $1"
+    if [[ "${JSON_MODE}" == true ]]; then
+        JSON_RESULTS+=("{\"component\":\"$(json_component)\",\"status\":\"skip\",\"message\":\"$(json_escape "$1")\"}")
+    else
+        echo "${CYAN}  [SKIP]${RESET} $1"
+    fi
     SKIP=$((SKIP + 1))
 }
 
@@ -153,12 +175,18 @@ explain_ip_forward() {
     [[ -n "${ovpn_units// /}" ]] && causes+=("OpenVPN (${ovpn_units% })")
 
     if [[ ${#causes[@]} -gt 0 ]]; then
-        warn_check "net.ipv4.ip_forward=1 — kiro sets 0, but overridden at runtime by:"
-        for c in "${causes[@]}"; do
-            echo "           - $c"
-        done
-        echo "         These services need packet forwarding to route traffic between"
-        echo "         virtual machines, containers, or VPN tunnels. This is expected."
+        if [[ "${JSON_MODE}" == true ]]; then
+            local causes_joined
+            causes_joined=$(IFS=', '; echo "${causes[*]}")
+            warn_check "net.ipv4.ip_forward=1 — kiro sets 0, but overridden at runtime by: ${causes_joined}"
+        else
+            warn_check "net.ipv4.ip_forward=1 — kiro sets 0, but overridden at runtime by:"
+            for c in "${causes[@]}"; do
+                echo "           - $c"
+            done
+            echo "         These services need packet forwarding to route traffic between"
+            echo "         virtual machines, containers, or VPN tunnels. This is expected."
+        fi
     else
         warn_check "net.ipv4.ip_forward=1 — no known service identified; check: libvirtd, docker, WireGuard, OpenVPN"
     fi
@@ -420,7 +448,9 @@ check_systemd_units() {
         ok "Systemd: no failed units"
     else
         ko "Systemd: $failed_count failed unit(s)"
-        systemctl list-units --state=failed --no-legend --no-pager 2>/dev/null | head -10 || true
+        if [[ "${JSON_MODE}" != true ]]; then
+            systemctl list-units --state=failed --no-legend --no-pager 2>/dev/null | head -10 || true
+        fi
     fi
 
     # kiro-pci-latency is a oneshot service — check result rather than active state
@@ -471,7 +501,7 @@ check_journal() {
         ok "Journal: no error-level entries since boot"
     else
         warn_check "Journal: $boot_errors error-level entries since boot"
-        echo "         Run: journalctl -b -p err --no-pager"
+        if [[ "${JSON_MODE}" != true ]]; then echo "         Run: journalctl -b -p err --no-pager"; fi
     fi
 
     # Kiro-specific warnings or errors
@@ -484,11 +514,13 @@ check_journal() {
 
     if [[ "$kiro_issues" -gt 0 ]]; then
         warn_check "Journal: $kiro_issues kiro-related warnings/errors since boot"
-        journalctl -b --no-pager -q 2>/dev/null \
-            | grep -iE "(kiro|sysctl|modprobe|udev|zram|pci.latency)" \
-            | grep -iE "(error|fail|warn)" \
-            | grep -v "alsactl restore" \
-            | head -10 || true
+        if [[ "${JSON_MODE}" != true ]]; then
+            journalctl -b --no-pager -q 2>/dev/null \
+                | grep -iE "(kiro|sysctl|modprobe|udev|zram|pci.latency)" \
+                | grep -iE "(error|fail|warn)" \
+                | grep -v "alsactl restore" \
+                | head -10 || true
+        fi
     else
         ok "Journal: no kiro-related warnings/errors found"
     fi
@@ -498,7 +530,7 @@ check_journal() {
         local dmesg_errors
         dmesg_errors=$(dmesg -l err 2>/dev/null | grep -c "." || true)
         warn_check "dmesg: $dmesg_errors error-level kernel messages"
-        dmesg -l err 2>/dev/null | head -10 || true
+        if [[ "${JSON_MODE}" != true ]]; then dmesg -l err 2>/dev/null | head -10 || true; fi
     elif dmesg >/dev/null 2>&1; then
         ok "dmesg: no error-level kernel messages"
     else
@@ -514,10 +546,12 @@ check_journal() {
 
     if [[ "$udev_errors" -gt 0 ]]; then
         warn_check "udev: $udev_errors errors in systemd-udevd log"
-        journalctl -b -u systemd-udevd --no-pager -q 2>/dev/null \
-            | grep -iE "(error|fail)" \
-            | grep -v "alsactl restore" \
-            | head -5 || true
+        if [[ "${JSON_MODE}" != true ]]; then
+            journalctl -b -u systemd-udevd --no-pager -q 2>/dev/null \
+                | grep -iE "(error|fail)" \
+                | grep -v "alsactl restore" \
+                | head -5 || true
+        fi
     else
         ok "udev: no errors in systemd-udevd log"
     fi
@@ -539,21 +573,33 @@ main() {
     check_journal
 
     # ── Summary ──────────────────────────────────────────────────────────────
-    log_section "Verification Summary"
-    echo "  ${GREEN}PASS: ${PASS}${RESET}"
-    echo "  ${RED}FAIL: ${FAIL}${RESET}"
-    echo "  ${YELLOW}WARN: ${WARN}${RESET}"
-    echo "  ${CYAN}SKIP: ${SKIP}${RESET}"
-    echo
+    if [[ "${JSON_MODE}" != true ]]; then
+        log_section "Verification Summary"
+        echo "  ${GREEN}PASS: ${PASS}${RESET}"
+        echo "  ${RED}FAIL: ${FAIL}${RESET}"
+        echo "  ${YELLOW}WARN: ${WARN}${RESET}"
+        echo "  ${CYAN}SKIP: ${SKIP}${RESET}"
+        echo
+    fi
 
     if [[ $FAIL -gt 0 ]]; then
         log_warn "${FAIL} check(s) FAILED — review the output above"
+        if [[ "${JSON_MODE}" == true ]]; then json_print_summary; fi
         exit 1
     elif [[ $WARN -gt 0 ]]; then
         log_warn "${WARN} warning(s) found — system functional but review recommended"
     else
         log_success "All checks passed"
     fi
+
+    if [[ "${JSON_MODE}" == true ]]; then json_print_summary; fi
+}
+
+json_print_summary() {
+    local joined
+    joined=$(IFS=,; echo "${JSON_RESULTS[*]}")
+    printf '{"script":"kiro-verify","generated":"%s","summary":{"pass":%d,"fail":%d,"warn":%d,"skip":%d},"results":[%s]}\n' \
+        "$(date -Iseconds)" "${PASS}" "${FAIL}" "${WARN}" "${SKIP}" "${joined}"
 }
 
 main "$@"
