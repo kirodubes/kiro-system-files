@@ -5,6 +5,7 @@ kiro-audit \- comprehensive post-install audit of a Kiro system
 .B kiro-audit
 [\fB\-h\fR|\fB\-\-help\fR]
 [\fB\-v\fR|\fB\-\-version\fR]
+[\fB\-\-json\fR]
 .SH DESCRIPTION
 .B kiro-audit
 performs a structured PASS/WARN/FAIL audit of a Kiro system after installation.
@@ -52,6 +53,9 @@ Print a help message and exit (does not require root).
 .TP
 .BR \-v ", " \-\-version
 Print version information and exit (does not require root).
+.TP
+.B \-\-json
+Output results as a single JSON document instead of colored text.
 .SH EXIT STATUS
 .TP
 .B 0

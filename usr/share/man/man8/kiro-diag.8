@@ -5,6 +5,7 @@ kiro-diag \- display Kiro system diagnostic information
 .B kiro-diag
 [\fB\-h\fR|\fB\-\-help\fR]
 [\fB\-v\fR|\fB\-\-version\fR]
+[\fB\-\-json\fR]
 .SH DESCRIPTION
 .B kiro-diag
 prints a concise system snapshot useful for quick diagnosis and bug reports.
@@ -38,6 +39,9 @@ Print a help message and exit (does not require root).
 .TP
 .BR \-v ", " \-\-version
 Print version information and exit (does not require root).
+.TP
+.B \-\-json
+Output results as a single JSON document instead of colored text.
 .SH NOTES
 Must be run as root:
 .B sudo kiro-diag
