@@ -213,6 +213,7 @@ check_sysctl() {
         [[ "$line" != *=* ]] && continue
 
         key=$(echo "$line" | sed 's/[[:space:]]*=.*//' | tr -d '[:space:]')
+        key="${key#-}"  # strip sysctl.d "ignore if missing" prefix
         value=$(echo "$line" | sed 's/^[^=]*=[[:space:]]*//')
         # trim trailing whitespace
         value=$(echo "$value" | sed 's/[[:space:]]*$//')

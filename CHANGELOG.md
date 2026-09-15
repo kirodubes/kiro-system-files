@@ -44,6 +44,30 @@ consume the results without scraping/regexing terminal output.
 - `usr/local/bin/kiro-diag`
 - `CHANGELOG.md`
 
+### `kiro-verify` false-fail on `netdev_budget_usecs` sysctl check
+
+**What Changed**
+
+`check_sysctl()` was reporting a hard fail for `net.core.netdev_budget_usecs`, showing
+`sysctl`'s own usage/help text as the "actual" value instead of a number.
+
+**Technical Details**
+
+- `/etc/sysctl.d/99-kiro-optimizations.conf` deliberately prefixes that one key with `-`
+  (`-net.core.netdev_budget_usecs = 2000`) — standard `sysctl.d(5)` syntax meaning "don't fail
+  the unit if this key is missing," needed because linux-lts (`CONFIG_HZ=300`) rejects the write.
+- `check_sysctl()`'s line parser stripped whitespace but not that leading `-`, so it ran
+  `sysctl -n -net.core.netdev_budget_usecs`. `sysctl` read the leading dash as an unknown option
+  and printed its usage text to stdout, which slipped past the `2>/dev/null` and got compared as
+  the "actual" value, always mismatching.
+- Fix: strip the leading `-` from `$key` right after extraction (`key="${key#-}"`), before both
+  the `sysctl -n` query and the pass/fail message.
+
+**Files Modified**
+
+- `usr/local/bin/kiro-verify`
+- `CHANGELOG.md`
+
 ## 2026.09.14
 
 ### `kiro-audit` now checks for the `10-archiso.conf` sshd leftover
