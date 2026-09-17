@@ -5,7 +5,7 @@
 # Jack detection: restore ALSA state when a sound card is detected
 # Ensures mixer levels and routing are preserved across hotplug events
 ACTION=="add", SUBSYSTEM=="sound", KERNEL=="card*", \
-  RUN+="/usr/bin/alsactl restore 2>/dev/null || true"
+  RUN+="/usr/bin/bash -c '/usr/bin/alsactl restore 2>/dev/null || true'"
 
 # snd_hda_intel: disable power saving on AC, enable on battery.
 # Prevents audio cracks/pops on AC while saving power on battery.

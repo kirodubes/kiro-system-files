@@ -1,5 +1,43 @@
 # CHANGELOG
 
+## 2026.09.17
+
+### `68-sound-power.rules`: alsactl restore ran without a shell
+
+**What Changed**
+
+The ALSA-restore rule passed shell syntax to a bare `RUN+=`:
+
+```
+RUN+="/usr/bin/alsactl restore 2>/dev/null || true"
+```
+
+udev does **not** run `RUN+=` through a shell, so `2>/dev/null`, `||` and `true` were
+handed to `alsactl` as literal argv. `alsactl restore` treats the first argument as a
+card name, fails with exit 19 (ENODEV), and the `|| true` that was meant to swallow it
+never ran. Every boot logged:
+
+```
+(udev-worker)[344]: card0: Process '/usr/bin/alsactl restore 2>/dev/null || true' failed with exit code 19.
+```
+
+Now wrapped in `bash -c`, matching the four other rules in the same file, which already
+did this correctly.
+
+**Technical Details**
+
+Confirmed on a fresh v26.09.17 install rather than inferred: `/usr/bin/alsactl restore`
+alone exits 0, while `/usr/bin/alsactl restore '2>/dev/null' '||' true` exits 19 —
+exactly the code in the journal. `udevadm verify` passes on the amended file. This was
+the only rule in `/etc/udev/rules.d/` using shell operators outside a `bash -c` wrapper.
+
+Found by a `/kiro-syscheck` run against the VM.
+
+**Files Modified**
+
+- etc/udev/rules.d/68-sound-power.rules
+- CHANGELOG.md
+
 ## 2026.09.15
 
 ### `kiro-audit`, `kiro-verify`, `kiro-diag` gained `--json` output
