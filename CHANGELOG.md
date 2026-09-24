@@ -1,5 +1,25 @@
 # CHANGELOG
 
+## 2026.09.24
+
+### `up.sh` / `setup.sh` re-synced from the Kiro-HQ canonical templates
+
+**What Changed**
+
+Both maintainer scripts now match the canonical copies byte for byte: a Purpose/Why header on each,
+a guard in `up.sh` that aborts if a generated `keybindings.html`/`.pdf` is tracked, and an optional
+`COMMIT_MSG` override for the commit message (default stays `update`).
+
+**Technical Details**
+
+Maintainer-only scripts — neither is installed by the package, so no rebuild is needed.
+
+**Files Modified**
+
+- `up.sh`
+- `setup.sh`
+- `CHANGELOG.md`
+
 ## 2026.09.17
 
 ### `68-sound-power.rules`: alsactl restore ran without a shell
