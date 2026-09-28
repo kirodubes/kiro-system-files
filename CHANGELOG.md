@@ -5,13 +5,21 @@
 ### What Changed
 - Added `ruff.toml` pinning ruff to the classic rule set. ruff 0.16 widened its implicit rules, so the
   global pre-commit hook started rejecting commits over untouched code (BLE001, PLW1510, I001, ...).
+- `60-io-scheduler.rules` now only targets whole disks. The globs also matched partitions (`sdb1`,
+  `nvme0n1p1`, `vda1`), so udev tried to set a scheduler on them and logged "Could not chase sysfs
+  attribute ... queue/scheduler" at priority 3 on every boot/hotplug — seen on a v26.10.01 test install
+  with a USB stick plugged in.
 
 ### Technical Details
 - Same file as archlinux-tweak-tool: `line-length = 120`, `select = ["E4", "E7", "E9", "F"]`, `E402`
   ignored for `gi.require_version()`. `ruff check .` passes with no code changes.
+- Added `ENV{DEVTYPE}=="disk"` to all five scheduler rules. Partitions have no `queue/` directory; the
+  SSD/HDD rules failed silently on their `rotational` test, but the NVMe, virtio and USB rules assigned
+  unconditionally. Checked with `udevadm verify`.
 
 ### Files Modified
 - `ruff.toml` (new)
+- `etc/udev/rules.d/60-io-scheduler.rules`
 
 ## 2026.09.24
 
