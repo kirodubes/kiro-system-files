@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 2026.10.01
+
+### What Changed
+- `60-ioschedulers-tuning.rules` now only sets `io_poll_delay` on whole NVMe disks. The glob
+  `nvme[0-9]*n[0-9]*` also matched partitions (`nvme0n1p1`…), so udev logged "Could not chase sysfs
+  attribute ... queue/io_poll_delay" at priority 3 once per partition on every boot. Seen on a v26.10.01
+  live boot on an NVMe laptop. Same bug and fix as `60-io-scheduler.rules` on 2026.09.28.
+
+### Technical Details
+- Added `ENV{DEVTYPE}=="disk"`: partitions have no `queue/` directory. Checked with `udevadm verify`.
+
+### Files Modified
+- `etc/udev/rules.d/60-ioschedulers-tuning.rules`
+
 ## 2026.09.28
 
 ### What Changed
