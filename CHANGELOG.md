@@ -10,15 +10,24 @@
 - Removed the backlight rule from `64-gpu-optimization.rules`. It wrote `raw` to the backlight's `type`
   attribute, which the kernel exposes read-only, so it never worked and logged "Failed to write "raw" to
   sysfs attribute "type" ... Permission denied" at priority 3 on every laptop boot.
+- Then removed `60-ioschedulers-tuning.rules` altogether. Its only rule set NVMe `io_poll_delay`, and the
+  kernel ignores that setting now that hybrid polling is gone from the block layer (on 7.2 it reads `-1`
+  straight after the rule writes `0`). Everything else in the file was comments. `kiro-verify` and `kiro-audit` no longer
+  expect it.
 
 ### Technical Details
 - Added `ENV{DEVTYPE}=="disk"`: partitions have no `queue/` directory. Checked with `udevadm verify`.
 - `type` (raw / platform / firmware) only reports which interface the backlight uses; it is 0444 and can't
   be changed. Brightness smoothing is a desktop-side feature, not something udev can set.
+- Verified on kernel 7.2 only; the removal predates the 6.18 linux-lts, so no Kiro kernel loses a working
+  tweak. On upgrade pacman deletes the file from installed systems because the package no longer ships it.
 
 ### Files Modified
 - `etc/udev/rules.d/60-ioschedulers-tuning.rules`
 - `etc/udev/rules.d/64-gpu-optimization.rules`
+- `etc/udev/rules.d/60-ioschedulers-tuning.rules` (deleted)
+- `usr/local/bin/kiro-verify`
+- `usr/local/bin/kiro-audit`
 
 ## 2026.09.28
 

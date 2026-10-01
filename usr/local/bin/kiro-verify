@@ -129,7 +129,6 @@ check_config_files() {
         /etc/systemd/resolved.conf.d/10-kiro-mdns.conf
         /etc/tmpfiles.d/thp-tuning.conf
         /etc/udev/rules.d/60-io-scheduler.rules
-        /etc/udev/rules.d/60-ioschedulers-tuning.rules
         /etc/udev/rules.d/61-audio-power.rules
         /etc/udev/rules.d/62-network-optimization.rules
         /etc/udev/rules.d/63-usb-optimization.rules

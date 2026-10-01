@@ -865,7 +865,6 @@ check_udev_rules() {
     # All rule files the edu-system-files package ships
     local expected_rules=(
         60-io-scheduler.rules
-        60-ioschedulers-tuning.rules
         61-audio-power.rules
         62-network-optimization.rules
         63-usb-optimization.rules
