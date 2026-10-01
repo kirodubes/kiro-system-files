@@ -7,12 +7,18 @@
   `nvme[0-9]*n[0-9]*` also matched partitions (`nvme0n1p1`…), so udev logged "Could not chase sysfs
   attribute ... queue/io_poll_delay" at priority 3 once per partition on every boot. Seen on a v26.10.01
   live boot on an NVMe laptop. Same bug and fix as `60-io-scheduler.rules` on 2026.09.28.
+- Removed the backlight rule from `64-gpu-optimization.rules`. It wrote `raw` to the backlight's `type`
+  attribute, which the kernel exposes read-only, so it never worked and logged "Failed to write "raw" to
+  sysfs attribute "type" ... Permission denied" at priority 3 on every laptop boot.
 
 ### Technical Details
 - Added `ENV{DEVTYPE}=="disk"`: partitions have no `queue/` directory. Checked with `udevadm verify`.
+- `type` (raw / platform / firmware) only reports which interface the backlight uses; it is 0444 and can't
+  be changed. Brightness smoothing is a desktop-side feature, not something udev can set.
 
 ### Files Modified
 - `etc/udev/rules.d/60-ioschedulers-tuning.rules`
+- `etc/udev/rules.d/64-gpu-optimization.rules`
 
 ## 2026.09.28
 

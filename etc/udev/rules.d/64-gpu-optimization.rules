@@ -18,7 +18,3 @@ ACTION=="add", SUBSYSTEM=="pci", ATTRS{vendor}=="0x8086", ATTRS{class}=="0x03000
 
 # Displays: prevent accidental power-off
 ACTION=="add", SUBSYSTEM=="drm", RUN+="/bin/bash -c 'echo 0 > /sys/class/drm/*/power/autosuspend_delay_ms 2>/dev/null || true'"
-
-# Backlight: smooth brightness transitions
-ACTION=="add", SUBSYSTEM=="backlight", ATTR{brightness}=="*", \
-  ATTR{max_brightness}=="*", ATTR{type}="raw"
