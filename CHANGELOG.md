@@ -10,6 +10,11 @@
 - Removed the backlight rule from `64-gpu-optimization.rules`. It wrote `raw` to the backlight's `type`
   attribute, which the kernel exposes read-only, so it never worked and logged "Failed to write "raw" to
   sysfs attribute "type" ... Permission denied" at priority 3 on every laptop boot.
+- AMD OverDrive is now opt-in. `modprobe.d/amdgpu.conf` set `ppfeaturemask=0xffffffff` on every install,
+  so every machine with an AMD GPU booted with a kernel tainted "S" (CPU_OUT_OF_SPEC) and the
+  "Overdrive is enabled, please disable it before reporting any bugs" warning, plus the GPU-reset risk the
+  file itself documented for early Vega and Navi 10/14. Seen on a Yoga 510 (Radeon R5 M330). The line is
+  now commented out with opt-in instructions for CoreCtrl/LACT users.
 - Then removed `60-ioschedulers-tuning.rules` altogether. Its only rule set NVMe `io_poll_delay`, and the
   kernel ignores that setting now that hybrid polling is gone from the block layer (on 7.2 it reads `-1`
   straight after the rule writes `0`). Everything else in the file was comments. `kiro-verify` and `kiro-audit` no longer
@@ -25,6 +30,7 @@
 ### Files Modified
 - `etc/udev/rules.d/60-ioschedulers-tuning.rules`
 - `etc/udev/rules.d/64-gpu-optimization.rules`
+- `etc/modprobe.d/amdgpu.conf`
 - `etc/udev/rules.d/60-ioschedulers-tuning.rules` (deleted)
 - `usr/local/bin/kiro-verify`
 - `usr/local/bin/kiro-audit`
