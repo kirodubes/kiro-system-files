@@ -105,6 +105,11 @@ main() {
     fi
 
     log_success "$(basename "$0") done"
+
+    # The source address of the default route is the one other machines reach us on.
+    local ip_addr
+    ip_addr="$(ip -4 route get 1.1.1.1 2>/dev/null | awk '{for (i = 1; i < NF; i++) if ($i == "src") { print $(i + 1); exit }}')"
+    log_info "IP address: ${ip_addr:-unknown (no network route)}"
 }
 
 main "$@"
