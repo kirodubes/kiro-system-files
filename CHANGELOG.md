@@ -5,14 +5,20 @@
 ### What Changed
 - `kiro-enable-ssh` now prints the machine's IP address as its last line, so you can connect right away
   without looking it up with `ip a`.
+- `etc/modprobe.d/nvidia.conf`: comment only. `NVreg_UsePageAttributeTable=1` is now documented as a closed-module
+  option (580xx/390xx). The open module logs "unknown parameter ... ignored" for it at boot, which is harmless.
+  Found on an RTX 3070 test desktop.
 
 ### Technical Details
 - Uses the `src` field of `ip -4 route get` to a public address: the address of the interface that
   carries the default route, which is the one other machines on the LAN reach. `ip route get` only does a
   route lookup and sends no packets. Prints "unknown (no network route)" when there is no route.
+- The PAT option stays: modprobe options can't target one nvidia module flavour, and removing it would drop the
+  tweak for closed-driver users just to silence a cosmetic log line.
 
 ### Files Modified
 - `usr/local/bin/kiro-enable-ssh`
+- `etc/modprobe.d/nvidia.conf`
 - `CHANGELOG.md`
 
 ## 2026.10.01
