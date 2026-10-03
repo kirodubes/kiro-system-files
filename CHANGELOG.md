@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## 2026.10.03
+
+### What Changed
+- `kiro-enable-ssh` now prints the machine's IP address as its last line, so you can connect right away
+  without looking it up with `ip a`.
+
+### Technical Details
+- Uses the `src` field of `ip -4 route get` to a public address: the address of the interface that
+  carries the default route, which is the one other machines on the LAN reach. `ip route get` only does a
+  route lookup and sends no packets. Prints "unknown (no network route)" when there is no route.
+
+### Files Modified
+- `usr/local/bin/kiro-enable-ssh`
+- `CHANGELOG.md`
+
 ## 2026.10.01
 
 ### What Changed
