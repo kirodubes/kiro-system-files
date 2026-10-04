@@ -630,10 +630,13 @@ check_sddm() {
     pkg_installed sddm && pass "sddm installed" || fail "sddm not installed"
     systemctl is-enabled sddm &>/dev/null && pass "sddm.service enabled" || fail "sddm.service not enabled"
 
-    if grep -q 'edu-simplicity' /etc/sddm.conf.d/*.conf 2>/dev/null || grep -q 'edu-simplicity' /etc/sddm.conf 2>/dev/null; then
-        pass "SDDM theme set to edu-simplicity"
+    # edu-simplicity on the X11 ISO, simplicity-hyprland on the Hyprland ISO
+    local sddm_theme
+    sddm_theme=$(grep -ohE 'edu-simplicity|simplicity-hyprland' /etc/sddm.conf.d/*.conf /etc/sddm.conf 2>/dev/null | head -n1 || true)
+    if [[ -n "${sddm_theme}" ]]; then
+        pass "SDDM theme set to ${sddm_theme}"
     else
-        warn "SDDM theme not set to edu-simplicity"
+        warn "SDDM theme not set to edu-simplicity or simplicity-hyprland"
     fi
 }
 

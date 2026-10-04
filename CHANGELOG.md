@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 2026.10.04
+
+### What Changed
+- `kiro-audit` no longer warns about the login theme on the Hyprland ISO. Its SDDM check only accepted
+  `edu-simplicity`, so a Hyprland install, which uses the `simplicity-hyprland` theme, always showed
+  "SDDM theme not set to edu-simplicity" even though the theme was right.
+
+### Technical Details
+- `check_sddm` now greps the SDDM config for `edu-simplicity` or `simplicity-hyprland` and reports which one it
+  found. The warning is kept for any other theme. Tested on a Hyprland install: 132 PASS, 0 WARN, 0 FAIL.
+
+### Files Modified
+- `usr/local/bin/kiro-audit`
+
 ## 2026.10.03
 
 ### What Changed
