@@ -70,7 +70,6 @@
 - `etc/udev/rules.d/60-ioschedulers-tuning.rules` (deleted)
 - `usr/local/bin/kiro-verify`
 - `usr/local/bin/kiro-audit`
-- `usr/share/man/man8/kiro-audit.8`
 
 ## 2026.09.28
 
@@ -191,7 +190,6 @@ consume the results without scraping/regexing terminal output.
 
 - `usr/local/lib/kiro-common.sh`
 - `usr/local/bin/kiro-audit`
-- `usr/share/man/man8/kiro-audit.8`
 - `usr/local/bin/kiro-verify`
 - `usr/local/bin/kiro-diag`
 - `CHANGELOG.md`
@@ -254,7 +252,6 @@ highest-severity of the six live-only artifacts and the only one the audit did n
 **Files Modified**
 
 - `usr/local/bin/kiro-audit`
-- `usr/share/man/man8/kiro-audit.8`
 - `CHANGELOG.md`
 
 ## 2026.09.12
@@ -379,7 +376,6 @@ actually happened at the time.
 **Files Modified**
 
 - `usr/local/bin/kiro-audit`
-- `usr/share/man/man8/kiro-audit.8`
 - `CLAUDE.md`
 - `etc/systemd/oomd.conf.d/10-kiro-oomd.conf`
 - `etc/systemd/system/system.slice.d/10-kiro-oomd-per-slice.conf`
@@ -421,7 +417,6 @@ demonstrably loading while the audit called it missing.
 
 **Files Modified**
 - `usr/local/bin/kiro-audit`
-- `usr/share/man/man8/kiro-audit.8`
 
 ### What Changed
 - **Removed the orphaned `kiro-install-tools` documentation.** The script itself was
@@ -866,7 +861,6 @@ demonstrably loading while the audit called it missing.
 
 ### Files Modified
 - `usr/local/bin/kiro-audit`
-- `usr/share/man/man8/kiro-audit.8`
 - `usr/local/share/kiro/pacman.conf` — dropped per-repo `SigLevel` from nemesis_repo + chaotic-aur
 
 ## 2026.06.12
@@ -899,7 +893,6 @@ demonstrably loading while the audit called it missing.
 
 **Files Modified**
 - `usr/local/bin/kiro-audit`
-- `usr/share/man/man8/kiro-audit.8`
 
 ### `kiro-audit`: live-ISO guard (`--force` to override)
 
@@ -963,7 +956,6 @@ demonstrably loading while the audit called it missing.
 
 **Files Modified**
 - `usr/local/bin/kiro-audit`
-- `usr/share/man/man8/kiro-audit.8`
 
 ### `kiro-audit`: fix stale `ohmychadwm-git` package name (false FAIL)
 
@@ -977,7 +969,6 @@ demonstrably loading while the audit called it missing.
 
 **Files Modified**
 - `usr/local/bin/kiro-audit`
-- `usr/share/man/man8/kiro-audit.8`
 - `usr/share/man/man8/kiro-audit.8`
 
 ### `kiro-audit`: btrfs snapshot verification hook
@@ -994,7 +985,6 @@ demonstrably loading while the audit called it missing.
 
 **Files Modified**
 - `usr/local/bin/kiro-audit`
-- `usr/share/man/man8/kiro-audit.8`
 
 ### `kiro-audit`: disk format & LUKS encryption verification hook
 
@@ -1009,7 +999,6 @@ demonstrably loading while the audit called it missing.
 
 **Files Modified**
 - `usr/local/bin/kiro-audit`
-- `usr/share/man/man8/kiro-audit.8`
 
 ### `kiro-report`: disk encryption hint
 
@@ -1085,7 +1074,6 @@ demonstrably loading while the audit called it missing.
 
 **Files Modified**
 - `usr/local/bin/kiro-audit`
-- `usr/share/man/man8/kiro-audit.8`
 
 ## 2026.05.31
 
@@ -1204,7 +1192,6 @@ demonstrably loading while the audit called it missing.
 
 **Files Modified**
 - `usr/local/bin/kiro-audit`
-- `usr/share/man/man8/kiro-audit.8`
 - `usr/share/applications/kiro-audit.desktop` (new)
 - `usr/share/applications/kiro-sysinfo.desktop` (new)
 - `usr/local/share/applications/firewall-config.desktop` (new)
@@ -1235,7 +1222,6 @@ demonstrably loading while the audit called it missing.
 
 **Files Modified**
 - `usr/local/bin/kiro-audit`
-- `usr/share/man/man8/kiro-audit.8`
 
 ### `kiro-audit` — `check_pacman_repos` now checks the cachyos opt-in state
 
@@ -1248,7 +1234,6 @@ demonstrably loading while the audit called it missing.
 
 **Files Modified**
 - `usr/local/bin/kiro-audit`
-- `usr/share/man/man8/kiro-audit.8`
 
 ---
 
@@ -1267,7 +1252,6 @@ demonstrably loading while the audit called it missing.
 
 **Files Modified**
 - `usr/local/bin/kiro-audit`
-- `usr/share/man/man8/kiro-audit.8`
 
 ---
 
@@ -1284,7 +1268,6 @@ demonstrably loading while the audit called it missing.
 **Files Modified**
 - `usr/local/lib/kiro-common.sh`
 - `usr/local/bin/kiro-audit`
-- `usr/share/man/man8/kiro-audit.8`
 
 ---
 
@@ -1302,7 +1285,6 @@ demonstrably loading while the audit called it missing.
 
 **Files Modified**
 - `usr/local/bin/kiro-audit`
-- `usr/share/man/man8/kiro-audit.8`
 - `usr/share/man/man8/kiro-audit.8`
 
 ---
@@ -1371,7 +1353,6 @@ Companion changes outside this repo:
 
 **Files Modified**
 - `usr/local/bin/kiro-audit`
-- `usr/share/man/man8/kiro-audit.8`
 
 ## 2026.05.25
 
@@ -1470,7 +1451,6 @@ Added the mandatory `Purpose:` / `Why:` header block to 18 scripts in `usr/local
 **Files Modified**
 - `usr/local/bin/get-nemesis`
 - `usr/local/bin/kiro-audit`
-- `usr/share/man/man8/kiro-audit.8`
 - `usr/local/bin/kiro-diag`
 - `usr/local/bin/kiro-enable-ssh`
 - `usr/local/bin/kiro-fix-gpg-conf`
@@ -1507,7 +1487,6 @@ Major expansion of `kiro-diag` with new sections; fixes to `kiro-lint` and `kiro
 - `usr/local/bin/kiro-lint`
 - `usr/local/bin/kiro-verify`
 - `usr/local/bin/kiro-audit`
-- `usr/share/man/man8/kiro-audit.8`
 
 ---
 
@@ -1522,7 +1501,6 @@ Removed the stale `cups-permissions.conf` tmpfiles.d check from `kiro-audit` —
 
 **Files Modified**
 - `usr/local/bin/kiro-audit`
-- `usr/share/man/man8/kiro-audit.8`
 
 ---
 
@@ -1539,7 +1517,6 @@ Added `--fix` mode to `kiro-audit` that auto-remediates known fixable failures. 
 
 **Files Modified**
 - `usr/local/bin/kiro-audit`
-- `usr/share/man/man8/kiro-audit.8`
 
 ---
 
