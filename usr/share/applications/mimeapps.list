@@ -1,0 +1,6 @@
+# Kiro: folders open in Thunar.
+# Without a default, Disk Usage Analyzer (baobab, on the Kiro and KIROTUX ISOs) won: it comes first
+# alphabetically among the apps that declare inode/directory. This is the lowest-priority mimeapps.list,
+# so a desktop's own list (Plasma's kde-mimeapps.list -> Dolphin) and the user's choices still win.
+[Default Applications]
+inode/directory=thunar.desktop

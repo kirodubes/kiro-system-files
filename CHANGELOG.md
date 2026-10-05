@@ -1,5 +1,24 @@
 # CHANGELOG
 
+## 2026.10.05
+
+### What Changed
+- **Folders open in Thunar** on every Kiro and KIROTUX desktop, X11 and Wayland. With no default set, opening a folder
+  (a browser's download list, "Show in folder", …) started Disk Usage Analyzer: baobab is on the ISOs, declares
+  `inode/directory` too and comes first alphabetically. New `/usr/share/applications/mimeapps.list` makes Thunar the
+  default.
+
+### Technical Details
+- The lowest-priority `mimeapps.list` in the freedesktop lookup order: the user's `~/.config/mimeapps.list` (also what
+  Kirotux Hyprland Premium's Default apps writes), `/etc/xdg` lists and a desktop's own list in the same folder
+  (Plasma's `kde-mimeapps.list` → Dolphin) all still win.
+- Tested on a QEMU kiro-hyprland-dms install: `xdg-mime` and `gio mime` give `thunar.desktop` with
+  `XDG_CURRENT_DESKTOP` set to Hyprland, sway or empty (X11 window managers); a stand-in `kde-mimeapps.list` still
+  wins under `XDG_CURRENT_DESKTOP=KDE`. Replaces the Hyprland-only file tried in kiro-wayland-dotfiles the same day.
+
+### Files Modified
+- `usr/share/applications/mimeapps.list` (new)
+
 ## 2026.10.04
 
 ### What Changed
