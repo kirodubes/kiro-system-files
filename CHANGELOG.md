@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2026.10.10
+
+### What Changed
+- `kiro-audit` accepts the new KiroTux login theme id `simplicity-kirotux` (the KiroTux SDDM theme is now one
+  neutral theme for every edition). Older KiroTux installs keep `simplicity-hyprland`, which is still accepted, so
+  neither shows a false "SDDM theme not set" warning.
+
+### Files Modified
+- `usr/local/bin/kiro-audit`, `usr/share/man/man8/kiro-audit.8`
+
 ## 2026.10.05
 
 ### What Changed

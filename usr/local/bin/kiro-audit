@@ -630,13 +630,13 @@ check_sddm() {
     pkg_installed sddm && pass "sddm installed" || fail "sddm not installed"
     systemctl is-enabled sddm &>/dev/null && pass "sddm.service enabled" || fail "sddm.service not enabled"
 
-    # edu-simplicity on the X11 ISO, simplicity-hyprland on the Hyprland ISO
+    # edu-simplicity on the X11 ISO; simplicity-kirotux on KiroTux ISOs (simplicity-hyprland on older ones)
     local sddm_theme
-    sddm_theme=$(grep -ohE 'edu-simplicity|simplicity-hyprland' /etc/sddm.conf.d/*.conf /etc/sddm.conf 2>/dev/null | head -n1 || true)
+    sddm_theme=$(grep -ohE 'edu-simplicity|simplicity-kirotux|simplicity-hyprland' /etc/sddm.conf.d/*.conf /etc/sddm.conf 2>/dev/null | head -n1 || true)
     if [[ -n "${sddm_theme}" ]]; then
         pass "SDDM theme set to ${sddm_theme}"
     else
-        warn "SDDM theme not set to edu-simplicity or simplicity-hyprland"
+        warn "SDDM theme not set to edu-simplicity or simplicity-kirotux"
     fi
 }
 
