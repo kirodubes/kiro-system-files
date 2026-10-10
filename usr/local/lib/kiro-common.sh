@@ -810,6 +810,7 @@ download_pacman_conf() {
     # Replace config
     sudo mv /tmp/pacman.conf /etc/pacman.conf
     log_success "pacman.conf updated"
+    ensure_kirotux_repo
 }
 
 # Append repository to pacman.conf if not present
@@ -839,6 +840,37 @@ remove_repo_from_pacman() {
     log_subsection "Removing '${repo_name}' repository from pacman.conf"
     sudo sed -i "/^\[${repo_name}\]/,/^$/d" /etc/pacman.conf
     log_success "Repository removed"
+}
+
+# Return 0 on a KiroTux system: /etc/os-release names kirotux, or the ISO's /etc/dev-rel says ISO_CODENAME=kirotux
+# (dev-rel survives the install; os-release is Arch's own file unless KiroTux adds its name there).
+is_kirotux() {
+    grep -qi 'kirotux' /etc/os-release 2>/dev/null && return 0
+    grep -qx 'ISO_CODENAME=kirotux' /etc/dev-rel 2>/dev/null
+}
+
+# On KiroTux, make sure /etc/pacman.conf has [kirotux_repo] (KiroTux packages that stay installed get their
+# updates there), placed before [nemesis_repo] because pacman takes a package from the first repo that has it.
+# No-op on Kiro and when the repo is already there. Call it after anything that replaces pacman.conf.
+ensure_kirotux_repo() {
+    local conf="${1:-/etc/pacman.conf}"
+    is_kirotux || return 0
+    [[ -f "${conf}" ]] || return 0
+    if grep -q '^\[kirotux_repo\]' "${conf}"; then
+        return 0
+    fi
+    log_subsection "KiroTux: putting [kirotux_repo] back in ${conf}"
+    local tmp
+    tmp="$(mktemp)"
+    awk '
+        BEGIN { block = "# KiroTux packages that stay installed (kirotux-thunar, the SDDM theme) get their updates here.\n[kirotux_repo]\nSigLevel = Required DatabaseOptional\nServer = https://kirodubes.github.io/$repo/$arch\n" }
+        /^\[nemesis_repo\]/ && !done { print block; done = 1 }
+        { print }
+        END { if (!done) print "\n" block }
+    ' "${conf}" > "${tmp}"
+    sudo install -m 644 "${tmp}" "${conf}"
+    rm -f "${tmp}"
+    log_success "[kirotux_repo] restored"
 }
 
 # Refresh pacman keys and databases

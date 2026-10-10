@@ -106,6 +106,13 @@ trap 'on_error "$LINENO" "$BASH_COMMAND"' ERR
 #####################################################################
 # kiro-audit is self-contained and does NOT source kiro-common.sh, so it
 # carries its own copies of these helpers. Keep them in sync with kiro-common.sh.
+
+# Copy of kiro-common.sh's is_kirotux: "kirotux" in /etc/os-release, or ISO_CODENAME=kirotux in /etc/dev-rel.
+is_kirotux() {
+    grep -qi 'kirotux' /etc/os-release 2>/dev/null && return 0
+    grep -qx 'ISO_CODENAME=kirotux' /etc/dev-rel 2>/dev/null
+}
+
 json_escape() {
     local s=$1
     s=${s//\\/\\\\}; s=${s//\"/\\\"}
@@ -524,6 +531,23 @@ check_pacman_repos() {
     grep -q '^\[nemesis_repo\]' /etc/pacman.conf && pass "nemesis_repo in pacman.conf" || fail "nemesis_repo missing from pacman.conf"
     grep -q '^\[chaotic-aur\]'  /etc/pacman.conf && pass "chaotic-aur in pacman.conf"  || fail "chaotic-aur missing from pacman.conf"
 
+    # KiroTux: KiroTux packages that stay installed get their updates from [kirotux_repo], which must come
+    # before [nemesis_repo] (pacman takes a package from the first repo that has it). Tools that reset
+    # pacman.conf to the Kiro default used to drop it; kiro-keep-kirotux-repo puts it back.
+    if is_kirotux; then
+        local kt nem
+        kt=$(grep -n '^\[kirotux_repo\]' /etc/pacman.conf | head -n1 | cut -d: -f1)
+        nem=$(grep -n '^\[nemesis_repo\]' /etc/pacman.conf | head -n1 | cut -d: -f1)
+        if [[ -z "${kt}" ]]; then
+            fail "KiroTux system but [kirotux_repo] missing from pacman.conf: KiroTux packages get no updates"
+            apply_fix "put [kirotux_repo] back" /usr/local/bin/kiro-keep-kirotux-repo
+        elif [[ -n "${nem}" && "${kt}" -gt "${nem}" ]]; then
+            warn "[kirotux_repo] comes after [nemesis_repo]: move it above so KiroTux packages win"
+        else
+            pass "kirotux_repo in pacman.conf (KiroTux)"
+        fi
+    fi
+
     # cachyos may legitimately be enabled (chwd drivers during install; and going
     # forward, cachyos niri / cachyos hyprland packages) or shipped commented — both
     # are fine, so an active [cachyos] is a PASS, not a WARN. We still verify that an
@@ -569,7 +593,7 @@ check_pacman_repos() {
     global_sig="$(awk '$0=="[options]"{f=1;next} f&&/^\[/{f=0} f&&/^SigLevel/{print $3; exit}' /etc/pacman.conf)"
 
     local repo siglevel effective src
-    for repo in nemesis_repo kiro_repo; do
+    for repo in nemesis_repo kiro_repo kirotux_repo; do  # kirotux_repo: KiroTux only, same Kiro key
         grep -q "^\[${repo}\]" /etc/pacman.conf || continue
         siglevel="$(awk -v r="[${repo}]" '$0==r{f=1;next} f&&/^\[/{f=0} f&&/^SigLevel/{print $3; exit}' /etc/pacman.conf)"
         if [[ -n "${siglevel}" ]]; then

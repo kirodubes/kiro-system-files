@@ -6,9 +6,28 @@
 - `kiro-audit` accepts the new KiroTux login theme id `simplicity-kirotux` (the KiroTux SDDM theme is now one
   neutral theme for every edition). Older KiroTux installs keep `simplicity-hyprland`, which is still accepted, so
   neither shows a false "SDDM theme not set" warning.
+- **KiroTux keeps `[kirotux_repo]` when pacman.conf is reset.** `kiro-fix-pacman-conf` copies the Kiro default
+  pacman.conf, which has no `[kirotux_repo]`, so on a KiroTux install the KiroTux packages that stay installed
+  (kirotux-thunar, the SDDM theme) silently stopped getting updates. After the copy it now puts the section back,
+  before `[nemesis_repo]`. Kiro itself is unchanged.
+- New `kiro-keep-kirotux-repo` (+ man page): the same repair as a command, for ATT's reset buttons and
+  `kiro-audit --fix`. No-op on Kiro and when the section is already there.
+- `kiro-audit` checks on KiroTux that `[kirotux_repo]` exists and comes before `[nemesis_repo]` (`--fix` restores
+  it), and verifies its signatures like `nemesis_repo`.
+
+### Technical Details
+- `kiro-common.sh`: `is_kirotux` ("kirotux" in `/etc/os-release`, or `ISO_CODENAME=kirotux` in `/etc/dev-rel`,
+  which survives the install; os-release is Arch's own file today) and `ensure_kirotux_repo` (awk insert before
+  `[nemesis_repo]`, else append; idempotent). `download_pacman_conf` calls it too. kiro-audit stays
+  self-contained, so it carries its own copy of `is_kirotux`.
+- Tested on a copy of `usr/local/share/kiro/pacman.conf`: Kiro unchanged; KiroTux gets the block in the same place
+  as the KiroTux ISO's pacman.conf; a second run adds nothing; `pacman-conf` parses the result.
 
 ### Files Modified
 - `usr/local/bin/kiro-audit`, `usr/share/man/man8/kiro-audit.8`
+- `usr/local/bin/kiro-fix-pacman-conf`, `usr/share/man/man8/kiro-fix-pacman-conf.8`
+- `usr/local/bin/kiro-keep-kirotux-repo`, `usr/share/man/man8/kiro-keep-kirotux-repo.8` (new)
+- `usr/local/lib/kiro-common.sh`
 
 ## 2026.10.05
 

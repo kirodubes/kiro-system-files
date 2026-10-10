@@ -15,6 +15,10 @@ It first tries the locally-shipped copy at
 .IR /usr/local/share/kiro/pacman.conf ;
 if that file is absent it downloads the current version from GitHub,
 provided network connectivity is available.
+.PP
+On a KiroTux system (\fBkirotux\fR in \fI/etc/os-release\fR, or \fBISO_CODENAME=kirotux\fR in
+\fI/etc/dev-rel\fR) the \fB[kirotux_repo]\fR section is put back before \fB[nemesis_repo]\fR afterwards, so
+KiroTux packages keep getting updates. See \fBkiro-keep-kirotux-repo\fR.
 .SH OPTIONS
 .TP
 .BR \-h ", " \-\-help

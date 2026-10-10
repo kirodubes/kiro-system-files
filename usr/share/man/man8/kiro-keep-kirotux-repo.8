@@ -1,0 +1,29 @@
+.TH KIRO-KEEP-KIROTUX-REPO 8 "2026-10-10" "kiro-system-files" "Kiro System Manual"
+.SH NAME
+kiro-keep-kirotux-repo \- put [kirotux_repo] back into pacman.conf on KiroTux
+.SH SYNOPSIS
+.B kiro-keep-kirotux-repo
+[\fB\-\-help\fR] [\fB\-\-version\fR] [\fB\-\-dry\-run\fR]
+.SH DESCRIPTION
+On a KiroTux system, makes sure
+.I /etc/pacman.conf
+contains the \fB[kirotux_repo]\fR section, placed before \fB[nemesis_repo]\fR (pacman takes a package from
+the first repository that has it). Does nothing on Kiro and when the section is already present.
+.PP
+KiroTux is recognised by \fBkirotux\fR in \fI/etc/os-release\fR or \fBISO_CODENAME=kirotux\fR in
+\fI/etc/dev-rel\fR. \fBkiro-fix-pacman-conf\fR, ATT's pacman.conf resets and \fBkiro-audit \-\-fix\fR call it.
+.SH OPTIONS
+.TP
+.BR \-h ", " \-\-help
+Show help.
+.TP
+.BR \-v ", " \-\-version
+Show the installed version.
+.TP
+.BR \-d ", " \-\-dry\-run
+Report what would change without writing.
+.SH SEE ALSO
+.BR kiro-fix-pacman-conf (8),
+.BR kiro-audit (8)
+.SH AUTHOR
+Erik Dubois

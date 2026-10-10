@@ -8,13 +8,13 @@ set -Euo pipefail
 #   DO NOT JUST RUN THIS. EXAMINE AND JUDGE. RUN AT YOUR OWN RISK.
 #
 #   Purpose:
-#   Replaces /etc/pacman.conf with the Kiro default.
+#   On a KiroTux system, make sure /etc/pacman.conf has [kirotux_repo], placed before
+#   [nemesis_repo]. Does nothing on Kiro, and nothing when the repo is already there.
 #
-#   Why: user edits or a broken upgrade can leave /etc/pacman.conf in a
-#   bad state; resetting to the Kiro default restores the expected repo
-#   set (including nemesis and chaotic-aur). On KiroTux the file then gets
-#   [kirotux_repo] back (ensure_kirotux_repo), so KiroTux packages keep
-#   their updates.
+#   Why: tools that reset pacman.conf (kiro-fix-pacman-conf, ATT's reset buttons) copy
+#   Kiro's default file, which has no [kirotux_repo]. Without it, KiroTux packages that
+#   stay installed (kirotux-thunar, the SDDM theme) stop getting updates. KiroTux is
+#   recognised by "kirotux" in /etc/os-release or ISO_CODENAME=kirotux in /etc/dev-rel.
 #
 ##################################################################################################################
 
@@ -26,15 +26,15 @@ else
     exit 1
 fi
 
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 DRY_RUN=false
 
 main() {
+    local conf="/etc/pacman.conf"
     for arg in "$@"; do
         case "$arg" in
             -h|--help)
                 show_help "$(basename "$0")" \
-                    "Replace /etc/pacman.conf with the Kiro default" \
+                    "On KiroTux, put [kirotux_repo] back into /etc/pacman.conf when it is missing" \
                     "[--help] [--version] [--dry-run]" \
                     ""
                 exit 0
@@ -45,7 +45,6 @@ main() {
                 ;;
             -d|--dry-run)
                 DRY_RUN=true
-                log_info "Dry-run mode enabled — no changes will be made"
                 ;;
             *)
                 echo "${RED}Unknown option: $arg${RESET}" >&2
@@ -54,28 +53,19 @@ main() {
         esac
     done
 
-    log_section "Getting /etc/pacman.conf"
-
-    local local_pacman="/usr/local/share/kiro/pacman.conf"
-
-    if [[ ! -f "${local_pacman}" ]]; then
-        echo "${RED}Local pacman.conf not found at: ${local_pacman} — cannot proceed${RESET}" >&2
-        exit 1
-    fi
-
-    log_subsection "Using local pacman.conf"
-    if execute_or_dryrun "Copy local pacman.conf to /etc/pacman.conf" sudo cp "${local_pacman}" /etc/pacman.conf; then
-        log_success "pacman.conf copied from local system"
-        if [[ "${DRY_RUN}" == true ]]; then
-            is_kirotux && log_info "[DRY-RUN] Would put [kirotux_repo] back (KiroTux system)"
-        else
-            ensure_kirotux_repo
-        fi
+    if ! is_kirotux; then
+        log_info "Not a KiroTux system: nothing to do"
         return 0
-    else
-        log_warn "Failed to copy local pacman.conf"
-        exit 1
     fi
+    if grep -q '^\[kirotux_repo\]' "${conf}" 2>/dev/null; then
+        log_info "[kirotux_repo] is already in ${conf}"
+        return 0
+    fi
+    if [[ "${DRY_RUN}" == true ]]; then
+        log_info "[DRY-RUN] Would add [kirotux_repo] before [nemesis_repo] in ${conf}"
+        return 0
+    fi
+    ensure_kirotux_repo "${conf}"
 }
 
 main "$@"
