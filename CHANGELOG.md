@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 2026.10.20
+
+### What Changed
+- `kiro-audit` Plasma theme warnings now name the active look-and-feel. They always said "Kiro-Sweet wants …", even
+  when the values checked came from another theme (seen on a Layan install).
+
+### Technical Details
+- The two `warn` lines in the visual-inventory loop print `${lnf_id}` (the matched look-and-feel id) instead of the
+  hardcoded `Kiro-Sweet`.
+
+### Files Modified
+- `usr/local/bin/kiro-audit`
+- `CHANGELOG.md`
+
 ## 2026.10.10
 
 ### What Changed

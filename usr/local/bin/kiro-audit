@@ -1420,11 +1420,11 @@ check_kiro_plasma() {
                 src="${file}"
             fi
             if [[ -z "${actual}" ]]; then
-                warn "NOT SET  ${file} [${group}] ${key} — Kiro-Sweet wants '${expected}' (using cascade/system fallback)"
+                warn "NOT SET  ${file} [${group}] ${key} — ${lnf_id} wants '${expected}' (using cascade/system fallback)"
             elif [[ "${actual}" == "${expected}" ]]; then
                 pass "SET      ${file} [${group}] ${key} = ${expected}"
             else
-                warn "DIFFERS  ${file} [${group}] ${key} = '${actual}' — Kiro-Sweet wants '${expected}' (source: ${src})"
+                warn "DIFFERS  ${file} [${group}] ${key} = '${actual}' — ${lnf_id} wants '${expected}' (source: ${src})"
             fi
         done <"${defaults}"
     done <<<"${pkgs}"
