@@ -3,6 +3,9 @@
 ## 2026.11.03
 
 ### What Changed
+- **The login screen and system services follow the install language.** `10-kiro-system.conf` no longer
+  forces `LANG=en_US.UTF-8` on every system service. That line kept SDDM, and so the login screen, in English on
+  every non-English install.
 - **The 7 menu entries speak the user's language.** Kiro Website, Kiro Releases, Kiro Discussions, Kiro Source Code,
   System Information, Kiro System Audit and Hardware Probe Report now carry a translated Name and search Keywords
   in all 13 Kiro languages (de, es, fr, hu, it, ja, nl, pl, pt_BR, ro, ru, tr, zh_CN). Before, only the small
@@ -19,6 +22,12 @@
   built package after the flow.
 
 ### Technical Details
+- Removed `DefaultEnvironment="LANG=en_US.UTF-8"` and its Environment header from
+  `etc/systemd/system.conf.d/10-kiro-system.conf` (there since the first commit, no stated reason). systemd now
+  takes LANG from `/etc/locale.conf`, the Arch default. Tested on a Kiro VM with a Dutch system: with the line
+  systemd, the sddm daemon and the greeter ran `en_US`; without it (`daemon-reexec` + sddm restart) all three ran
+  `nl_BE` and the login screen turned Dutch. No failed units. Service messages in the journal can now be in the
+  install language.
 - Scripts use the ohmychadwm-menu pattern: `_t "Text"` (gettext) and `_tf 'Text with $var'` (eval_gettext, so a
   translator can move the value), English when gettext is missing. Domain `kiro-system-files`, the same one as the
   menu entries; `po/make-mo.sh` now extracts the shell strings as well (xgettext Desktop + Shell, joined with
@@ -76,6 +85,7 @@
   "expenses") became "versies". The rest were minor fixes in hu, ro, fr and it.
 
 ### Files Modified
+- `etc/systemd/system.conf.d/10-kiro-system.conf`
 - `po/make-mo.sh` (new), `po/desktop/*.desktop.in` (new, 7), `po/*.po` (new, 16), `po/kiro-system-files.pot`,
   `po/LINGUAS`
 - `usr/share/applications/kiro-{audit,sysinfo,probe-report,link-website,link-releases,link-discussions,link-code}.desktop`
