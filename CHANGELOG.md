@@ -15,6 +15,8 @@
   (kiro-audit, kiro-verify, kiro-report, kiro-calamares-log, kiro-diag, kiro-lint, kiro-probe-report) translate
   their headings and prompts only: users paste their findings into Discussions, so the findings stay English.
 - When a script asks for root through the polkit dialog (pkexec), the root run now keeps the user's language.
+- **New `tests/check.sh`**, run by `up.sh` before every push: a FAIL blocks the push. `--installed` checks the
+  built package after the flow.
 
 ### Technical Details
 - Scripts use the ohmychadwm-menu pattern: `_t "Text"` (gettext) and `_tf 'Text with $var'` (eval_gettext, so a
@@ -44,6 +46,18 @@
   full-width punctuation 88, ro 19 (one Romanian word for backup, the ATT one), de 11, fr/tr/pl 7, ru 4, it 3, nl/pt_BR/hu 2,
   ja 1, es 0). The 4 link-entry URLs stay untranslated. cs, pt and uk keep only the menu entries; pt_PT reads
   pt_BR for the scripts.
+- `tests/check.sh` (~8 s, 25 checks): `bash -n`; no new shellcheck warnings against `@{upstream}`; every script
+  calling `_t`/`_tf` defines it or sources the library first, the 4 self-contained scripts keep their init, no bare
+  script name in the catalog; the `.pot` matches a fresh extraction, every `.po` passes `msgfmt --check` and
+  compiles byte-identical to its shipped `.mo`; untranslated strings in the 13 languages are a WARN, not a FAIL;
+  dry runs from temp copies wired to the repo's library and catalogs (kiro-skell, kiro-skell-all, kiro-fix-mirrors,
+  kiro-calamares-log in de and ja, kiro-skell in C and with gettext removed from PATH), no unfilled `$var`, the
+  pt_PT/zh_TW fallback, and the language through both pkexec re-execs. Tested by breaking a repo copy four ways
+  (new string without make-mo.sh, broken `$var` in de.po, init block removed, .po edited without the .mo): each
+  gave one FAIL naming the fix. `--installed` compares the installed library, kiro-skell, kiro-audit and German
+  catalog with the repo and runs the installed kiro-skell in German.
+- `up.sh` gains `run_checks` before the commit, so it now differs from the canonical HQ copy (sync-boilerplate
+  sees it as CUSTOM and skips it, as with ohmychadwm).
 - Gates: `msgfmt --check`, pofilter (xmltags, printf, urls, spacing, newlines) clean in all 13; dry runs of
   kiro-skell checked in de, ja, nl, ro, tr and zh_CN, plus kiro-xlibre-swap `--status` and kiro-lint in Dutch.
 
@@ -68,6 +82,7 @@
 - `.codespellrc`
 - `usr/local/lib/kiro-common.sh`, `usr/local/bin/kiro-*` (all 26), `usr/share/locale/*/LC_MESSAGES/kiro-system-files.mo`
   (new, 16)
+- `tests/check.sh` (new), `up.sh`
 - `CLAUDE.md`, `CHANGELOG.md`
 
 ## 2026.10.20

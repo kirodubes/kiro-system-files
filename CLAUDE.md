@@ -121,6 +121,10 @@ pkg=$(pacman -Qqo "$(realpath "${BASH_SOURCE[0]}")" 2>/dev/null) \
   only. Findings stay English: users paste them into Discussions.
 - Keep answer keys (`y/n`, `[1/2/3]`) literal and add a `# Translators:` comment above the line.
 - Locals read only inside a `_tf` string need `# shellcheck disable=SC2034` (shellcheck can't see them).
+- `bash tests/check.sh` (~8 s) checks syntax, new shellcheck warnings, the wrapping, the catalogs and dry runs in
+  de/ja/English/no-gettext; `up.sh` runs it and blocks the push on a FAIL (so this up.sh is custom, like
+  ohmychadwm's). After the flow, `bash tests/check.sh --installed` confirms the package ships the catalogs and
+  matches the repo. A new self-contained script that translates goes into `SELF_CONTAINED` there.
 - After changing any text run `bash po/make-mo.sh` (extracts menu entries + scripts, merges the `.po` files,
   writes the `.desktop` files and the `.mo` catalogs). Rules and registers:
   `~/Insync/Kiro/Kiro-HQ/TRANSLATIONS/README.md`.

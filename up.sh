@@ -123,6 +123,15 @@ ensure_git_remote_configured() {
     fi
 }
 
+run_checks() {
+    # tests/check.sh checks the scripts and their 16 translation catalogs; a failure blocks the push.
+    log_section "Running tests/check.sh"
+    if ! bash "${SCRIPT_DIR}/tests/check.sh"; then
+        log_error "BLOCKED: tests/check.sh failed — fix the FAIL lines above, then re-run up.sh"
+        exit 1
+    fi
+}
+
 git_commit_and_push() {
     local branch
 
@@ -181,6 +190,7 @@ main() {
         python "${SCRIPT_DIR}/build/sync-videos.py" || log_warn "Video sync skipped (missing creds or deps) — keeping current files"
     fi
 
+    run_checks
     git_commit_and_push
 
     log_success "$(basename "$0") done"
