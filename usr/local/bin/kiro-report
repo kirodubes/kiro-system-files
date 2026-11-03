@@ -92,7 +92,7 @@ report_header() {
 }
 
 section_debug() {
-    log_subsection "Recent Issues (debug)"
+    log_subsection "$(_t "Recent Issues (debug)")"
 
     local failed
     failed=$(systemctl --failed --no-legend --plain 2>/dev/null | awk '{print $1}' | tr '\n' ' ' | xargs || true)
@@ -121,7 +121,7 @@ section_debug() {
 # Graphics stack is the most common support topic; list the actual driver
 # packages (Xorg video/input, Mesa, Vulkan, NVIDIA, VA-API) with versions.
 section_drivers() {
-    log_subsection "Graphics / driver packages"
+    log_subsection "$(_t "Graphics / driver packages")"
     local drv
     drv=$(pacman -Q 2>/dev/null | grep -iE '^(xf86-video-|xf86-input-|xorg-server|mesa|lib32-mesa|vulkan-|lib32-vulkan-|libva|lib32-libva|libvdpau|nvidia|lib32-nvidia|libdrm|intel-media-driver|intel-gmmlib|onevpl|opencl-)' || true)
     [[ -n "${drv}" ]] && echo "${drv}" | sed 's/^/  /' || echo "  (no matching driver packages)"
@@ -131,7 +131,7 @@ section_drivers() {
 # Full list of explicitly-installed packages (names + versions only, no PII) —
 # what a maintainer needs to reproduce a user's environment.
 section_packages_full() {
-    log_subsection "Explicitly installed packages"
+    log_subsection "$(_t "Explicitly installed packages")"
     _field "Explicit packages" "$(pacman -Qqe 2>/dev/null | wc -l)"
     echo
     pacman -Qe 2>/dev/null | sed 's/^/  /' || true
@@ -145,7 +145,7 @@ section_packages_full() {
 section_audit() {
     command -v kiro-audit >/dev/null 2>&1 || return 0
 
-    log_subsection "Install audit (kiro-audit)"
+    log_subsection "$(_t "Install audit (kiro-audit)")"
 
     # kiro-audit audits an *installed* system and bails on the live ISO by design
     # (read-only squashfs, archiso packages still present → most checks FAIL on
@@ -179,7 +179,7 @@ section_audit() {
 section_calamares() {
     [[ -f /var/log/Calamares.log ]] || return 0
 
-    log_subsection "Calamares install log"
+    log_subsection "$(_t "Calamares install log")"
     _field "File" "/var/log/Calamares.log"
     _field "Total lines" "$(wc -l < /var/log/Calamares.log 2>/dev/null || echo '?')"
 
@@ -205,7 +205,7 @@ section_calamares() {
 # the LUKS version is available; no device UUIDs are printed (and redact() would
 # scrub them anyway).
 section_encryption() {
-    log_subsection "Disk encryption"
+    log_subsection "$(_t "Disk encryption")"
 
     local root_fs
     root_fs=$(findmnt -no FSTYPE / 2>/dev/null || echo "unknown")
@@ -343,7 +343,7 @@ main() {
                 shift
                 ;;
             *)
-                echo "${RED}Unknown option: $1${RESET}" >&2
+                echo "${RED}$(_t "Unknown option:") ${1}${RESET}" >&2
                 exit 1
                 ;;
         esac
@@ -355,7 +355,7 @@ main() {
     user_home="$(getent passwd "${TARGET_USER}" | cut -d: -f6 || true)"
     outfile="${OUTPUT_PATH:-${user_home:-/tmp}/kiro-report-$(date +%Y%m%d-%H%M%S).log}"
 
-    log_section "Generating Kiro report"
+    log_section "$(_t "Generating Kiro report")"
     log_info "Collecting diagnostics — this may take a few seconds..."
 
     build_report > "${outfile}"
@@ -386,7 +386,7 @@ main() {
     echo "${YELLOW}Redaction strips IP / MAC / UUID / machine-id / hostname / username,"
     echo "but skim it once before posting — automated scrubbing is never perfect.${RESET}"
 
-    log_success "$(basename "$0") done"
+    log_success "$(_tf '$SCRIPT_NAME done')"
 }
 
 main "$@"

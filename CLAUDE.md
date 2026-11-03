@@ -110,6 +110,21 @@ pkg=$(pacman -Qqo "$(realpath "${BASH_SOURCE[0]}")" 2>/dev/null) \
     || echo "$(basename "$0") (not installed via pacman)"
 ```
 
+## Translations (scripts + menu entries)
+
+- Every user-visible script message goes through `_t "Text"` or, with a value in it, `_tf 'Text with $var'`
+  (eval_gettext: whole sentence, plain `$name` only — copy `${arr[*]}` / `$(cmd)` into a local first). Wrap the
+  argument, never change `log_*` itself. Colour variables stay outside the string. Domain `kiro-system-files`.
+- The init block is in `kiro-common.sh`; the self-contained scripts (kiro-skell, kiro-skell-all, kiro-audit,
+  kiro-calamares-log) carry a copy — change all five together.
+- Report tools (kiro-audit, -verify, -report, -calamares-log, -diag, -lint, -probe-report): headings and prompts
+  only. Findings stay English: users paste them into Discussions.
+- Keep answer keys (`y/n`, `[1/2/3]`) literal and add a `# Translators:` comment above the line.
+- Locals read only inside a `_tf` string need `# shellcheck disable=SC2034` (shellcheck can't see them).
+- After changing any text run `bash po/make-mo.sh` (extracts menu entries + scripts, merges the `.po` files,
+  writes the `.desktop` files and the `.mo` catalogs). Rules and registers:
+  `~/Insync/Kiro/Kiro-HQ/TRANSLATIONS/README.md`.
+
 ## `log_error` is a trap handler, not a message function
 
 `log_error` in `kiro-common.sh` takes `lineno` and `cmd` params — it is wired to the ERR trap. Calling it with a plain string produces the full banner with the string treated as a line number. For user-facing messages (e.g. root checks), use:

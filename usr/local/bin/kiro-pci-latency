@@ -46,7 +46,7 @@ for _arg in "$@"; do
             ;;
         -d|--dry-run)
             DRY_RUN=true
-            log_info "Dry-run mode enabled — no changes will be made"
+            log_info "$(_t "Dry-run mode enabled — no changes will be made")"
             ;;
     esac
 done
@@ -55,17 +55,17 @@ unset _arg
 ensure_root "$@"
 
 if ! command -v setpci > /dev/null 2>&1; then
-    echo "${RED}setpci not found — install pciutils${RESET}" >&2
+    echo "${RED}$(_t "setpci not found — install pciutils")${RESET}" >&2
     exit 1
 fi
 
 main() {
-    log_section "PCI Latency Timer Optimization"
+    log_section "$(_t "PCI Latency Timer Optimization")"
 
     if [[ "${DRY_RUN}" == "true" ]]; then
-        log_info "[DRY-RUN] Would execute: setpci -s '*:*' latency_timer=20"
-        log_info "[DRY-RUN] Would execute: setpci -s '0:0' latency_timer=0"
-        log_info "[DRY-RUN] Would execute: setpci -s '*:*:04xx' latency_timer=80"
+        log_info "$(_t "[DRY-RUN] Would execute: setpci -s '*:*' latency_timer=20")"
+        log_info "$(_t "[DRY-RUN] Would execute: setpci -s '0:0' latency_timer=0")"
+        log_info "$(_t "[DRY-RUN] Would execute: setpci -s '*:*:04xx' latency_timer=80")"
     else
         # All devices: conservative 20-cycle default
         setpci -s '*:*' latency_timer=20 2>/dev/null || true
@@ -77,7 +77,7 @@ main() {
         setpci -s '*:*:04xx' latency_timer=80 2>/dev/null || true
     fi
 
-    log_success "$(basename "$0") done"
+    log_success "$(_tf '$SCRIPT_NAME done')"
 }
 
 main "$@"

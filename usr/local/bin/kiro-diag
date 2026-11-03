@@ -43,7 +43,7 @@ _field() {
 ##################################################################################################################
 
 section_system() {
-    log_subsection "System"
+    log_subsection "$(_t "System")"
 
     if [[ -f /etc/dev-rel ]]; then
         local release codename build
@@ -76,7 +76,7 @@ section_system() {
 }
 
 section_hardware() {
-    log_subsection "Hardware"
+    log_subsection "$(_t "Hardware")"
 
     local cpu cores
     cpu=$(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2 | xargs)
@@ -99,7 +99,7 @@ section_hardware() {
 }
 
 section_gpu() {
-    log_subsection "GPU"
+    log_subsection "$(_t "GPU")"
 
     local intel_gpu
     intel_gpu=$(lspci | grep -iE 'vga|3d|display' | grep -i intel | head -1 | sed 's/.*: //' || true)
@@ -150,7 +150,7 @@ section_gpu() {
 }
 
 section_storage() {
-    log_subsection "Storage"
+    log_subsection "$(_t "Storage")"
 
     local mounts
     mounts=$(mount | grep '^/dev' | awk '{print $1 "(" $5 ")"}' | tr '\n' '  ')
@@ -173,7 +173,7 @@ section_storage() {
 }
 
 section_network() {
-    log_subsection "Network"
+    log_subsection "$(_t "Network")"
 
     while IFS= read -r line; do
         local iface state addr
@@ -196,7 +196,7 @@ section_network() {
 }
 
 section_desktop() {
-    log_subsection "Desktop"
+    log_subsection "$(_t "Desktop")"
 
     local dm="none detected"
     for d in sddm lxdm gdm lightdm ly; do
@@ -224,7 +224,7 @@ section_desktop() {
 }
 
 section_kernel() {
-    log_subsection "Kernel"
+    log_subsection "$(_t "Kernel")"
 
     local installed
     installed=$(ls /usr/lib/modules 2>/dev/null | tr '\n' '  ' | xargs || echo "none")
@@ -249,7 +249,7 @@ section_kernel() {
 _bl_ver() { pacman -Q "$1" 2>/dev/null | awk '{print $2}' || echo 'installed'; }
 
 section_boot() {
-    log_subsection "Bootloader"
+    log_subsection "$(_t "Bootloader")"
 
     # bootctl -p resolves the ESP regardless of layout (/efi, /boot, /boot/efi).
     local bl="unknown" esp
@@ -285,7 +285,7 @@ section_boot() {
 }
 
 section_packages() {
-    log_subsection "Packages"
+    log_subsection "$(_t "Packages")"
 
     local total
     total=$(pacman -Q 2>/dev/null | wc -l)
@@ -303,7 +303,7 @@ section_packages() {
 }
 
 section_audio() {
-    log_subsection "Audio"
+    log_subsection "$(_t "Audio")"
 
     if pgrep -x pipewire &>/dev/null; then
         local pw_ver
@@ -329,7 +329,7 @@ section_audio() {
 }
 
 section_bluetooth() {
-    log_subsection "Bluetooth"
+    log_subsection "$(_t "Bluetooth")"
 
     if systemctl is-active --quiet bluetooth 2>/dev/null; then
         _field "Service" "active"
@@ -346,7 +346,7 @@ section_bluetooth() {
 }
 
 section_temps() {
-    log_subsection "Temperatures"
+    log_subsection "$(_t "Temperatures")"
 
     if command -v sensors &>/dev/null; then
         local temps
@@ -385,7 +385,7 @@ main() {
                 JSON_MODE=true
                 ;;
             *)
-                echo "${RED}Unknown option: $arg${RESET}" >&2
+                echo "${RED}$(_t "Unknown option:") ${arg}${RESET}" >&2
                 exit 1
                 ;;
         esac
@@ -393,7 +393,7 @@ main() {
 
     ensure_root "$@"
 
-    log_section "Kiro System Diagnostics"
+    log_section "$(_t "Kiro System Diagnostics")"
 
     section_system
     section_boot
@@ -414,7 +414,7 @@ main() {
         printf '{"script":"%s","generated":"%s","results":[%s]}\n' \
             "$(basename "$0")" "$(date -Iseconds)" "${joined}"
     else
-        log_success "$(basename "$0") done"
+        log_success "$(_tf '$SCRIPT_NAME done')"
     fi
 }
 

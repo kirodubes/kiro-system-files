@@ -9,15 +9,21 @@ set -euo pipefail
 #
 #   Purpose:
 #   - Extract the Name/GenericName/Comment/Keywords of every menu entry
-#     in po/desktop/*.desktop.in into po/kiro-system-files.pot.
+#     in po/desktop/*.desktop.in, and every _t "…" / _tf '…' string of
+#     the kiro-* scripts (usr/local/bin) and usr/local/lib/kiro-common.sh,
+#     into one template, po/kiro-system-files.pot.
 #   - Merge that template into each po/<lang>.po: a changed English
 #     string turns fuzzy, a removed one obsolete.
 #   - Write each menu entry into usr/share/applications/ with every
 #     language added. Edit the .in files, never usr/share/applications/
 #     (those files are overwritten).
+#   - Compile each <lang>.po into
+#     usr/share/locale/<lang>/LC_MESSAGES/kiro-system-files.mo for the
+#     scripts (the PKGBUILD ships usr/ as is).
 #
-#   Why: run it after any change to a menu entry, before the flow
-#   script builds the package, so the menu shows each user's language.
+#   Why: run it after any change to a menu entry or a script's text,
+#   before the flow script builds the package, so the menu and the
+#   scripts show each user's language.
 #
 #####################################################################
 
@@ -99,20 +105,31 @@ APPS="$REPO/usr/share/applications"
 
 extract() {
     log_section "Extracting the strings into $(basename "$POT")"
+    local tmp
+    tmp="$(mktemp -d)"
     # relative paths only: the source comments in the .pot must not carry a home folder
     (cd "$REPO" && xgettext --language=Desktop --package-name="$DOMAIN" --sort-by-file \
-        -o "$POT" po/desktop/*.desktop.in)
+        -o "$tmp/desktop.pot" po/desktop/*.desktop.in)
+    (cd "$REPO" && xgettext --language=Shell --from-code=UTF-8 --keyword=_t --keyword=_tf \
+        --add-comments=Translators: --package-name="$DOMAIN" --sort-by-file \
+        -o "$tmp/scripts.pot" usr/local/lib/kiro-common.sh usr/local/bin/kiro-*)
+    msgcat --use-first -o "$POT" "$tmp/desktop.pot" "$tmp/scripts.pot"
+    rm -rf "$tmp"
     log_info "${CYAN}$(grep -c '^msgid ' "$POT")${RESET} entries (the first is the header)"
 }
 
-merge_and_check() {
-    local po
+merge_and_compile() {
+    local po lang mo
     for po in "$SCRIPT_DIR"/*.po; do
         [[ -e "$po" ]] || continue
-        log_section "$(basename "$po" .po)"
+        lang="$(basename "$po" .po)"
+        log_section "$lang"
         msgmerge --quiet --update --backup=none "$po" "$POT"
-        # no .mo yet: the menu entries read the .po directly
-        msgfmt --check --statistics -o /dev/null "$po"
+        # the menu entries read the .po directly; the scripts read this .mo
+        mo="$REPO/usr/share/locale/$lang/LC_MESSAGES/$DOMAIN.mo"
+        mkdir -p "$(dirname "$mo")"
+        # --check also verifies that every $variable of the English survives in the translation
+        msgfmt --check --statistics -o "$mo" "$po"
     done
 }
 
@@ -132,7 +149,7 @@ write_desktop() {
 #####################################################################
 main() {
     extract
-    merge_and_check
+    merge_and_compile
     write_desktop
     log_success "$(basename "$0") done"
 }

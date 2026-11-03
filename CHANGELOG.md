@@ -9,12 +9,46 @@
   GenericName/Comment line was translated and the menu name stayed English. Hungarian and Romanian are new;
   Portuguese, Ukrainian and Czech, which the entries already had, are kept.
 - The menu entries are now generated from gettext catalogs, like the other translated Kiro apps.
+- **The 26 `kiro-*` scripts speak the user's language too** (ROADMAP §4 #16b, for the 1 Jan ISO). The fixers
+  (kiro-skell, kiro-skell-all, kiro-xlibre-swap, kiro-fix-*, kiro-get-*, kiro-set-cores*, kiro-enable-ssh,
+  kiro-which-vga, …) and the shared messages of `kiro-common.sh` are translated in full. The report tools
+  (kiro-audit, kiro-verify, kiro-report, kiro-calamares-log, kiro-diag, kiro-lint, kiro-probe-report) translate
+  their headings and prompts only: users paste their findings into Discussions, so the findings stay English.
+- When a script asks for root through the polkit dialog (pkexec), the root run now keeps the user's language.
 
 ### Technical Details
+- Scripts use the ohmychadwm-menu pattern: `_t "Text"` (gettext) and `_tf 'Text with $var'` (eval_gettext, so a
+  translator can move the value), English when gettext is missing. Domain `kiro-system-files`, the same one as the
+  menu entries; `po/make-mo.sh` now extracts the shell strings as well (xgettext Desktop + Shell, joined with
+  msgcat) and also compiles `usr/share/locale/<lang>/LC_MESSAGES/kiro-system-files.mo`. No PKGBUILD change: the
+  package copies `usr/` as is.
+- The init block lives in `kiro-common.sh`; kiro-skell, kiro-skell-all, kiro-audit and kiro-calamares-log are
+  self-contained and carry their own copy. Off-Kiro (ATT's `skell` copy) there is no catalog, so it stays English.
+- Sibling fallback: without `LANGUAGE`, a pt_PT / pt_* system reads pt_BR and zh_TW / zh_HK reads zh_CN (glibc
+  never falls back across countries by itself).
+- pkexec scrubs the environment; `ensure_root` (kiro-common.sh) and kiro-audit's own copy now pass LANG,
+  LANGUAGE, LC_ALL and LC_MESSAGES through `pkexec env`, next to TERM and PATH.
+- Answer keys (`y/n`, `Y/y`, `[1/2/3]`, the menu numbers) stay literal, with a `Translators:` comment. `--help`
+  text stays English (heredocs). Machine-read output stays English (nothing parses kiro-* stdout; ATT's
+  `keep_kirotux_repo` discards it).
+- `log_*` functions are unchanged; their arguments are wrapped at the call site. Plain messages were wrapped with a
+  converter (only literal text plus simple `$var`), the rest by hand: multi-line xlibre-swap texts, array values
+  kept after a translated label, messages printed before `kiro-common.sh` is sourced left untranslated.
+- `# shellcheck disable=SC2034` marks the locals that are only read inside a `_tf` string.
+- 312 script strings per language. 15 were reused from the other Kiro catalogs (exact matches only); the rest were
+  drafted by 5 Claude Sonnet agents with the register rules, then imported behind guards (same `$var` names, line
+  breaks, leading/trailing spaces, answer keys). Second review by 5 fresh reviewers: 153 fixes taken (zh_CN
+  full-width punctuation 88, ro 19 (one Romanian word for backup, the ATT one), de 11, fr/tr/pl 7, ru 4, it 3, nl/pt_BR/hu 2,
+  ja 1, es 0). The 4 link-entry URLs stay untranslated. cs, pt and uk keep only the menu entries; pt_PT reads
+  pt_BR for the scripts.
+- Gates: `msgfmt --check`, pofilter (xmltags, printf, urls, spacing, newlines) clean in all 13; dry runs of
+  kiro-skell checked in de, ja, nl, ro, tr and zh_CN, plus kiro-xlibre-swap `--status` and kiro-lint in Dutch.
+
+### Technical Details (menu entries)
 - English sources live in `po/desktop/*.desktop.in`; `po/make-mo.sh` extracts them into `po/kiro-system-files.pot`,
   merges each `po/<lang>.po`, checks it with `msgfmt --check` and writes `usr/share/applications/` with
-  `msgfmt --desktop`. Edit the `.in` files, never the generated entries. No `.mo` is shipped yet: the `kiro-*`
-  script round (ROADMAP §4 #16b) will add one under the same domain.
+  `msgfmt --desktop`. Edit the `.in` files, never the generated entries. The `kiro-*` script round (above) added
+  the `.mo` under the same domain.
 - The existing hand-written GenericName/Comment translations seeded the `.po` files. Spanish Comments moved to "tú"
   per the register rules. Localised Keywords keep the English terms after the local ones, so an English search
   still finds the entry in every language.
@@ -29,7 +63,9 @@
   `po/LINGUAS`
 - `usr/share/applications/kiro-{audit,sysinfo,probe-report,link-website,link-releases,link-discussions,link-code}.desktop`
 - `.codespellrc`
-- `CHANGELOG.md`
+- `usr/local/lib/kiro-common.sh`, `usr/local/bin/kiro-*` (all 26), `usr/share/locale/*/LC_MESSAGES/kiro-system-files.mo`
+  (new, 16)
+- `CLAUDE.md`, `CHANGELOG.md`
 
 ## 2026.10.20
 

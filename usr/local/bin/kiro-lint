@@ -66,7 +66,7 @@ _join_lines() {
 # Check 1 — sysctl duplicate keys
 ##################################################################################################################
 check_sysctl_duplicates() {
-    log_subsection "Sysctl: Duplicate Keys"
+    log_subsection "$(_t "Sysctl: Duplicate Keys")"
 
     local sysctl_dir="$SOURCE/etc/sysctl.d"
     if [[ ! -d "$sysctl_dir" ]]; then
@@ -112,7 +112,7 @@ check_sysctl_duplicates() {
 # Check 2 — modprobe.d parameters vs /sys/module/<driver>/parameters/
 ##################################################################################################################
 check_modprobe_params() {
-    log_subsection "Modprobe: Parameters vs /sys/module/"
+    log_subsection "$(_t "Modprobe: Parameters vs /sys/module/")"
 
     local modprobe_dir="$SOURCE/etc/modprobe.d"
     if [[ ! -d "$modprobe_dir" ]]; then
@@ -175,7 +175,7 @@ check_modprobe_params() {
 #   3b: udev ATTR writes that disagree with a modprobe.d option of the same name
 ##################################################################################################################
 check_cross_conflicts() {
-    log_subsection "Cross-file: Conflicting Settings"
+    log_subsection "$(_t "Cross-file: Conflicting Settings")"
 
     local modprobe_dir="$SOURCE/etc/modprobe.d"
     local udev_dir="$SOURCE/etc/udev/rules.d"
@@ -359,7 +359,7 @@ _sysfs_subsystem_attr_exists() {
 }
 
 check_udev_attr_targets() {
-    log_subsection "Udev: ATTR Write Targets in Sysfs"
+    log_subsection "$(_t "Udev: ATTR Write Targets in Sysfs")"
 
     local udev_dir="$SOURCE/etc/udev/rules.d"
     if [[ ! -d "$udev_dir" ]]; then
@@ -428,11 +428,11 @@ main() {
             --source) SOURCE="${2%/}"; shift 2 ;;
             --help|-h) usage; exit 0 ;;
             --version|-v) show_version "$(basename "$0")"; exit 0 ;;
-            *) echo "${RED}Unknown option: $1${RESET}" >&2; exit 1 ;;
+            *) echo "${RED}$(_t "Unknown option:") ${1}${RESET}" >&2; exit 1 ;;
         esac
     done
 
-    log_section "Kiro Config Linter"
+    log_section "$(_t "Kiro Config Linter")"
     log_info "Source: ${SOURCE:-/}"
 
     check_sysctl_duplicates
@@ -440,7 +440,7 @@ main() {
     check_cross_conflicts
     check_udev_attr_targets
 
-    log_section "Lint Summary"
+    log_section "$(_t "Lint Summary")"
     echo "  ${GREEN}PASS: ${PASS}${RESET}"
     echo "  ${RED}FAIL: ${FAIL}${RESET}"
     echo "  ${YELLOW}WARN: ${WARN}${RESET}"

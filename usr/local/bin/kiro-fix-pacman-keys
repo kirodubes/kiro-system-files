@@ -43,53 +43,53 @@ main() {
                 ;;
             -d|--dry-run)
                 DRY_RUN=true
-                log_info "Dry-run mode enabled — no changes will be made"
+                log_info "$(_t "Dry-run mode enabled — no changes will be made")"
                 ;;
             *)
-                echo "${RED}Unknown option: $arg${RESET}" >&2
+                echo "${RED}$(_t "Unknown option:") ${arg}${RESET}" >&2
                 exit 1
                 ;;
         esac
     done
 
     if check_connectivity 3 8.8.8.8; then
-        log_subsection "Installing the latest archlinux-keyring package"
-        execute_or_dryrun "Install archlinux-keyring" sudo pacman -Sy archlinux-keyring --noconfirm || log_warn "Failed to install archlinux-keyring"
+        log_subsection "$(_t "Installing the latest archlinux-keyring package")"
+        execute_or_dryrun "Install archlinux-keyring" sudo pacman -Sy archlinux-keyring --noconfirm || log_warn "$(_t "Failed to install archlinux-keyring")"
     fi
 
-    log_section "Fixing pacman database and GPG configuration"
+    log_section "$(_t "Fixing pacman database and GPG configuration")"
 
-    log_subsection "Removing pacman sync databases"
+    log_subsection "$(_t "Removing pacman sync databases")"
     if [[ -d /var/lib/pacman/sync ]]; then
-        execute_or_dryrun "Remove sync databases" sudo rm -f /var/lib/pacman/sync/*.db /var/lib/pacman/sync/*.db.sig || log_warn "Failed to remove all sync databases"
+        execute_or_dryrun "Remove sync databases" sudo rm -f /var/lib/pacman/sync/*.db /var/lib/pacman/sync/*.db.sig || log_warn "$(_t "Failed to remove all sync databases")"
     else
-        log_info "Directory not found: /var/lib/pacman/sync"
+        log_info "$(_t "Directory not found: /var/lib/pacman/sync")"
     fi
 
-    log_subsection "Removing pacman GPG keys"
+    log_subsection "$(_t "Removing pacman GPG keys")"
     if [[ -d /etc/pacman.d/gnupg ]]; then
-        execute_or_dryrun "Remove GPG keys" sudo rm -rf /etc/pacman.d/gnupg/* || log_warn "Failed to remove GPG keys"
+        execute_or_dryrun "Remove GPG keys" sudo rm -rf /etc/pacman.d/gnupg/* || log_warn "$(_t "Failed to remove GPG keys")"
     else
-        log_info "Directory not found: /etc/pacman.d/gnupg"
+        log_info "$(_t "Directory not found: /etc/pacman.d/gnupg")"
     fi
 
-    log_subsection "Initializing pacman keys"
-    execute_or_dryrun "Initialize pacman keys" sudo pacman-key --init || log_warn "Failed to initialize pacman keys"
+    log_subsection "$(_t "Initializing pacman keys")"
+    execute_or_dryrun "Initialize pacman keys" sudo pacman-key --init || log_warn "$(_t "Failed to initialize pacman keys")"
 
-    log_subsection "Populating keyring"
-    execute_or_dryrun "Populate keyring" sudo pacman-key --populate || log_warn "Failed to populate keyring"
+    log_subsection "$(_t "Populating keyring")"
+    execute_or_dryrun "Populate keyring" sudo pacman-key --populate || log_warn "$(_t "Failed to populate keyring")"
 
-    log_subsection "Adding Ubuntu keyserver to gpg.conf"
+    log_subsection "$(_t "Adding Ubuntu keyserver to gpg.conf")"
     if [[ -f /etc/pacman.d/gnupg/gpg.conf ]]; then
         execute_or_dryrun "Append keyserver to gpg.conf" bash -c 'echo "keyserver hkp://keyserver.ubuntu.com:80" | sudo tee -a /etc/pacman.d/gnupg/gpg.conf >/dev/null'
     else
-        log_warn "File not found: /etc/pacman.d/gnupg/gpg.conf"
+        log_warn "$(_t "File not found: /etc/pacman.d/gnupg/gpg.conf")"
     fi
 
-    log_subsection "Refreshing pacman databases"
-    execute_or_dryrun "Refresh pacman databases" sudo pacman -Sy || log_warn "Failed to refresh pacman databases"
+    log_subsection "$(_t "Refreshing pacman databases")"
+    execute_or_dryrun "Refresh pacman databases" sudo pacman -Sy || log_warn "$(_t "Failed to refresh pacman databases")"
 
-    log_success "$(basename "$0") done"
+    log_success "$(_tf '$SCRIPT_NAME done')"
 }
 
 main "$@"

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kiro-system-files\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-03 04:52+0100\n"
+"POT-Creation-Date: 2026-11-03 04:55+0100\n"
 "PO-Revision-Date: 2026-11-03 00:00+0100\n"
 "Last-Translator: Kiro\n"
 "Language-Team: Kiro\n"
@@ -114,3 +114,1427 @@ msgstr "完整的系统和硬件报告（inxi）"
 #: po/desktop/kiro-sysinfo.desktop.in:12
 msgid "inxi;system;hardware;info;information;"
 msgstr "系统;硬件;信息;inxi;system;hardware;info;information;"
+
+#: usr/local/bin/kiro-audit:162 usr/local/lib/kiro-common.sh:233
+#, sh-format
+msgid "$name needs root — requesting your password..."
+msgstr "$name 需要 root 权限 — 正在请求你的密码..."
+
+#: usr/local/bin/kiro-audit:172 usr/local/lib/kiro-common.sh:240
+#, sh-format
+msgid "$name needs root — re-running with sudo..."
+msgstr "$name 需要 root 权限 — 正在使用 sudo 重新运行..."
+
+#: usr/local/bin/kiro-audit:342 usr/local/bin/kiro-diag:227
+msgid "Kernel"
+msgstr "内核"
+
+#: usr/local/bin/kiro-audit:390
+msgid "Microcode"
+msgstr "微码"
+
+#: usr/local/bin/kiro-audit:408
+msgid "mkinitcpio"
+msgstr "mkinitcpio"
+
+#: usr/local/bin/kiro-audit:447
+msgid "Audio stack"
+msgstr "音频栈"
+
+#: usr/local/bin/kiro-audit:457
+msgid "Calamares cleanup"
+msgstr "Calamares 清理"
+
+#: usr/local/bin/kiro-audit:518
+msgid "kiro_final configuration"
+msgstr "kiro_final 配置"
+
+#: usr/local/bin/kiro-audit:560
+msgid "Pacman repositories"
+msgstr "Pacman 软件源"
+
+#: usr/local/bin/kiro-audit:660
+msgid "Desktop environments"
+msgstr "桌面环境"
+
+#: usr/local/bin/kiro-audit:683
+msgid "SDDM"
+msgstr "SDDM"
+
+#: usr/local/bin/kiro-audit:699
+msgid "User groups"
+msgstr "用户组"
+
+#: usr/local/bin/kiro-audit:718
+msgid "Systemd services"
+msgstr "Systemd 服务"
+
+#: usr/local/bin/kiro-audit:770
+msgid "Key file permissions"
+msgstr "关键文件权限"
+
+#: usr/local/bin/kiro-audit:803
+msgid "ISO version"
+msgstr "ISO 版本"
+
+#: usr/local/bin/kiro-audit:814
+msgid "NVIDIA"
+msgstr "NVIDIA"
+
+#: usr/local/bin/kiro-audit:827
+msgid "chwd driver install"
+msgstr "chwd 驱动安装"
+
+#: usr/local/bin/kiro-audit:847
+msgid "Package integrity (pacman -Qk)"
+msgstr "软件包完整性（pacman -Qk）"
+
+#: usr/local/bin/kiro-audit:871
+msgid "Sysctl security baseline"
+msgstr "Sysctl 安全基线"
+
+#: usr/local/bin/kiro-audit:899 usr/local/bin/kiro-verify:243
+msgid "ZRAM"
+msgstr "ZRAM"
+
+#: usr/local/bin/kiro-audit:921
+msgid "Udev rules"
+msgstr "Udev 规则"
+
+#: usr/local/bin/kiro-audit:956
+msgid "Systemd drop-ins"
+msgstr "Systemd 附加配置"
+
+#: usr/local/bin/kiro-audit:972
+msgid "Modprobe & THP tuning"
+msgstr "Modprobe 与 THP 调优"
+
+#: usr/local/bin/kiro-audit:986
+msgid "Hardening & tuning (2026-05-28)"
+msgstr "加固与调优（2026-05-28）"
+
+#: usr/local/bin/kiro-audit:1059
+msgid "systemd-resolved configuration"
+msgstr "systemd-resolved 配置"
+
+#: usr/local/bin/kiro-audit:1079
+msgid "tuned-ppd power profile"
+msgstr "tuned-ppd 电源配置"
+
+#: usr/local/bin/kiro-audit:1115
+msgid "Tumbler / thumbnailing"
+msgstr "Tumbler / 缩略图"
+
+#: usr/local/bin/kiro-audit:1123
+msgid "Failed systemd units"
+msgstr "失败的 systemd 单元"
+
+#: usr/local/bin/kiro-audit:1141
+msgid "Boot time and updates (info)"
+msgstr "启动时间与更新（信息）"
+
+#: usr/local/bin/kiro-audit:1157 usr/local/bin/kiro-diag:252
+msgid "Bootloader"
+msgstr "引导程序"
+
+#: usr/local/bin/kiro-audit:1189
+msgid "Btrfs snapshots"
+msgstr "Btrfs 快照"
+
+#: usr/local/bin/kiro-audit:1269
+msgid "Disk format & encryption"
+msgstr "磁盘格式与加密"
+
+#: usr/local/bin/kiro-audit:1372
+msgid "Kiro Plasma theme/config"
+msgstr "Kiro Plasma 主题/配置"
+
+#: usr/local/bin/kiro-audit:1472
+msgid "Kiro ISO — Installed System Audit"
+msgstr "Kiro ISO — 已安装系统审计"
+
+#: usr/local/bin/kiro-audit:1519
+msgid "Audit Summary"
+msgstr "审计摘要"
+
+#: usr/local/bin/kiro-calamares-log:173 usr/local/bin/kiro-diag:388
+#: usr/local/bin/kiro-enable-ssh:55 usr/local/bin/kiro-fix-gpg-conf:49
+#: usr/local/bin/kiro-fix-mirrors:49 usr/local/bin/kiro-fix-pacman-conf:51
+#: usr/local/bin/kiro-fix-pacman-keys:49 usr/local/bin/kiro-get-mirrors:49
+#: usr/local/bin/kiro-get-nemesis:51 usr/local/bin/kiro-iso-version:43
+#: usr/local/bin/kiro-keep-kirotux-repo:50 usr/local/bin/kiro-lint:431
+#: usr/local/bin/kiro-probe:58 usr/local/bin/kiro-probe-report:137
+#: usr/local/bin/kiro-report:346 usr/local/bin/kiro-set-cores:49
+#: usr/local/bin/kiro-set-cores-min1:50 usr/local/bin/kiro-set-cores-min2:50
+#: usr/local/bin/kiro-skell:138 usr/local/bin/kiro-skell-all:139
+#: usr/local/bin/kiro-which-vga:50 usr/local/bin/kiro-xlibre-swap:309
+msgid "Unknown option:"
+msgstr "未知选项："
+
+#: usr/local/bin/kiro-calamares-log:216
+msgid "Kiro — Calamares Install Summary"
+msgstr "Kiro — Calamares 安装摘要"
+
+#: usr/local/bin/kiro-calamares-log:233
+msgid "Install timeline (per-job duration)"
+msgstr "安装时间线（每个任务的耗时）"
+
+#: usr/local/bin/kiro-calamares-log:283
+msgid "Warnings"
+msgstr "警告"
+
+#: usr/local/bin/kiro-calamares-log:299
+msgid "Errors / tracebacks"
+msgstr "错误 / 回溯"
+
+#: usr/local/bin/kiro-diag:46
+msgid "System"
+msgstr "系统"
+
+#: usr/local/bin/kiro-diag:79
+msgid "Hardware"
+msgstr "硬件"
+
+#: usr/local/bin/kiro-diag:102
+msgid "GPU"
+msgstr "GPU"
+
+#: usr/local/bin/kiro-diag:153
+msgid "Storage"
+msgstr "存储"
+
+#: usr/local/bin/kiro-diag:176
+msgid "Network"
+msgstr "网络"
+
+#: usr/local/bin/kiro-diag:199
+msgid "Desktop"
+msgstr "桌面"
+
+#: usr/local/bin/kiro-diag:288
+msgid "Packages"
+msgstr "软件包"
+
+#: usr/local/bin/kiro-diag:306
+msgid "Audio"
+msgstr "音频"
+
+#: usr/local/bin/kiro-diag:332
+msgid "Bluetooth"
+msgstr "蓝牙"
+
+#: usr/local/bin/kiro-diag:349
+msgid "Temperatures"
+msgstr "温度"
+
+#: usr/local/bin/kiro-diag:396
+msgid "Kiro System Diagnostics"
+msgstr "Kiro 系统诊断"
+
+#: usr/local/bin/kiro-diag:417 usr/local/bin/kiro-enable-ssh:107
+#: usr/local/bin/kiro-fix-gpg-conf:66 usr/local/bin/kiro-fix-mirrors:64
+#: usr/local/bin/kiro-fix-pacman-keys:92 usr/local/bin/kiro-get-mirrors:65
+#: usr/local/bin/kiro-get-nemesis:69 usr/local/bin/kiro-iso-version:54
+#: usr/local/bin/kiro-pci-latency:80 usr/local/bin/kiro-probe:92
+#: usr/local/bin/kiro-probe-report:168 usr/local/bin/kiro-probe-report:182
+#: usr/local/bin/kiro-probe-report:219 usr/local/bin/kiro-report:389
+#: usr/local/bin/kiro-set-cores:71 usr/local/bin/kiro-set-cores-min1:74
+#: usr/local/bin/kiro-set-cores-min2:74 usr/local/bin/kiro-which-vga:85
+#: usr/local/bin/kiro-xlibre-swap:346
+#, sh-format
+msgid "$SCRIPT_NAME done"
+msgstr "$SCRIPT_NAME 已完成"
+
+#: usr/local/bin/kiro-enable-ssh:52 usr/local/bin/kiro-fix-gpg-conf:46
+#: usr/local/bin/kiro-fix-mirrors:46 usr/local/bin/kiro-fix-pacman-conf:48
+#: usr/local/bin/kiro-fix-pacman-keys:46 usr/local/bin/kiro-get-mirrors:46
+#: usr/local/bin/kiro-get-nemesis:48 usr/local/bin/kiro-pci-latency:49
+#: usr/local/bin/kiro-probe:51 usr/local/bin/kiro-set-cores:46
+#: usr/local/bin/kiro-set-cores-min1:47 usr/local/bin/kiro-set-cores-min2:47
+#: usr/local/bin/kiro-skell:135 usr/local/bin/kiro-skell-all:136
+#: usr/local/bin/kiro-which-vga:47 usr/local/bin/kiro-xlibre-swap:297
+msgid "Dry-run mode enabled — no changes will be made"
+msgstr "已启用试运行模式 — 不会进行任何更改"
+
+#: usr/local/bin/kiro-enable-ssh:63
+msgid "Enabling SSH"
+msgstr "正在启用 SSH"
+
+#: usr/local/bin/kiro-enable-ssh:65
+msgid "Refreshing pacman database"
+msgstr "正在刷新 pacman 数据库"
+
+#: usr/local/bin/kiro-enable-ssh:70
+msgid "Installing openssh"
+msgstr "正在安装 openssh"
+
+#: usr/local/bin/kiro-enable-ssh:73
+msgid "Enabling and starting sshd"
+msgstr "正在启用并启动 sshd"
+
+#: usr/local/bin/kiro-enable-ssh:76
+msgid "Allowing SSH through the firewall"
+msgstr "正在允许 SSH 通过防火墙"
+
+#: usr/local/bin/kiro-enable-ssh:85
+msgid "firewalld not running — applying permanent rule offline"
+msgstr "firewalld 未运行 — 正在离线应用永久规则"
+
+#: usr/local/bin/kiro-enable-ssh:89
+msgid "firewalld not running — nothing is blocking SSH, skipping firewall rule"
+msgstr "firewalld 未运行 — 没有任何东西阻止 SSH，跳过防火墙规则"
+
+#: usr/local/bin/kiro-enable-ssh:92
+msgid "firewalld not installed — skipping firewall rule"
+msgstr "firewalld 未安装 — 跳过防火墙规则"
+
+#: usr/local/bin/kiro-enable-ssh:95
+msgid "Setting liveuser password (live ISO only)"
+msgstr "正在设置 liveuser 密码（仅限 Live ISO）"
+
+#: usr/local/bin/kiro-enable-ssh:104
+msgid "Not on live ISO (or no liveuser) — skipping liveuser password setup"
+msgstr "不在 Live ISO 中（或没有 liveuser） — 跳过 liveuser 密码设置"
+
+#: usr/local/bin/kiro-enable-ssh:112
+msgid "IP address:"
+msgstr "IP 地址："
+
+#: usr/local/bin/kiro-enable-ssh:112
+msgid "unknown (no network route)"
+msgstr "未知（没有网络路由）"
+
+#: usr/local/bin/kiro-fix-gpg-conf:55
+msgid "Copying /etc/pacman.d/gnupg/gpg.conf"
+msgstr "正在复制 /etc/pacman.d/gnupg/gpg.conf"
+
+#: usr/local/bin/kiro-fix-gpg-conf:59
+#, sh-format
+msgid "$gpg_conf exists"
+msgstr "$gpg_conf 已存在"
+
+#: usr/local/bin/kiro-fix-gpg-conf:61
+msgid "/etc/pacman.d/gnupg/gpg.conf copied from local system"
+msgstr "已从本地系统复制 /etc/pacman.d/gnupg/gpg.conf"
+
+#: usr/local/bin/kiro-fix-gpg-conf:63
+#, sh-format
+msgid "$gpg_conf not found — skipping"
+msgstr "未找到 $gpg_conf — 已跳过"
+
+#: usr/local/bin/kiro-fix-mirrors:56
+msgid ""
+"rate-mirrors is not installed. Please install the 'rate-mirrors' package."
+msgstr "未安装 rate-mirrors。请安装「rate-mirrors」软件包。"
+
+#: usr/local/bin/kiro-fix-mirrors:60
+msgid "Using rate-mirrors"
+msgstr "正在使用 rate-mirrors"
+
+#: usr/local/bin/kiro-fix-pacman-conf:57
+msgid "Getting /etc/pacman.conf"
+msgstr "正在获取 /etc/pacman.conf"
+
+#: usr/local/bin/kiro-fix-pacman-conf:62
+#, sh-format
+msgid "Local pacman.conf not found at: $local_pacman — cannot proceed"
+msgstr "未找到本地 pacman.conf：$local_pacman — 无法继续"
+
+#: usr/local/bin/kiro-fix-pacman-conf:66
+msgid "Using local pacman.conf"
+msgstr "正在使用本地 pacman.conf"
+
+#: usr/local/bin/kiro-fix-pacman-conf:68
+msgid "pacman.conf copied from local system"
+msgstr "已从本地系统复制 pacman.conf"
+
+#: usr/local/bin/kiro-fix-pacman-conf:70
+msgid "[DRY-RUN] Would put [kirotux_repo] back (KiroTux system)"
+msgstr "[DRY-RUN] 将恢复 [kirotux_repo]（KiroTux 系统）"
+
+#: usr/local/bin/kiro-fix-pacman-conf:76
+msgid "Failed to copy local pacman.conf"
+msgstr "复制本地 pacman.conf 失败"
+
+#: usr/local/bin/kiro-fix-pacman-keys:56
+msgid "Installing the latest archlinux-keyring package"
+msgstr "正在安装最新的 archlinux-keyring 软件包"
+
+#: usr/local/bin/kiro-fix-pacman-keys:57
+msgid "Failed to install archlinux-keyring"
+msgstr "安装 archlinux-keyring 失败"
+
+#: usr/local/bin/kiro-fix-pacman-keys:60
+msgid "Fixing pacman database and GPG configuration"
+msgstr "正在修复 pacman 数据库和 GPG 配置"
+
+#: usr/local/bin/kiro-fix-pacman-keys:62
+msgid "Removing pacman sync databases"
+msgstr "正在删除 pacman 同步数据库"
+
+#: usr/local/bin/kiro-fix-pacman-keys:64
+msgid "Failed to remove all sync databases"
+msgstr "删除全部同步数据库失败"
+
+#: usr/local/bin/kiro-fix-pacman-keys:66
+msgid "Directory not found: /var/lib/pacman/sync"
+msgstr "未找到目录：/var/lib/pacman/sync"
+
+#: usr/local/bin/kiro-fix-pacman-keys:69
+msgid "Removing pacman GPG keys"
+msgstr "正在删除 pacman GPG 密钥"
+
+#: usr/local/bin/kiro-fix-pacman-keys:71
+msgid "Failed to remove GPG keys"
+msgstr "删除 GPG 密钥失败"
+
+#: usr/local/bin/kiro-fix-pacman-keys:73
+msgid "Directory not found: /etc/pacman.d/gnupg"
+msgstr "未找到目录：/etc/pacman.d/gnupg"
+
+#: usr/local/bin/kiro-fix-pacman-keys:76
+msgid "Initializing pacman keys"
+msgstr "正在初始化 pacman 密钥"
+
+#: usr/local/bin/kiro-fix-pacman-keys:77
+msgid "Failed to initialize pacman keys"
+msgstr "初始化 pacman 密钥失败"
+
+#: usr/local/bin/kiro-fix-pacman-keys:79
+msgid "Populating keyring"
+msgstr "正在填充密钥环"
+
+#: usr/local/bin/kiro-fix-pacman-keys:80
+msgid "Failed to populate keyring"
+msgstr "填充密钥环失败"
+
+#: usr/local/bin/kiro-fix-pacman-keys:82
+msgid "Adding Ubuntu keyserver to gpg.conf"
+msgstr "正在将 Ubuntu 密钥服务器添加到 gpg.conf"
+
+#: usr/local/bin/kiro-fix-pacman-keys:86
+msgid "File not found: /etc/pacman.d/gnupg/gpg.conf"
+msgstr "未找到文件：/etc/pacman.d/gnupg/gpg.conf"
+
+#: usr/local/bin/kiro-fix-pacman-keys:89
+msgid "Refreshing pacman databases"
+msgstr "正在刷新 pacman 数据库"
+
+#: usr/local/bin/kiro-fix-pacman-keys:90 usr/local/lib/kiro-common.sh:923
+msgid "Failed to refresh pacman databases"
+msgstr "刷新 pacman 数据库失败"
+
+#: usr/local/bin/kiro-get-mirrors:56
+msgid "reflector is present"
+msgstr "reflector 已存在"
+
+#: usr/local/bin/kiro-get-mirrors:58
+msgid "Installing reflector"
+msgstr "正在安装 reflector"
+
+#: usr/local/bin/kiro-get-nemesis:57
+msgid "Clone arcolinux-nemesis"
+msgstr "克隆 arcolinux-nemesis"
+
+#: usr/local/bin/kiro-get-nemesis:60
+msgid "git is present"
+msgstr "git 已存在"
+
+#: usr/local/bin/kiro-get-nemesis:62
+msgid "Installing git"
+msgstr "正在安装 git"
+
+#: usr/local/bin/kiro-iso-version:52
+msgid "Not on a Kiro ISO."
+msgstr "不在 Kiro ISO 中。"
+
+#: usr/local/bin/kiro-keep-kirotux-repo:57
+msgid "Not a KiroTux system: nothing to do"
+msgstr "不是 KiroTux 系统：无需任何操作"
+
+#: usr/local/bin/kiro-keep-kirotux-repo:61
+#, sh-format
+msgid "[kirotux_repo] is already in $conf"
+msgstr "[kirotux_repo] 已在 $conf 中"
+
+#: usr/local/bin/kiro-keep-kirotux-repo:65
+#, sh-format
+msgid "[DRY-RUN] Would add [kirotux_repo] before [nemesis_repo] in $conf"
+msgstr "[DRY-RUN] 将在 $conf 中的 [nemesis_repo] 之前添加 [kirotux_repo]"
+
+#: usr/local/bin/kiro-lint:69
+msgid "Sysctl: Duplicate Keys"
+msgstr "Sysctl：重复键"
+
+#: usr/local/bin/kiro-lint:115
+msgid "Modprobe: Parameters vs /sys/module/"
+msgstr "Modprobe：参数与 /sys/module/"
+
+#: usr/local/bin/kiro-lint:178
+msgid "Cross-file: Conflicting Settings"
+msgstr "跨文件：冲突的设置"
+
+#: usr/local/bin/kiro-lint:362
+msgid "Udev: ATTR Write Targets in Sysfs"
+msgstr "Udev：Sysfs 中的 ATTR 写入目标"
+
+#: usr/local/bin/kiro-lint:435
+msgid "Kiro Config Linter"
+msgstr "Kiro 配置检查器"
+
+#: usr/local/bin/kiro-lint:443
+msgid "Lint Summary"
+msgstr "检查摘要"
+
+#: usr/local/bin/kiro-pci-latency:58
+msgid "setpci not found — install pciutils"
+msgstr "未找到 setpci — 请安装 pciutils"
+
+#: usr/local/bin/kiro-pci-latency:63
+msgid "PCI Latency Timer Optimization"
+msgstr "PCI 延迟计时器优化"
+
+#: usr/local/bin/kiro-pci-latency:66
+msgid "[DRY-RUN] Would execute: setpci -s '*:*' latency_timer=20"
+msgstr "[DRY-RUN] 将执行：setpci -s '*:*' latency_timer=20"
+
+#: usr/local/bin/kiro-pci-latency:67
+msgid "[DRY-RUN] Would execute: setpci -s '0:0' latency_timer=0"
+msgstr "[DRY-RUN] 将执行：setpci -s '0:0' latency_timer=0"
+
+#: usr/local/bin/kiro-pci-latency:68
+msgid "[DRY-RUN] Would execute: setpci -s '*:*:04xx' latency_timer=80"
+msgstr "[DRY-RUN] 将执行：setpci -s '*:*:04xx' latency_timer=80"
+
+#: usr/local/bin/kiro-probe:66
+msgid "hw-probe is not installed. Installing it..."
+msgstr "未安装 hw-probe。正在安装..."
+
+#: usr/local/bin/kiro-probe:87
+msgid "We have put the files in your home directory."
+msgstr "我们已将文件放在你的主目录中。"
+
+#: usr/local/bin/kiro-probe-report:206
+msgid "Generate hardware probe report"
+msgstr "生成硬件探测报告"
+
+#: usr/local/bin/kiro-report:95
+msgid "Recent Issues (debug)"
+msgstr "最近的问题（调试）"
+
+#: usr/local/bin/kiro-report:124
+msgid "Graphics / driver packages"
+msgstr "图形 / 驱动软件包"
+
+#: usr/local/bin/kiro-report:134
+msgid "Explicitly installed packages"
+msgstr "显式安装的软件包"
+
+#: usr/local/bin/kiro-report:148
+msgid "Install audit (kiro-audit)"
+msgstr "安装审计（kiro-audit）"
+
+#: usr/local/bin/kiro-report:182
+msgid "Calamares install log"
+msgstr "Calamares 安装日志"
+
+#: usr/local/bin/kiro-report:208
+msgid "Disk encryption"
+msgstr "磁盘加密"
+
+#: usr/local/bin/kiro-report:358
+msgid "Generating Kiro report"
+msgstr "正在生成 Kiro 报告"
+
+#: usr/local/bin/kiro-set-cores:55
+msgid "kiro-set-cores"
+msgstr "kiro-set-cores"
+
+#: usr/local/bin/kiro-set-cores:61
+#, sh-format
+msgid "Changing the makeflags for $numberofcores cores."
+msgstr "正在为 $numberofcores 个核心更改 makeflags。"
+
+#: usr/local/bin/kiro-set-cores:64 usr/local/bin/kiro-set-cores-min1:70
+#: usr/local/bin/kiro-set-cores-min2:70
+msgid "Changing the PKGEXT to pkg.tar.zst"
+msgstr "正在将 PKGEXT 更改为 pkg.tar.zst"
+
+#: usr/local/bin/kiro-set-cores:68
+msgid "Single core detected — no change."
+msgstr "检测到单核 — 不做更改。"
+
+#: usr/local/bin/kiro-set-cores-min1:63 usr/local/bin/kiro-set-cores-min2:63
+#, sh-format
+msgid "Only $numberofcores core(s) detected — flooring MAKEFLAGS to -j1."
+msgstr "仅检测到 $numberofcores 个核心 — 将 MAKEFLAGS 提升到 -j1。"
+
+#: usr/local/bin/kiro-set-cores-min1:67
+#, sh-format
+msgid ""
+"Detected $numberofcores cores — setting MAKEFLAGS to -j$targetcores (leaving "
+"$RESERVE core free)."
+msgstr ""
+"检测到 $numberofcores 个核心 — 将 MAKEFLAGS 设置为 -j$targetcores（保留 "
+"$RESERVE 个核心空闲）。"
+
+#: usr/local/bin/kiro-set-cores-min2:67
+#, sh-format
+msgid ""
+"Detected $numberofcores cores — setting MAKEFLAGS to -j$targetcores (leaving "
+"$RESERVE cores free)."
+msgstr ""
+"检测到 $numberofcores 个核心 — 将 MAKEFLAGS 设置为 -j$targetcores（保留 "
+"$RESERVE 个核心空闲）。"
+
+#: usr/local/bin/kiro-skell:106 usr/local/bin/kiro-skell-all:104
+#: usr/local/lib/kiro-common.sh:357
+#, sh-format
+msgid "Would execute: $description"
+msgstr "将执行：$description"
+
+#: usr/local/bin/kiro-skell:107 usr/local/bin/kiro-skell-all:105
+#: usr/local/lib/kiro-common.sh:179 usr/local/lib/kiro-common.sh:358
+msgid "Command:"
+msgstr "命令："
+
+#: usr/local/bin/kiro-skell:117 usr/local/bin/kiro-skell-all:115
+#, sh-format
+msgid "ERROR on line $line: $cmd"
+msgstr "第 $line 行出错：$cmd"
+
+#: usr/local/bin/kiro-skell:144
+#, sh-format
+msgid "$NAME — restore default configuration from /etc/skel (fast backup)"
+msgstr "$NAME — 从 /etc/skel 恢复默认配置（快速备份）"
+
+#: usr/local/bin/kiro-skell:145
+#, sh-format
+msgid ""
+"$NAME copies /etc/skel to your home directory after backing up only the "
+"configs it is about to overwrite — not your entire ~/.config."
+msgstr ""
+"$NAME 只会备份即将被覆盖的配置，然后将 /etc/skel 复制到你的主目录 — 而不是整"
+"个 ~/.config。"
+
+#: usr/local/bin/kiro-skell:147 usr/local/bin/kiro-skell-all:148
+#, sh-format
+msgid ""
+"New configurations often end up in /etc/skel — $NAME brings them into use."
+msgstr "新的配置通常会出现在 /etc/skel 中 — $NAME 会让它们生效。"
+
+#: usr/local/bin/kiro-skell:149
+msgid ""
+"It backs up each ~/.config entry that /etc/skel/.config contains (date/time "
+"stamped), then overwrites your configs with everything in /etc/skel."
+msgstr ""
+"它会备份 /etc/skel/.config 中包含的每个 ~/.config 条目（带日期/时间戳），然后"
+"用 /etc/skel 中的全部内容覆盖你的配置。"
+
+#: usr/local/bin/kiro-skell:151
+msgid "For a full ~/.config backup instead, use kiro-skell-all."
+msgstr "如需完整备份 ~/.config，请改用 kiro-skell-all。"
+
+#: usr/local/bin/kiro-skell:153 usr/local/bin/kiro-skell-all:152
+#, sh-format
+msgid ""
+"Useful when a tiling WM is crashing — run $NAME in a terminal or TTY to "
+"recover."
+msgstr "当平铺式 WM 崩溃时很有用 — 在终端或 TTY 中运行 $NAME 即可恢复。"
+
+#. Translators: keep the answer keys (y/n) as they are; the script only accepts y or Y.
+#: usr/local/bin/kiro-skell:158 usr/local/bin/kiro-skell-all:157
+msgid ""
+"Can we copy/paste the content from /etc/skel to your home directory? (y/n) "
+msgstr "我们可以将 /etc/skel 的内容复制到你的主目录吗？(y/n) "
+
+#: usr/local/bin/kiro-skell:160 usr/local/bin/kiro-skell-all:159
+msgid "Nothing has been changed."
+msgstr "没有进行任何更改。"
+
+#: usr/local/bin/kiro-skell:172
+#, sh-format
+msgid "Backing up only the configs /etc/skel overwrites to $backup_dir"
+msgstr "正在仅将 /etc/skel 会覆盖的配置备份到 $backup_dir"
+
+#: usr/local/bin/kiro-skell:178
+#, sh-format
+msgid "backing up ~/.config/$name"
+msgstr "正在备份 ~/.config/$name"
+
+#: usr/local/bin/kiro-skell:183
+msgid "No /etc/skel/.config found — nothing to back up"
+msgstr "未找到 /etc/skel/.config — 没有需要备份的内容"
+
+#: usr/local/bin/kiro-skell:187 usr/local/bin/kiro-skell-all:171
+msgid "Copying /etc/skel to home — be patient"
+msgstr "正在将 /etc/skel 复制到主目录 — 请耐心等待"
+
+#: usr/local/bin/kiro-skell:190 usr/local/bin/kiro-skell-all:174
+#, sh-format
+msgid "$NAME done"
+msgstr "$NAME 已完成"
+
+#: usr/local/bin/kiro-skell-all:145
+#, sh-format
+msgid "$NAME — restore default configuration from /etc/skel"
+msgstr "$NAME — 从 /etc/skel 恢复默认配置"
+
+#: usr/local/bin/kiro-skell-all:146
+#, sh-format
+msgid ""
+"$NAME copies /etc/skel to your home directory after making a backup of "
+"~/.config."
+msgstr "$NAME 会先备份 ~/.config，然后将 /etc/skel 复制到你的主目录。"
+
+#: usr/local/bin/kiro-skell-all:150
+msgid ""
+"It will make a backup of ~/.config with a date/time stamp, then overwrite "
+"your configs with what is in /etc/skel."
+msgstr ""
+"它会创建带日期/时间戳的 ~/.config 备份，然后用 /etc/skel 中的内容覆盖你的配"
+"置。"
+
+#: usr/local/bin/kiro-skell-all:168
+#, sh-format
+msgid "Making a backup of ~/.config to ~/.config-backup-$time"
+msgstr "正在将 ~/.config 备份到 ~/.config-backup-$time"
+
+#: usr/local/bin/kiro-verify:106
+msgid "Config File Presence"
+msgstr "配置文件是否存在"
+
+#: usr/local/bin/kiro-verify:198
+msgid "Sysctl Runtime Values"
+msgstr "Sysctl 运行时值"
+
+#: usr/local/bin/kiro-verify:304
+msgid "IO Schedulers"
+msgstr "I/O 调度器"
+
+#: usr/local/bin/kiro-verify:356
+msgid "Transparent Huge Pages"
+msgstr "透明大页"
+
+#: usr/local/bin/kiro-verify:418
+msgid "Blacklisted Modules"
+msgstr "已列入黑名单的模块"
+
+#: usr/local/bin/kiro-verify:442
+msgid "Systemd Unit State"
+msgstr "Systemd 单元状态"
+
+#: usr/local/bin/kiro-verify:494
+msgid "Journal Error Scan"
+msgstr "日志错误扫描"
+
+#: usr/local/bin/kiro-verify:564
+msgid "Kiro System Configuration Verifier"
+msgstr "Kiro 系统配置验证器"
+
+#: usr/local/bin/kiro-verify:577
+msgid "Verification Summary"
+msgstr "验证摘要"
+
+#: usr/local/bin/kiro-which-vga:56
+msgid ""
+"Some commands will give no output or error messages — one of them should "
+"give you info"
+msgstr "有些命令不会有输出或只会显示错误信息 — 其中总有一个会给你提供信息"
+
+#: usr/local/bin/kiro-which-vga:58
+msgid "Check 1 — lspci"
+msgstr "检查 1 — lspci"
+
+#: usr/local/bin/kiro-which-vga:59
+msgid "command 1:"
+msgstr "命令 1："
+
+#: usr/local/bin/kiro-which-vga:62
+msgid "command 2:"
+msgstr "命令 2："
+
+#: usr/local/bin/kiro-which-vga:65
+msgid "Check 2 — glxinfo"
+msgstr "检查 2 — glxinfo"
+
+#: usr/local/bin/kiro-which-vga:67
+msgid "glxinfo is present"
+msgstr "glxinfo 已存在"
+
+#: usr/local/bin/kiro-which-vga:69
+msgid "Installing glxinfo (note: conflicts with mesa-demos)"
+msgstr "正在安装 glxinfo（注意：与 mesa-demos 冲突）"
+
+#: usr/local/bin/kiro-which-vga:73
+msgid "[DRY-RUN] Would run: glxinfo | grep OpenGL vendor/renderer"
+msgstr "[DRY-RUN] 将运行：glxinfo | grep OpenGL vendor/renderer"
+
+#: usr/local/bin/kiro-which-vga:78
+msgid "Check 3 — nvidia-smi"
+msgstr "检查 3 — nvidia-smi"
+
+#: usr/local/bin/kiro-which-vga:82
+msgid "No nvidia driver present"
+msgstr "没有 nvidia 驱动"
+
+#: usr/local/bin/kiro-xlibre-swap:54
+msgid "Current X server"
+msgstr "当前的 X 服务器"
+
+#: usr/local/bin/kiro-xlibre-swap:58
+#, sh-format
+msgid "  Package: $owner"
+msgstr "  软件包：$owner"
+
+#: usr/local/bin/kiro-xlibre-swap:63
+#, sh-format
+msgid "  Binary reports: $banner"
+msgstr "  二进制文件报告：$banner"
+
+#: usr/local/bin/kiro-xlibre-swap:66
+msgid "Running XLibre"
+msgstr "正在运行 XLibre"
+
+#: usr/local/bin/kiro-xlibre-swap:68
+msgid "Running stock Xorg"
+msgstr "正在运行标准 Xorg"
+
+#: usr/local/bin/kiro-xlibre-swap:70
+msgid "Could not determine which X server is installed"
+msgstr "无法确定安装了哪个 X 服务器"
+
+#: usr/local/bin/kiro-xlibre-swap:75
+msgid "Backing up current package list"
+msgstr "正在备份当前软件包列表"
+
+#: usr/local/bin/kiro-xlibre-swap:77
+#, sh-format
+msgid "[DRY-RUN] Would save 'pacman -Qe' output to $BACKUP_FILE"
+msgstr "[DRY-RUN] 将把 'pacman -Qe' 的输出保存到 $BACKUP_FILE"
+
+#: usr/local/bin/kiro-xlibre-swap:80
+#, sh-format
+msgid "Saved to $BACKUP_FILE"
+msgstr "已保存到 $BACKUP_FILE"
+
+#: usr/local/bin/kiro-xlibre-swap:86
+msgid ""
+"Proprietary nvidia-utils detected. Before xlibre-xserver 26.0.0.16,\n"
+"its X driver ABI may lag XLibre's. If X fails to start after the swap, add:"
+msgstr ""
+"检测到专有的 nvidia-utils。在 xlibre-xserver 26.0.0.16 之前，\n"
+"其 X 驱动的 ABI 可能落后于 XLibre。如果替换后 X 无法启动，请添加："
+
+#: usr/local/bin/kiro-xlibre-swap:92
+msgid "See:"
+msgstr "参见："
+
+#: usr/local/bin/kiro-xlibre-swap:97
+msgid "Adding the [xlibre] pacman repo"
+msgstr "正在添加 [xlibre] pacman 软件源"
+
+#: usr/local/bin/kiro-xlibre-swap:106
+msgid "Receiving and locally signing the XLibre packaging key"
+msgstr "正在接收并在本地签署 XLibre 打包密钥"
+
+#: usr/local/bin/kiro-xlibre-swap:118
+msgid "[DRY-RUN] Would add '[xlibre]' repository to /etc/pacman.conf"
+msgstr "[DRY-RUN] 将把 '[xlibre]' 软件源添加到 /etc/pacman.conf"
+
+#: usr/local/bin/kiro-xlibre-swap:158
+msgid "Matching installed xf86-*/xorg-server-* packages to:"
+msgstr "正在将已安装的 xf86-*/xorg-server-* 软件包匹配到："
+
+#: usr/local/bin/kiro-xlibre-swap:160
+msgid "No installed xf86-* driver packages found — nothing extra to match"
+msgstr "未找到已安装的 xf86-* 驱动软件包 — 无需额外匹配"
+
+#: usr/local/bin/kiro-xlibre-swap:175
+msgid "Removing Xorg packages first:"
+msgstr "首先移除 Xorg 软件包："
+
+#: usr/local/bin/kiro-xlibre-swap:179
+msgid "Installing XLibre:"
+msgstr "正在安装 XLibre："
+
+#: usr/local/bin/kiro-xlibre-swap:201
+msgid "Rolling back to Xorg"
+msgstr "正在回滚到 Xorg"
+
+#: usr/local/bin/kiro-xlibre-swap:208
+msgid "Restoring matching xf86 drivers:"
+msgstr "正在恢复匹配的 xf86 驱动："
+
+#: usr/local/bin/kiro-xlibre-swap:220
+msgid "Removing XLibre packages first:"
+msgstr "首先移除 XLibre 软件包："
+
+#: usr/local/bin/kiro-xlibre-swap:229
+msgid "[DRY-RUN] Would remove '[xlibre]' repository from /etc/pacman.conf"
+msgstr "[DRY-RUN] 将从 /etc/pacman.conf 中移除 '[xlibre]' 软件源"
+
+#: usr/local/bin/kiro-xlibre-swap:238
+msgid "Xorg restored"
+msgstr "Xorg 已恢复"
+
+#: usr/local/bin/kiro-xlibre-swap:242
+msgid ""
+"This script swaps your X display server. A bad swap can leave you\n"
+"without a graphical session — know how to reach a TTY (Ctrl+Alt+F2) and\n"
+"log in there before choosing either option."
+msgstr ""
+"此脚本会替换你的 X 显示服务器。替换出错可能导致\n"
+"无法进入图形会话 — 在选择任一选项之前，请先了解如何进入 TTY (Ctrl+Alt+F2)\n"
+"并在那里登录。"
+
+#: usr/local/bin/kiro-xlibre-swap:245
+msgid "XLibre / Xorg swap"
+msgstr "XLibre / Xorg 替换"
+
+#. Translators: keep the numbers 1) 2) 3); the menu answers with them. Keep the indentation of each line.
+#: usr/local/bin/kiro-xlibre-swap:247
+msgid ""
+"  1) Install XLibre — adds the official xlibre.net pacman repo,\n"
+"     removes xorg-server, installs xlibre-xserver + drivers"
+msgstr ""
+"  1) 安装 XLibre — 添加官方 xlibre.net pacman 软件源，\n"
+"     移除 xorg-server，安装 xlibre-xserver 和驱动"
+
+#. Translators: keep the number 2) and the indentation of each line.
+#: usr/local/bin/kiro-xlibre-swap:250
+msgid ""
+"  2) Restore Xorg — removes XLibre, reinstalls xorg-server + drivers,\n"
+"     removes the [xlibre] pacman repo"
+msgstr ""
+"  2) 恢复 Xorg — 移除 XLibre，重新安装 xorg-server 和驱动，\n"
+"     移除 [xlibre] pacman 软件源"
+
+#. Translators: keep the number 3).
+#: usr/local/bin/kiro-xlibre-swap:253
+msgid "  3) Check status — show which X server is currently installed"
+msgstr "  3) 检查状态 — 显示当前安装的 X 服务器"
+
+#: usr/local/bin/kiro-xlibre-swap:260
+msgid ""
+"This will add the third-party [xlibre] repo and replace xorg-server\n"
+"with XLibre. Make sure you have a TTY fallback (Ctrl+Alt+F2). Continue?"
+msgstr ""
+"这将添加第三方 [xlibre] 软件源，并用 XLibre 替换 xorg-server。\n"
+"请确保你有 TTY 作为后备（Ctrl+Alt+F2）。是否继续？"
+
+#: usr/local/bin/kiro-xlibre-swap:265
+#, sh-format
+msgid ""
+"To roll back later, run: sudo $SCRIPT_NAME --rollback\n"
+"Pre-swap package list: $BACKUP_FILE\n"
+"Note: XLibre enables the 'TearFree' option by default, unlike Xorg."
+msgstr ""
+"之后如需回滚，请运行：sudo $SCRIPT_NAME --rollback\n"
+"替换前的软件包列表：$BACKUP_FILE\n"
+"注意：与 Xorg 不同，XLibre 默认启用「TearFree」选项。"
+
+#: usr/local/bin/kiro-xlibre-swap:271
+msgid ""
+"This will remove XLibre, restore xorg-server, and remove the\n"
+"[xlibre] pacman repo. Make sure you have a TTY fallback (Ctrl+Alt+F2). "
+"Continue?"
+msgstr ""
+"这将移除 XLibre，恢复 xorg-server，并移除 [xlibre] pacman\n"
+"软件源。请确保你有 TTY 作为后备（Ctrl+Alt+F2）。是否继续？"
+
+#. Translators: keep 1/2/3; the menu answers with those numbers.
+#: usr/local/bin/kiro-xlibre-swap:320
+msgid "Choose [1/2/3]: "
+msgstr "请选择 [1/2/3]: "
+
+#: usr/local/bin/kiro-xlibre-swap:341
+#, sh-format
+msgid "Invalid choice: $choice"
+msgstr "无效的选择：$choice"
+
+#: usr/local/lib/kiro-common.sh:163
+msgid "WARNING"
+msgstr "警告"
+
+#: usr/local/lib/kiro-common.sh:176
+msgid "ERROR DETECTED"
+msgstr "检测到错误"
+
+#: usr/local/lib/kiro-common.sh:177
+#, sh-format
+msgid "Line: $lineno"
+msgstr "行：$lineno"
+
+#: usr/local/lib/kiro-common.sh:181
+msgid "Waiting 10 seconds before continuing..."
+msgstr "等待 10 秒后继续..."
+
+#: usr/local/lib/kiro-common.sh:215
+#, sh-format
+msgid "Required command not found: $cmd"
+msgstr "未找到所需命令：$cmd"
+
+#: usr/local/lib/kiro-common.sh:249
+msgid "Waiting for user input to continue. Debug mode is on."
+msgstr "正在等待用户输入以继续。调试模式已开启。"
+
+#: usr/local/lib/kiro-common.sh:252
+msgid "Debug mode is on. Press any key to continue..."
+msgstr "调试模式已开启。按任意键继续..."
+
+#: usr/local/lib/kiro-common.sh:265 usr/local/lib/kiro-common.sh:296
+#: usr/local/lib/kiro-common.sh:665 usr/local/lib/kiro-common.sh:683
+#, sh-format
+msgid "Skipping: file not found: $file"
+msgstr "跳过：未找到文件：$file"
+
+#: usr/local/lib/kiro-common.sh:270
+#, sh-format
+msgid "No replacement needed in: $file"
+msgstr "无需替换：$file"
+
+#: usr/local/lib/kiro-common.sh:280 usr/local/lib/kiro-common.sh:284
+#, sh-format
+msgid "Updated: $file"
+msgstr "已更新：$file"
+
+#: usr/local/lib/kiro-common.sh:281 usr/local/lib/kiro-common.sh:285
+#, sh-format
+msgid "Failed to update: $file"
+msgstr "更新失败：$file"
+
+#: usr/local/lib/kiro-common.sh:302
+#, sh-format
+msgid "Processing pattern: $pattern"
+msgstr "正在处理模式：$pattern"
+
+#: usr/local/lib/kiro-common.sh:408
+msgid "Installing packages"
+msgstr "正在安装软件包"
+
+#: usr/local/lib/kiro-common.sh:424
+msgid "Removing packages"
+msgstr "正在移除软件包"
+
+#: usr/local/lib/kiro-common.sh:427
+msgid "No packages to remove"
+msgstr "没有需要移除的软件包"
+
+#: usr/local/lib/kiro-common.sh:437
+#, sh-format
+msgid "Removing package with dependencies: $pkg"
+msgstr "正在连同依赖一起移除软件包：$pkg"
+
+#: usr/local/lib/kiro-common.sh:440 usr/local/lib/kiro-common.sh:454
+#, sh-format
+msgid "No package named '$pkg' is installed"
+msgstr "没有安装名为「$pkg」的软件包"
+
+#: usr/local/lib/kiro-common.sh:451
+#, sh-format
+msgid "Force removing package: $pkg"
+msgstr "正在强制移除软件包：$pkg"
+
+#: usr/local/lib/kiro-common.sh:465
+msgid "No package directory provided"
+msgstr "未提供软件包目录"
+
+#: usr/local/lib/kiro-common.sh:470
+#, sh-format
+msgid "Directory not found: $dir"
+msgstr "未找到目录：$dir"
+
+#: usr/local/lib/kiro-common.sh:475
+msgid "pacman not found"
+msgstr "未找到 pacman"
+
+#: usr/local/lib/kiro-common.sh:482
+#, sh-format
+msgid "No local packages found in $dir"
+msgstr "在 $dir 中未找到本地软件包"
+
+#: usr/local/lib/kiro-common.sh:486
+#, sh-format
+msgid "Installing local packages from $dir"
+msgstr "正在从 $dir 安装本地软件包"
+
+#: usr/local/lib/kiro-common.sh:497
+#, sh-format
+msgid "Enabling and starting service: $service"
+msgstr "正在启用并启动服务：$service"
+
+#: usr/local/lib/kiro-common.sh:507
+#, sh-format
+msgid "Disabling service: $service"
+msgstr "正在禁用服务：$service"
+
+#: usr/local/lib/kiro-common.sh:510
+#, sh-format
+msgid "Service $service already disabled"
+msgstr "服务 $service 已被禁用"
+
+#: usr/local/lib/kiro-common.sh:513
+#, sh-format
+msgid "Service $service not installed"
+msgstr "服务 $service 未安装"
+
+#: usr/local/lib/kiro-common.sh:520
+#, sh-format
+msgid "Starting service: $service"
+msgstr "正在启动服务：$service"
+
+#: usr/local/lib/kiro-common.sh:529
+#, sh-format
+msgid "Restarting service: $service"
+msgstr "正在重启服务：$service"
+
+#: usr/local/lib/kiro-common.sh:532
+#, sh-format
+msgid "Service $service not found"
+msgstr "未找到服务 $service"
+
+#: usr/local/lib/kiro-common.sh:546 usr/local/lib/kiro-common.sh:565
+#: usr/local/lib/kiro-common.sh:589
+#, sh-format
+msgid "Backup already exists: $dst"
+msgstr "备份已存在：$dst"
+
+#: usr/local/lib/kiro-common.sh:551 usr/local/lib/kiro-common.sh:570
+#, sh-format
+msgid "Source folder does not exist: $src"
+msgstr "源文件夹不存在：$src"
+
+#: usr/local/lib/kiro-common.sh:555 usr/local/lib/kiro-common.sh:574
+#, sh-format
+msgid "Creating folder backup: $src -> $dst"
+msgstr "正在创建文件夹备份：$src -> $dst"
+
+#: usr/local/lib/kiro-common.sh:584
+#, sh-format
+msgid "Source file does not exist: $src"
+msgstr "源文件不存在：$src"
+
+#: usr/local/lib/kiro-common.sh:591
+#, sh-format
+msgid "Creating backup: $dst"
+msgstr "正在创建备份：$dst"
+
+#: usr/local/lib/kiro-common.sh:602 usr/local/lib/kiro-common.sh:616
+#: usr/local/lib/kiro-common.sh:630 usr/local/lib/kiro-common.sh:644
+#, sh-format
+msgid "Source file missing: $src"
+msgstr "缺少源文件：$src"
+
+#: usr/local/lib/kiro-common.sh:606
+#, sh-format
+msgid "Copying $src -> $dst"
+msgstr "正在复制 $src -> $dst"
+
+#: usr/local/lib/kiro-common.sh:620
+#, sh-format
+msgid "Copying (user: $TARGET_USER) $src -> $dst"
+msgstr "正在复制（用户：$TARGET_USER） $src -> $dst"
+
+#: usr/local/lib/kiro-common.sh:634
+#, sh-format
+msgid "Moving $src -> $dst"
+msgstr "正在移动 $src -> $dst"
+
+#: usr/local/lib/kiro-common.sh:648
+#, sh-format
+msgid "Moving (user: $TARGET_USER) $src -> $dst"
+msgstr "正在移动（用户：$TARGET_USER） $src -> $dst"
+
+#: usr/local/lib/kiro-common.sh:655
+#, sh-format
+msgid "Writing $target"
+msgstr "正在写入 $target"
+
+#: usr/local/lib/kiro-common.sh:670 usr/local/lib/kiro-common.sh:688
+#, sh-format
+msgid "Line already present in $file"
+msgstr "该行已存在于 $file 中"
+
+#: usr/local/lib/kiro-common.sh:673 usr/local/lib/kiro-common.sh:691
+#, sh-format
+msgid "Added line to $file"
+msgstr "已向 $file 添加一行"
+
+#: usr/local/lib/kiro-common.sh:701
+#, sh-format
+msgid "Removed: $target"
+msgstr "已移除：$target"
+
+#: usr/local/lib/kiro-common.sh:703
+#, sh-format
+msgid "Already removed: $target"
+msgstr "已被移除：$target"
+
+#: usr/local/lib/kiro-common.sh:713
+#, sh-format
+msgid "Removed folder: $target"
+msgstr "已移除文件夹：$target"
+
+#: usr/local/lib/kiro-common.sh:715
+#, sh-format
+msgid "Folder already removed: $target"
+msgstr "文件夹已被移除：$target"
+
+#: usr/local/lib/kiro-common.sh:725
+#, sh-format
+msgid "Source folder does not exist: $source"
+msgstr "源文件夹不存在：$source"
+
+#: usr/local/lib/kiro-common.sh:730
+#, sh-format
+msgid "Destination already exists: $destination"
+msgstr "目标已存在：$destination"
+
+#: usr/local/lib/kiro-common.sh:735
+#, sh-format
+msgid "Moved folder: $source -> $destination"
+msgstr "已移动文件夹：$source -> $destination"
+
+#: usr/local/lib/kiro-common.sh:754
+#, sh-format
+msgid "User $user already in group $group"
+msgstr "用户 $user 已在组 $group 中"
+
+#: usr/local/lib/kiro-common.sh:756
+#, sh-format
+msgid "Adding $user to group $group"
+msgstr "正在将用户 $user 添加到组 $group"
+
+#. Translators: the answer keys Y/y and N/n stay as they are; the script only accepts those.
+#: usr/local/lib/kiro-common.sh:771
+msgid "Answer with Y/y or N/n (default: Y)"
+msgstr "请回答 Y/y 或 N/n（默认：Y）"
+
+#. Translators: the answer keys Y/y and N/n stay as they are.
+#: usr/local/lib/kiro-common.sh:780
+msgid "Invalid answer. Please use Y/y or N/n."
+msgstr "回答无效。请使用 Y/y 或 N/n。"
+
+#: usr/local/lib/kiro-common.sh:796
+#, sh-format
+msgid "Downloading $name"
+msgstr "正在下载 $name"
+
+#: usr/local/lib/kiro-common.sh:798
+#, sh-format
+msgid "Failed to download: $url"
+msgstr "下载失败：$url"
+
+#: usr/local/lib/kiro-common.sh:801
+#, sh-format
+msgid "Downloaded: $name"
+msgstr "已下载：$name"
+
+#: usr/local/lib/kiro-common.sh:813
+#, sh-format
+msgid "Setting ParallelDownloads to $value"
+msgstr "正在将 ParallelDownloads 设置为 $value"
+
+#: usr/local/lib/kiro-common.sh:816
+#, sh-format
+msgid "File not found: $file"
+msgstr "未找到文件：$file"
+
+#: usr/local/lib/kiro-common.sh:823
+#, sh-format
+msgid "ParallelDownloads set to $value"
+msgstr "ParallelDownloads 已设置为 $value"
+
+#: usr/local/lib/kiro-common.sh:831
+msgid "Downloading pacman configuration"
+msgstr "正在下载 pacman 配置"
+
+#: usr/local/lib/kiro-common.sh:836
+#, sh-format
+msgid "Backup created: $backup_file"
+msgstr "已创建备份：$backup_file"
+
+#: usr/local/lib/kiro-common.sh:841
+msgid "Failed to download pacman.conf"
+msgstr "下载 pacman.conf 失败"
+
+#: usr/local/lib/kiro-common.sh:847
+msgid "Downloaded file is empty or missing"
+msgstr "下载的文件为空或不存在"
+
+#: usr/local/lib/kiro-common.sh:853
+msgid "pacman.conf updated"
+msgstr "pacman.conf 已更新"
+
+#: usr/local/lib/kiro-common.sh:863
+#, sh-format
+msgid "Repository '$repo_name' already present in pacman.conf"
+msgstr "软件源「$repo_name」已存在于 pacman.conf 中"
+
+#: usr/local/lib/kiro-common.sh:867
+#, sh-format
+msgid "Adding '$repo_name' repository to pacman.conf"
+msgstr "正在将软件源「$repo_name」添加到 pacman.conf"
+
+#: usr/local/lib/kiro-common.sh:869
+msgid "Repository added"
+msgstr "软件源已添加"
+
+#: usr/local/lib/kiro-common.sh:877
+#, sh-format
+msgid "Repository '$repo_name' not found in pacman.conf"
+msgstr "在 pacman.conf 中未找到软件源「$repo_name」"
+
+#: usr/local/lib/kiro-common.sh:881
+#, sh-format
+msgid "Removing '$repo_name' repository from pacman.conf"
+msgstr "正在从 pacman.conf 中移除软件源「$repo_name」"
+
+#: usr/local/lib/kiro-common.sh:883
+msgid "Repository removed"
+msgstr "软件源已移除"
+
+#: usr/local/lib/kiro-common.sh:903
+#, sh-format
+msgid "KiroTux: putting [kirotux_repo] back in $conf"
+msgstr "KiroTux：正在将 [kirotux_repo] 恢复到 $conf"
+
+#: usr/local/lib/kiro-common.sh:914
+msgid "[kirotux_repo] restored"
+msgstr "[kirotux_repo] 已恢复"
+
+#: usr/local/lib/kiro-common.sh:919
+msgid "Refreshing pacman keys and databases"
+msgstr "正在刷新 pacman 密钥和数据库"
+
+#: usr/local/lib/kiro-common.sh:921
+msgid "Failed to init pacman keys"
+msgstr "初始化 pacman 密钥失败"
+
+#: usr/local/lib/kiro-common.sh:922
+msgid "Failed to populate pacman keys"
+msgstr "填充 pacman 密钥失败"
+
+#: usr/local/lib/kiro-common.sh:925
+msgid "Pacman keys and databases refreshed"
+msgstr "pacman 密钥和数据库已刷新"
+
+#: usr/local/lib/kiro-common.sh:930
+msgid "Clearing pacman cache"
+msgstr "正在清理 pacman 缓存"
+
+#: usr/local/lib/kiro-common.sh:933
+msgid "Failed to clean pacman cache"
+msgstr "清理 pacman 缓存失败"
+
+#: usr/local/lib/kiro-common.sh:936
+msgid "Failed to remove unneeded packages"
+msgstr "移除不需要的软件包失败"
+
+#: usr/local/lib/kiro-common.sh:938
+msgid "Pacman cache cleared"
+msgstr "pacman 缓存已清理"
+
+#: usr/local/lib/kiro-common.sh:943
+msgid "Fixing pacman database"
+msgstr "正在修复 pacman 数据库"
+
+#: usr/local/lib/kiro-common.sh:946
+msgid "Removing corrupted sync databases..."
+msgstr "正在删除损坏的同步数据库..."
+
+#: usr/local/lib/kiro-common.sh:950
+msgid "Refreshing pacman databases..."
+msgstr "正在刷新 pacman 数据库..."
+
+#: usr/local/lib/kiro-common.sh:952
+msgid "Failed to refresh databases"
+msgstr "刷新数据库失败"
+
+#: usr/local/lib/kiro-common.sh:956
+msgid "Pacman database fixed"
+msgstr "pacman 数据库已修复"
+
+#: usr/local/lib/kiro-common.sh:961
+msgid "Fixing pacman GPG configuration"
+msgstr "正在修复 pacman GPG 配置"
+
+#: usr/local/lib/kiro-common.sh:970
+msgid "Initializing pacman GPG keys..."
+msgstr "正在初始化 pacman GPG 密钥..."
+
+#: usr/local/lib/kiro-common.sh:972
+msgid "Failed to init GPG keys"
+msgstr "初始化 GPG 密钥失败"
+
+#: usr/local/lib/kiro-common.sh:976
+msgid "Populating pacman GPG keys..."
+msgstr "正在填充 pacman GPG 密钥..."
+
+#: usr/local/lib/kiro-common.sh:978
+msgid "Failed to populate GPG keys"
+msgstr "填充 GPG 密钥失败"
+
+#: usr/local/lib/kiro-common.sh:982
+msgid "Pacman GPG configuration fixed"
+msgstr "pacman GPG 配置已修复"
+
+#: usr/local/lib/kiro-common.sh:994
+msgid "Checking internet connectivity"
+msgstr "正在检查网络连接"
+
+#: usr/local/lib/kiro-common.sh:997
+msgid "Internet connection detected"
+msgstr "检测到网络连接"
+
+#: usr/local/lib/kiro-common.sh:1000
+msgid "No internet connection detected"
+msgstr "未检测到网络连接"
+
+#: usr/local/lib/kiro-common.sh:1022
+#, sh-format
+msgid "Setting DNS servers: $dns1, $dns2"
+msgstr "正在设置 DNS 服务器：$dns1, $dns2"
+
+#: usr/local/lib/kiro-common.sh:1027
+msgid "DNS servers configured"
+msgstr "DNS 服务器已配置"
+
+#: usr/local/lib/kiro-common.sh:1043
+#, sh-format
+msgid "Setting MAKEFLAGS to -j$cores"
+msgstr "正在将 MAKEFLAGS 设置为 -j$cores"
+
+#: usr/local/lib/kiro-common.sh:1050
+msgid "Failed to set MAKEFLAGS in ~/.makepkg.conf"
+msgstr "在 ~/.makepkg.conf 中设置 MAKEFLAGS 失败"
+
+#: usr/local/lib/kiro-common.sh:1053
+#, sh-format
+msgid "MAKEFLAGS set to -j$cores"
+msgstr "MAKEFLAGS 已设置为 -j$cores"
+
+#: usr/local/lib/kiro-common.sh:1083
+msgid "Operation cancelled by user"
+msgstr "操作已被用户取消"
+
+#: usr/local/lib/kiro-common.sh:1099
+#, sh-format
+msgid "$description completed successfully"
+msgstr "$description 已成功完成"
+
+#: usr/local/lib/kiro-common.sh:1104
+#, sh-format
+msgid "$description failed with exit code $rc"
+msgstr "$description 失败，退出码 $rc"
+
+#: usr/local/lib/kiro-common.sh:1113
+#, sh-format
+msgid "Creating system report: $report_file"
+msgstr "正在创建系统报告：$report_file"
+
+#: usr/local/lib/kiro-common.sh:1138
+#, sh-format
+msgid "System report created: $report_file"
+msgstr "系统报告已创建：$report_file"

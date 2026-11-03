@@ -48,6 +48,28 @@ else
 fi
 
 #####################################################################
+# Translation (same block as /usr/local/lib/kiro-common.sh): headings and prompts only;
+# the findings stay English because users paste this report into Discussions.
+#####################################################################
+export TEXTDOMAIN=kiro-system-files
+if [[ -z "${LANGUAGE:-}" ]]; then
+    case "${LC_ALL:-${LC_MESSAGES:-${LANG:-}}}" in
+        pt_BR*|zh_CN*) ;;
+        pt*) export LANGUAGE=pt_BR ;;
+        zh*) export LANGUAGE=zh_CN ;;
+    esac
+fi
+if command -v gettext >/dev/null 2>&1 && command -v gettext.sh >/dev/null 2>&1; then
+    # shellcheck source=/dev/null
+    . gettext.sh
+    _t() { gettext "$1"; }
+    _tf() { eval_gettext "$1"; }
+else
+    _t() { printf '%s' "$1"; }
+    _tf() { local _s="$1"; eval "printf '%s' \"${_s//\"/\\\"}\""; }
+fi
+
+#####################################################################
 # Logging
 #####################################################################
 log_section() {
@@ -148,7 +170,7 @@ while [[ $# -gt 0 ]]; do
             fi
             ;;
         --upload)     UPLOAD=true; SCRUB=true ;;
-        *)            echo "${RED}Unknown option: $1${RESET}" >&2; usage; exit 1 ;;
+        *)            echo "${RED}$(_t "Unknown option:") ${1}${RESET}" >&2; usage; exit 1 ;;
     esac
     shift
 done
@@ -191,7 +213,7 @@ print_header() {
     run_ts="$(grep -E 'Starting job "' <<<"${SESSION}" | head -1 |
               grep -oE '^[0-9]{4}-[0-9]{2}-[0-9]{2} - [0-9:]+')"
 
-    log_section "Kiro — Calamares Install Summary"
+    log_section "$(_t "Kiro — Calamares Install Summary")"
     echo "  Log        : ${LOG_FILE}"
     echo "  Launched   : ${launch_ts:-unknown}"
     echo "  Install ran: ${run_ts:-not started}"
@@ -208,7 +230,7 @@ print_header() {
 }
 
 print_timeline() {
-    log_section "Install timeline (per-job duration)"
+    log_section "$(_t "Install timeline (per-job duration)")"
 
     # Kiro-specific modules get a marker so they stand out in the sequence.
     local kiro_re='kiro_|chwd|unpackfs|packages|bootloader|grubcfg|initcpio|mkinitcpio'
@@ -258,7 +280,7 @@ print_timeline() {
 BENIGN_RE='beginResetModel|endResetModel|QObject::setParent|QLayout|chcon|EFI but no EFI system partitions|no EFI system partitions found|Unknown GS key autoLoginUser|source write-protected|Unknown branding|No config file for "chwd"|Invalid osprober count|QSslSocket|device not open'
 
 print_warnings() {
-    log_section "Warnings"
+    log_section "$(_t "Warnings")"
     # Only [2] lines that carry an actual WARNING token (drops the bare C++
     # function-signature context lines Calamares prints at [2]), then filter
     # the known-benign noise.
@@ -274,7 +296,7 @@ print_warnings() {
 }
 
 print_errors() {
-    log_section "Errors / tracebacks"
+    log_section "$(_t "Errors / tracebacks")"
     local errs
     errs="$(grep -E '\[1\]:|Traceback|\[PYTHON JOB\]: "[^"]*(FAIL|ERROR|[Ee]rror)|Job .* failed|chroot .* returned non-zero' <<<"${SESSION}" || true)"
     if [[ -z "${errs}" ]]; then

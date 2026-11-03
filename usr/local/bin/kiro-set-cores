@@ -43,32 +43,32 @@ main() {
                 ;;
             -d|--dry-run)
                 DRY_RUN=true
-                log_info "Dry-run mode enabled — no changes will be made"
+                log_info "$(_t "Dry-run mode enabled — no changes will be made")"
                 ;;
             *)
-                echo "${RED}Unknown option: $arg${RESET}" >&2
+                echo "${RED}$(_t "Unknown option:") ${arg}${RESET}" >&2
                 exit 1
                 ;;
         esac
     done
 
-    log_section "kiro-set-cores"
+    log_section "$(_t "kiro-set-cores")"
 
     local numberofcores
     numberofcores=$(nproc)
 
     if [ "$numberofcores" -gt 1 ]; then
-        log_info "Changing the makeflags for $numberofcores cores."
+        log_info "$(_tf 'Changing the makeflags for $numberofcores cores.')"
         execute_or_dryrun "Set MAKEFLAGS=-j${numberofcores} in makepkg.conf" \
             sudo sed -i 's/#MAKEFLAGS="-j2"/MAKEFLAGS="-j'"$numberofcores"'"/g' /etc/makepkg.conf
-        log_info "Changing the PKGEXT to pkg.tar.zst"
+        log_info "$(_t "Changing the PKGEXT to pkg.tar.zst")"
         execute_or_dryrun "Set PKGEXT=.pkg.tar.zst in makepkg.conf" \
             sudo sed -i "s/PKGEXT='.pkg.tar.xz'/PKGEXT='.pkg.tar.zst'/g" /etc/makepkg.conf
     else
-        log_info "Single core detected — no change."
+        log_info "$(_t "Single core detected — no change.")"
     fi
 
-    log_success "$(basename "$0") done"
+    log_success "$(_tf '$SCRIPT_NAME done')"
 }
 
 main "$@"

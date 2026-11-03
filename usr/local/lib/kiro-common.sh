@@ -58,6 +58,41 @@ TARGET_USER="${TARGET_USER:-${SUDO_USER:-$USER}}"
 SCRIPT_NAME="$(basename "${0:-.}")"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 
+# Translation: messages go through gettext (domain kiro-system-files, catalogs in /usr/share/locale);
+# English is the fallback. kiro-skell, kiro-skell-all and kiro-calamares-log carry their own copy of this block.
+export TEXTDOMAIN=kiro-system-files
+# Portugal and Taiwan/Hong Kong read the sibling catalog: glibc never falls from pt_PT to pt_BR by itself.
+if [[ -z "${LANGUAGE:-}" ]]; then
+    case "${LC_ALL:-${LC_MESSAGES:-${LANG:-}}}" in
+        pt_BR*|zh_CN*) ;;
+        pt*) export LANGUAGE=pt_BR ;;
+        zh*) export LANGUAGE=zh_CN ;;
+    esac
+fi
+# _t "Text" translates; _tf 'Text with $var' translates a whole sentence and then fills in $var
+# (gettext's eval_gettext), so translators can move the value where their language needs it.
+if command -v gettext >/dev/null 2>&1 && command -v gettext.sh >/dev/null 2>&1; then
+    # shellcheck source=/dev/null
+    . gettext.sh
+    _t() { gettext "$1"; }
+    _tf() { eval_gettext "$1"; }
+else
+    _t() { printf '%s' "$1"; }
+    _tf() { local _s="$1"; eval "printf '%s' \"${_s//\"/\\\"}\""; }
+fi
+
+# Arguments for `pkexec env …`: pkexec scrubs the environment, so pass TERM (color), a PATH that includes
+# /usr/local/bin, and the caller's language so the root run speaks it too.
+pkexec_env_args() {
+    local v
+    printf '%s\0' "TERM=${TERM:-xterm-256color}" "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    for v in LANG LANGUAGE LC_ALL LC_MESSAGES; do
+        if [[ -n "${!v:-}" ]]; then
+            printf '%s\0' "${v}=${!v}"
+        fi
+    done
+}
+
 ##################################################################################################################################
 # 2. Colors
 ##################################################################################################################################
@@ -125,7 +160,7 @@ log_warn() {
     [[ "${JSON_MODE:-false}" == true ]] && return 0
     echo
     echo "${YELLOW}########################################################################${RESET}"
-    echo "${BOLD}${YELLOW}⚠️  WARNING${RESET}"
+    echo "${BOLD}${YELLOW}⚠️  $(_t "WARNING")${RESET}"
     echo "${YELLOW}${1}${RESET}"
     echo "${YELLOW}########################################################################${RESET}"
     echo
@@ -138,12 +173,12 @@ log_error() {
 
     echo
     echo "${RED}########################################################################${RESET}"
-    echo "${BOLD}${RED}⚠️  ERROR DETECTED${RESET}"
-    echo "${RED}Line: ${lineno}${RESET}"
+    echo "${BOLD}${RED}⚠️  $(_t "ERROR DETECTED")${RESET}"
+    echo "${RED}$(_tf 'Line: $lineno')${RESET}"
     if [[ -n "$cmd" ]]; then
-        echo "${RED}Command: '${cmd}'${RESET}"
+        echo "${RED}$(_t "Command:") '${cmd}'${RESET}"
     fi
-    echo "${RED}Waiting 10 seconds before continuing...${RESET}"
+    echo "${RED}$(_t "Waiting 10 seconds before continuing...")${RESET}"
     echo "${RED}########################################################################${RESET}"
     echo
 }
@@ -177,7 +212,7 @@ require_root_tools() {
     local cmd
     for cmd in "$@"; do
         if ! command -v "${cmd}" >/dev/null 2>&1; then
-            log_warn "Required command not found: ${cmd}"
+            log_warn "$(_tf 'Required command not found: $cmd')"
             return 1
         fi
     done
@@ -192,15 +227,17 @@ ensure_root() {
     trap - ERR
     local self
     self="$(realpath "${BASH_SOURCE[-1]}")"
+    local name
+    name="$(basename "$self")"
     if [[ -n "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ]] && command -v pkexec >/dev/null 2>&1; then
-        echo "${YELLOW}$(basename "$self") needs root — requesting your password...${RESET}" >&2
-        # pkexec scrubs the environment to a minimal PATH (/usr/sbin:/usr/bin:/sbin:/bin)
-        # that omits /usr/local/bin, so sibling tools called by bare name (e.g. kiro-diag)
-        # would not resolve. Pass TERM (color) and a PATH that includes /usr/local/bin.
-        exec pkexec env TERM="${TERM:-xterm-256color}" \
-            PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" "$self" "$@"
+        echo "${YELLOW}$(_tf '$name needs root — requesting your password...')${RESET}" >&2
+        # pkexec's minimal PATH omits /usr/local/bin, so sibling tools called by bare name (e.g. kiro-diag)
+        # would not resolve; pkexec_env_args restores it, plus TERM and the language.
+        local -a env_args
+        mapfile -d '' env_args < <(pkexec_env_args)
+        exec pkexec env "${env_args[@]}" "$self" "$@"
     fi
-    echo "${YELLOW}$(basename "$self") needs root — re-running with sudo...${RESET}" >&2
+    echo "${YELLOW}$(_tf '$name needs root — re-running with sudo...')${RESET}" >&2
     exec sudo "$self" "$@"
 }
 
@@ -209,10 +246,10 @@ pause_if_debug() {
     if [[ "${DEBUG:-false}" == true ]]; then
         echo
         echo "------------------------------------------------------------"
-        echo "Waiting for user input to continue. Debug mode is on."
+        echo "$(_t "Waiting for user input to continue. Debug mode is on.")"
         echo "------------------------------------------------------------"
         echo
-        read -r -n 1 -s -p "Debug mode is on. Press any key to continue..."
+        read -r -n 1 -s -p "$(_t "Debug mode is on. Press any key to continue...")"
         echo
     fi
 }
@@ -225,12 +262,12 @@ replace_text_in_file() {
     local use_sudo="${4:-false}"
 
     if [[ ! -f "$file" ]]; then
-        log_warn "Skipping: file not found: $file"
+        log_warn "$(_tf 'Skipping: file not found: $file')"
         return 0
     fi
 
     if ! grep -qF "$old_text" "$file"; then
-        log_info "No replacement needed in: $file"
+        log_info "$(_tf 'No replacement needed in: $file')"
         return 0
     fi
 
@@ -240,12 +277,12 @@ replace_text_in_file() {
 
     if [[ "$use_sudo" == "true" ]]; then
         sudo sed -i "s|${escaped_old}|${escaped_new}|g" "$file" \
-            && log_success "Updated: $file" \
-            || log_warn "Failed to update: $file"
+            && log_success "$(_tf 'Updated: $file')" \
+            || log_warn "$(_tf 'Failed to update: $file')"
     else
         sed -i "s|${escaped_old}|${escaped_new}|g" "$file" \
-            && log_success "Updated: $file" \
-            || log_warn "Failed to update: $file"
+            && log_success "$(_tf 'Updated: $file')" \
+            || log_warn "$(_tf 'Failed to update: $file')"
     fi
 }
 
@@ -256,13 +293,13 @@ comment_out_patterns_in_file() {
     local patterns=("$@")
 
     if [[ ! -f "$file" ]]; then
-        log_warn "Skipping: file not found: $file"
+        log_warn "$(_tf 'Skipping: file not found: $file')"
         return 0
     fi
 
     local pattern
     for pattern in "${patterns[@]}"; do
-        log_info "Processing pattern: $pattern"
+        log_info "$(_tf 'Processing pattern: $pattern')"
         sed -i "/$pattern/ {/^[[:space:]]*#/! s/^/#/}" "$file"
     done
 }
@@ -317,8 +354,8 @@ execute_or_dryrun() {
     local cmd=("$@")
     
     if [[ "${DRY_RUN:-false}" == "true" ]]; then
-        log_info "[DRY-RUN] Would execute: ${description}"
-        log_info "[DRY-RUN] Command: ${cmd[*]}"
+        log_info "[DRY-RUN] $(_tf 'Would execute: $description')"
+        log_info "[DRY-RUN] $(_t "Command:") ${cmd[*]}"
     else
         "${cmd[@]}"
     fi
@@ -368,7 +405,7 @@ install_packages() {
     local pkgs=("$@")
     (( ${#pkgs[@]} == 0 )) && return 0
 
-    log_subsection "Installing packages"
+    log_subsection "$(_t "Installing packages")"
     sudo pacman -S --noconfirm --needed "${pkgs[@]}"
 }
 
@@ -384,10 +421,10 @@ remove_packages() {
     done
 
     if (( ${#pkgs[@]} > 0 )); then
-        log_subsection "Removing packages"
+        log_subsection "$(_t "Removing packages")"
         sudo pacman -R --noconfirm "${pkgs[@]}"
     else
-        log_subsection "No packages to remove"
+        log_subsection "$(_t "No packages to remove")"
     fi
 }
 
@@ -397,10 +434,10 @@ remove_matching_packages_deps() {
 
     for pkg in "$@"; do
         if pacman -Qq | grep -Fxq -- "${pkg}"; then
-            log_subsection "Removing package with dependencies: ${pkg}"
+            log_subsection "$(_tf 'Removing package with dependencies: $pkg')"
             sudo pacman -Rns --noconfirm "${pkg}"
         else
-            log_info "No package named '${pkg}' is installed"
+            log_info "$(_tf "No package named '\$pkg' is installed")"
         fi
     done
 }
@@ -411,10 +448,10 @@ remove_matching_packages_deps_dd() {
 
     for pkg in "$@"; do
         if pacman -Qq | grep -Fxq -- "${pkg}"; then
-            log_subsection "Force removing package: ${pkg}"
+            log_subsection "$(_tf 'Force removing package: $pkg')"
             sudo pacman -Rdd --noconfirm "${pkg}"
         else
-            log_info "No package named '${pkg}' is installed"
+            log_info "$(_tf "No package named '\$pkg' is installed")"
         fi
     done
 }
@@ -425,28 +462,28 @@ install_local_packages_from_dir() {
     local -a pkgs=()
 
     if [[ -z "${dir}" ]]; then
-        log_warn "No package directory provided"
+        log_warn "$(_t "No package directory provided")"
         return 1
     fi
 
     if [[ ! -d "${dir}" ]]; then
-        log_warn "Directory not found: ${dir}"
+        log_warn "$(_tf 'Directory not found: $dir')"
         return 1
     fi
 
     if ! command -v pacman >/dev/null 2>&1; then
-        log_warn "pacman not found"
+        log_warn "$(_t "pacman not found")"
         return 1
     fi
 
     pkgs=("${dir}"/*.pkg.tar.*)
 
     if (( ${#pkgs[@]} == 0 )); then
-        log_warn "No local packages found in ${dir}"
+        log_warn "$(_tf 'No local packages found in $dir')"
         return 1
     fi
 
-    log_subsection "Installing local packages from ${dir}"
+    log_subsection "$(_tf 'Installing local packages from $dir')"
     sudo pacman -U --noconfirm "${pkgs[@]}"
 }
 
@@ -457,7 +494,7 @@ install_local_packages_from_dir() {
 # Enable and start a service
 enable_now_service() {
     local service="$1"
-    log_subsection "Enabling and starting service: ${service}"
+    log_subsection "$(_tf 'Enabling and starting service: $service')"
     sudo systemctl enable --now "${service}"
 }
 
@@ -467,20 +504,20 @@ disable_service() {
 
     if systemctl list-unit-files | grep -q "^${service}\.service"; then
         if systemctl is-enabled --quiet "${service}" 2>/dev/null || systemctl is-active --quiet "${service}" 2>/dev/null; then
-            log_subsection "Disabling service: ${service}"
+            log_subsection "$(_tf 'Disabling service: $service')"
             sudo systemctl disable --now "${service}"
         else
-            log_info "Service ${service} already disabled"
+            log_info "$(_tf 'Service $service already disabled')"
         fi
     else
-        log_warn "Service ${service} not installed"
+        log_warn "$(_tf 'Service $service not installed')"
     fi
 }
 
 # Start a service
 start_service() {
     local service="$1"
-    log_subsection "Starting service: ${service}"
+    log_subsection "$(_tf 'Starting service: $service')"
     sudo systemctl start "${service}"
 }
 
@@ -489,10 +526,10 @@ restart_service() {
     local service="$1"
 
     if systemctl list-unit-files | grep -q "^${service}\.service"; then
-        log_subsection "Restarting service: ${service}"
+        log_subsection "$(_tf 'Restarting service: $service')"
         sudo systemctl restart "${service}"
     else
-        log_warn "Service ${service} not found"
+        log_warn "$(_tf 'Service $service not found')"
     fi
 }
 
@@ -506,16 +543,16 @@ backup_folder_as_root() {
     local dst="$2"
 
     if [[ -d "${dst}" ]]; then
-        log_info "Backup already exists: ${dst}"
+        log_info "$(_tf 'Backup already exists: $dst')"
         return 0
     fi
 
     if [[ ! -d "${src}" ]]; then
-        log_warn "Source folder does not exist: ${src}"
+        log_warn "$(_tf 'Source folder does not exist: $src')"
         return 0
     fi
 
-    log_subsection "Creating folder backup: ${src} -> ${dst}"
+    log_subsection "$(_tf 'Creating folder backup: $src -> $dst')"
     sudo cp -a -- "${src}" "${dst}"
 }
 
@@ -525,16 +562,16 @@ backup_folder_as_user() {
     local dst="$2"
 
     if [[ -d "${dst}" ]]; then
-        log_info "Backup already exists: ${dst}"
+        log_info "$(_tf 'Backup already exists: $dst')"
         return 0
     fi
 
     if [[ ! -d "${src}" ]]; then
-        log_warn "Source folder does not exist: ${src}"
+        log_warn "$(_tf 'Source folder does not exist: $src')"
         return 0
     fi
 
-    log_subsection "Creating folder backup: ${src} -> ${dst}"
+    log_subsection "$(_tf 'Creating folder backup: $src -> $dst')"
     cp -a -- "${src}" "${dst}"
 }
 
@@ -544,14 +581,14 @@ backup_file_once() {
     local dst="$2"
 
     if [[ ! -f "${src}" ]]; then
-        log_warn "Source file does not exist: ${src}"
+        log_warn "$(_tf 'Source file does not exist: $src')"
         return 0
     fi
 
     if [[ -f "${dst}" ]]; then
-        log_info "Backup already exists: ${dst}"
+        log_info "$(_tf 'Backup already exists: $dst')"
     else
-        log_subsection "Creating backup: ${dst}"
+        log_subsection "$(_tf 'Creating backup: $dst')"
         sudo cp -v "${src}" "${dst}"
     fi
 }
@@ -562,11 +599,11 @@ copy_file() {
     local dst="$2"
 
     if [[ ! -f "${src}" ]]; then
-        log_warn "Source file missing: ${src}"
+        log_warn "$(_tf 'Source file missing: $src')"
         return 1
     fi
 
-    log_subsection "Copying ${src} -> ${dst}"
+    log_subsection "$(_tf 'Copying $src -> $dst')"
     sudo cp -v "${src}" "${dst}"
 }
 
@@ -576,11 +613,11 @@ copy_file_user() {
     local dst="$2"
 
     if [[ ! -f "$src" ]]; then
-        log_warn "Source file missing: $src"
+        log_warn "$(_tf 'Source file missing: $src')"
         return 1
     fi
 
-    log_subsection "Copying (user: $TARGET_USER) $src -> $dst"
+    log_subsection "$(_tf 'Copying (user: $TARGET_USER) $src -> $dst')"
     sudo -u "$TARGET_USER" cp -v -- "$src" "$dst"
 }
 
@@ -590,11 +627,11 @@ move_file() {
     local dst="$2"
 
     if [[ ! -f "${src}" ]]; then
-        log_warn "Source file missing: ${src}"
+        log_warn "$(_tf 'Source file missing: $src')"
         return 1
     fi
 
-    log_subsection "Moving ${src} -> ${dst}"
+    log_subsection "$(_tf 'Moving $src -> $dst')"
     sudo mv -v -- "${src}" "${dst}"
 }
 
@@ -604,18 +641,18 @@ move_file_user() {
     local dst="$2"
 
     if [[ ! -f "$src" ]]; then
-        log_warn "Source file missing: $src"
+        log_warn "$(_tf 'Source file missing: $src')"
         return 1
     fi
 
-    log_subsection "Moving (user: $TARGET_USER) $src -> $dst"
+    log_subsection "$(_tf 'Moving (user: $TARGET_USER) $src -> $dst')"
     sudo -u "$TARGET_USER" mv -v -- "$src" "$dst"
 }
 
 # Write file as root
 write_file_as_root() {
     local target="$1"
-    log_subsection "Writing ${target}"
+    log_subsection "$(_tf 'Writing $target')"
     sudo tee "${target}" >/dev/null
 }
 
@@ -625,15 +662,15 @@ append_line_if_missing() {
     local line="$2"
 
     if [[ ! -f "$file" ]]; then
-        log_warn "Skipping: file not found: $file"
+        log_warn "$(_tf 'Skipping: file not found: $file')"
         return 0
     fi
 
     if grep -qxF "$line" "$file"; then
-        log_info "Line already present in $file"
+        log_info "$(_tf 'Line already present in $file')"
     else
         printf '%s\n' "$line" >> "$file"
-        log_success "Added line to $file"
+        log_success "$(_tf 'Added line to $file')"
     fi
 }
 
@@ -643,15 +680,15 @@ append_line_if_missing_root() {
     local line="$2"
 
     if [[ ! -f "$file" ]]; then
-        log_warn "Skipping: file not found: $file"
+        log_warn "$(_tf 'Skipping: file not found: $file')"
         return 0
     fi
 
     if grep -qxF "$line" "$file"; then
-        log_info "Line already present in $file"
+        log_info "$(_tf 'Line already present in $file')"
     else
         printf '%s\n' "$line" | sudo tee -a "$file" > /dev/null
-        log_success "Added line to $file"
+        log_success "$(_tf 'Added line to $file')"
     fi
 }
 
@@ -661,9 +698,9 @@ remove_file_if_exists() {
 
     if [[ -f "${target}" ]]; then
         sudo rm -f "${target}"
-        log_success "Removed: ${target}"
+        log_success "$(_tf 'Removed: $target')"
     else
-        log_info "Already removed: ${target}"
+        log_info "$(_tf 'Already removed: $target')"
     fi
 }
 
@@ -673,9 +710,9 @@ remove_folder_if_exists() {
 
     if [[ -d "${target}" ]]; then
         sudo rm -rf "${target}"
-        log_success "Removed folder: ${target}"
+        log_success "$(_tf 'Removed folder: $target')"
     else
-        log_info "Folder already removed: ${target}"
+        log_info "$(_tf 'Folder already removed: $target')"
     fi
 }
 
@@ -685,17 +722,17 @@ move_folder_if_exists() {
     local destination="$2"
 
     if [[ ! -d "${source}" ]]; then
-        log_info "Source folder does not exist: ${source}"
+        log_info "$(_tf 'Source folder does not exist: $source')"
         return
     fi
 
     if [[ -e "${destination}" ]]; then
-        log_info "Destination already exists: ${destination}"
+        log_info "$(_tf 'Destination already exists: $destination')"
         return
     fi
 
     sudo mv "${source}" "${destination}"
-    log_success "Moved folder: ${source} -> ${destination}"
+    log_success "$(_tf 'Moved folder: $source -> $destination')"
 }
 
 # Append text as root
@@ -714,9 +751,9 @@ add_user_to_group() {
     local group="$2"
 
     if id -nG "${user}" | grep -qw "${group}"; then
-        log_info "User ${user} already in group ${group}"
+        log_info "$(_tf 'User $user already in group $group')"
     else
-        log_subsection "Adding ${user} to group ${group}"
+        log_subsection "$(_tf 'Adding $user to group $group')"
         sudo gpasswd -a "${user}" "${group}"
     fi
 }
@@ -730,7 +767,8 @@ confirm_yes_no() {
         echo
         echo "${YELLOW}########################################################################${RESET}"
         echo "${prompt}"
-        echo "Answer with Y/y or N/n (default: Y)"
+        # Translators: the answer keys Y/y and N/n stay as they are; the script only accepts those.
+        echo "$(_t "Answer with Y/y or N/n (default: Y)")"
         echo "${YELLOW}########################################################################${RESET}"
         echo
         read -r reply
@@ -738,7 +776,8 @@ confirm_yes_no() {
         case "${reply}" in
             ""|[yY]) return 0 ;;
             [nN]) return 1 ;;
-            *) echo "Invalid answer. Please use Y/y or N/n." ;;
+            # Translators: the answer keys Y/y and N/n stay as they are.
+            *) echo "$(_t "Invalid answer. Please use Y/y or N/n.")" ;;
         esac
     done
 }
@@ -752,12 +791,14 @@ download_file() {
     local url="$1"
     local dest="$2"
 
-    log_subsection "Downloading $(basename "${dest}")"
+    local name
+    name="$(basename "${dest}")"
+    log_subsection "$(_tf 'Downloading $name')"
     curl -L --fail --output "${dest}" "${url}" || {
-        log_warn "Failed to download: ${url}"
+        log_warn "$(_tf 'Failed to download: $url')"
         return 1
     }
-    log_success "Downloaded: $(basename "${dest}")"
+    log_success "$(_tf 'Downloaded: $name')"
 }
 
 ##################################################################################################################################
@@ -769,17 +810,17 @@ set_parallel_downloads() {
     local file="/etc/pacman.conf"
     local value="${1:-25}"
 
-    log_subsection "Setting ParallelDownloads to $value"
+    log_subsection "$(_tf 'Setting ParallelDownloads to $value')"
 
     if [[ ! -f "$file" ]]; then
-        log_warn "File not found: $file"
+        log_warn "$(_tf 'File not found: $file')"
         return 1
     fi
 
     sudo sed -i "/^#ParallelDownloads/c\\ParallelDownloads = $value" "$file" || \
     sudo sed -i "/^ParallelDownloads/c\\ParallelDownloads = $value" "$file"
     
-    log_success "ParallelDownloads set to $value"
+    log_success "$(_tf 'ParallelDownloads set to $value')"
 }
 
 # Download and replace pacman.conf
@@ -787,29 +828,29 @@ download_pacman_conf() {
     local source_url="$1"
     local backup_file="/etc/pacman.conf.backup-$(date +%Y%m%d-%H%M%S)"
     
-    log_subsection "Downloading pacman configuration"
+    log_subsection "$(_t "Downloading pacman configuration")"
     
     # Backup current config
     if [[ -f /etc/pacman.conf ]]; then
         sudo cp /etc/pacman.conf "${backup_file}"
-        log_info "Backup created: ${backup_file}"
+        log_info "$(_tf 'Backup created: $backup_file')"
     fi
     
     # Download new config
     if ! download_file "${source_url}" "/tmp/pacman.conf"; then
-        log_warn "Failed to download pacman.conf"
+        log_warn "$(_t "Failed to download pacman.conf")"
         return 1
     fi
     
     # Verify download
     if [[ ! -f /tmp/pacman.conf ]] || [[ ! -s /tmp/pacman.conf ]]; then
-        log_warn "Downloaded file is empty or missing"
+        log_warn "$(_t "Downloaded file is empty or missing")"
         return 1
     fi
     
     # Replace config
     sudo mv /tmp/pacman.conf /etc/pacman.conf
-    log_success "pacman.conf updated"
+    log_success "$(_t "pacman.conf updated")"
     ensure_kirotux_repo
 }
 
@@ -819,13 +860,13 @@ append_repo_to_pacman() {
     local repo_config="$2"
     
     if grep -q "^\[${repo_name}\]" /etc/pacman.conf; then
-        log_info "Repository '${repo_name}' already present in pacman.conf"
+        log_info "$(_tf "Repository '\$repo_name' already present in pacman.conf")"
         return 0
     fi
     
-    log_subsection "Adding '${repo_name}' repository to pacman.conf"
+    log_subsection "$(_tf "Adding '\$repo_name' repository to pacman.conf")"
     printf '\n%s\n' "${repo_config}" | sudo tee -a /etc/pacman.conf >/dev/null
-    log_success "Repository added"
+    log_success "$(_t "Repository added")"
 }
 
 # Remove repository from pacman.conf
@@ -833,13 +874,13 @@ remove_repo_from_pacman() {
     local repo_name="$1"
     
     if ! grep -q "^\[${repo_name}\]" /etc/pacman.conf; then
-        log_info "Repository '${repo_name}' not found in pacman.conf"
+        log_info "$(_tf "Repository '\$repo_name' not found in pacman.conf")"
         return 0
     fi
     
-    log_subsection "Removing '${repo_name}' repository from pacman.conf"
+    log_subsection "$(_tf "Removing '\$repo_name' repository from pacman.conf")"
     sudo sed -i "/^\[${repo_name}\]/,/^$/d" /etc/pacman.conf
-    log_success "Repository removed"
+    log_success "$(_t "Repository removed")"
 }
 
 # Return 0 on a KiroTux system: /etc/os-release names kirotux, or the ISO's /etc/dev-rel says ISO_CODENAME=kirotux
@@ -859,7 +900,7 @@ ensure_kirotux_repo() {
     if grep -q '^\[kirotux_repo\]' "${conf}"; then
         return 0
     fi
-    log_subsection "KiroTux: putting [kirotux_repo] back in ${conf}"
+    log_subsection "$(_tf 'KiroTux: putting [kirotux_repo] back in $conf')"
     local tmp
     tmp="$(mktemp)"
     awk '
@@ -870,54 +911,54 @@ ensure_kirotux_repo() {
     ' "${conf}" > "${tmp}"
     sudo install -m 644 "${tmp}" "${conf}"
     rm -f "${tmp}"
-    log_success "[kirotux_repo] restored"
+    log_success "$(_t "[kirotux_repo] restored")"
 }
 
 # Refresh pacman keys and databases
 refresh_pacman_keys() {
-    log_subsection "Refreshing pacman keys and databases"
+    log_subsection "$(_t "Refreshing pacman keys and databases")"
     
-    sudo pacman-key --init || log_warn "Failed to init pacman keys"
-    sudo pacman-key --populate || log_warn "Failed to populate pacman keys"
-    sudo pacman -Sy || log_warn "Failed to refresh pacman databases"
+    sudo pacman-key --init || log_warn "$(_t "Failed to init pacman keys")"
+    sudo pacman-key --populate || log_warn "$(_t "Failed to populate pacman keys")"
+    sudo pacman -Sy || log_warn "$(_t "Failed to refresh pacman databases")"
     
-    log_success "Pacman keys and databases refreshed"
+    log_success "$(_t "Pacman keys and databases refreshed")"
 }
 
 # Clear pacman cache safely
 clear_pacman_cache() {
-    log_subsection "Clearing pacman cache"
+    log_subsection "$(_t "Clearing pacman cache")"
     
     # Remove all packages from cache (keeps nothing)
-    sudo pacman -Sc --noconfirm || log_warn "Failed to clean pacman cache"
+    sudo pacman -Sc --noconfirm || log_warn "$(_t "Failed to clean pacman cache")"
     
     # Remove unneeded packages from cache
-    sudo pacman -Scc --noconfirm || log_warn "Failed to remove unneeded packages"
+    sudo pacman -Scc --noconfirm || log_warn "$(_t "Failed to remove unneeded packages")"
     
-    log_success "Pacman cache cleared"
+    log_success "$(_t "Pacman cache cleared")"
 }
 
 # Fix broken pacman database
 fix_pacman_database() {
-    log_subsection "Fixing pacman database"
+    log_subsection "$(_t "Fixing pacman database")"
     
     # Remove corrupted sync databases
-    log_info "Removing corrupted sync databases..."
+    log_info "$(_t "Removing corrupted sync databases...")"
     sudo rm -f /var/lib/pacman/sync/*.db /var/lib/pacman/sync/*.db.sig
     
     # Refresh databases
-    log_info "Refreshing pacman databases..."
+    log_info "$(_t "Refreshing pacman databases...")"
     sudo pacman -Sy || {
-        log_warn "Failed to refresh databases"
+        log_warn "$(_t "Failed to refresh databases")"
         return 1
     }
     
-    log_success "Pacman database fixed"
+    log_success "$(_t "Pacman database fixed")"
 }
 
 # Fix broken pacman GPG keys
 fix_pacman_gpg() {
-    log_subsection "Fixing pacman GPG configuration"
+    log_subsection "$(_t "Fixing pacman GPG configuration")"
     
     # Backup existing gnupg directory
     if [[ -d /etc/pacman.d/gnupg ]]; then
@@ -926,19 +967,19 @@ fix_pacman_gpg() {
     fi
     
     # Initialize new GPG keys
-    log_info "Initializing pacman GPG keys..."
+    log_info "$(_t "Initializing pacman GPG keys...")"
     sudo pacman-key --init || {
-        log_warn "Failed to init GPG keys"
+        log_warn "$(_t "Failed to init GPG keys")"
         return 1
     }
     
-    log_info "Populating pacman GPG keys..."
+    log_info "$(_t "Populating pacman GPG keys...")"
     sudo pacman-key --populate || {
-        log_warn "Failed to populate GPG keys"
+        log_warn "$(_t "Failed to populate GPG keys")"
         return 1
     }
     
-    log_success "Pacman GPG configuration fixed"
+    log_success "$(_t "Pacman GPG configuration fixed")"
 }
 
 ##################################################################################################################################
@@ -950,13 +991,13 @@ check_connectivity() {
     local timeout=${1:-3}
     local test_host="${2:-8.8.8.8}"
     
-    log_subsection "Checking internet connectivity"
+    log_subsection "$(_t "Checking internet connectivity")"
     
     if ping -c 1 -W "${timeout}" "${test_host}" &>/dev/null; then
-        log_success "Internet connection detected"
+        log_success "$(_t "Internet connection detected")"
         return 0
     else
-        log_warn "No internet connection detected"
+        log_warn "$(_t "No internet connection detected")"
         return 1
     fi
 }
@@ -978,12 +1019,12 @@ set_dns_servers() {
     local dns1="${1:-8.8.8.8}"
     local dns2="${2:-8.8.4.4}"
     
-    log_subsection "Setting DNS servers: $dns1, $dns2"
+    log_subsection "$(_tf 'Setting DNS servers: $dns1, $dns2')"
     
     echo "nameserver ${dns1}" | sudo tee /etc/resolv.conf >/dev/null
     echo "nameserver ${dns2}" | sudo tee -a /etc/resolv.conf >/dev/null
     
-    log_success "DNS servers configured"
+    log_success "$(_t "DNS servers configured")"
 }
 
 ##################################################################################################################################
@@ -999,17 +1040,17 @@ get_cpu_cores() {
 set_makeflags() {
     local cores="${1:=$(get_cpu_cores)}"
     
-    log_subsection "Setting MAKEFLAGS to -j${cores}"
+    log_subsection "$(_tf 'Setting MAKEFLAGS to -j$cores')"
     
     if [[ ! -d ~/.makepkg.d ]]; then
         mkdir -p ~/.makepkg.d
     fi
     
     echo "MAKEFLAGS=\"-j${cores}\"" >> ~/.makepkg.conf || \
-        log_warn "Failed to set MAKEFLAGS in ~/.makepkg.conf"
+        log_warn "$(_t "Failed to set MAKEFLAGS in ~/.makepkg.conf")"
     
     export MAKEFLAGS="-j${cores}"
-    log_success "MAKEFLAGS set to -j${cores}"
+    log_success "$(_tf 'MAKEFLAGS set to -j$cores')"
 }
 
 # Get current Linux kernel info
@@ -1039,7 +1080,7 @@ confirm_destructive_operation() {
     local operation="$1"
     
     if ! confirm_yes_no "Are you sure you want to ${operation}? This action cannot be undone."; then
-        log_warn "Operation cancelled by user"
+        log_warn "$(_t "Operation cancelled by user")"
         return 1
     fi
     
@@ -1055,10 +1096,12 @@ run_with_check() {
     log_subsection "$description"
     
     if "${cmd[@]}"; then
-        log_success "$description completed successfully"
+        log_success "$(_tf '$description completed successfully')"
         return 0
     else
-        log_warn "$description failed with exit code $?"
+        # shellcheck disable=SC2034  # read by _tf (eval_gettext), which shellcheck cannot see
+        local rc=$?
+        log_warn "$(_tf '$description failed with exit code $rc')"
         return 1
     fi
 }
@@ -1067,7 +1110,7 @@ run_with_check() {
 create_system_report() {
     local report_file="${1:-/tmp/edu-system-report-$(date +%Y%m%d-%H%M%S).txt}"
     
-    log_subsection "Creating system report: $report_file"
+    log_subsection "$(_tf 'Creating system report: $report_file')"
     
     {
         echo "=== System Report ==="
@@ -1092,7 +1135,7 @@ create_system_report() {
         head -5 /etc/pacman.d/mirrorlist
     } | tee "${report_file}"
     
-    log_success "System report created: ${report_file}"
+    log_success "$(_tf 'System report created: $report_file')"
 }
 
 ##################################################################################################################################

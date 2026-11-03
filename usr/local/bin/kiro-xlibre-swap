@@ -51,49 +51,50 @@ BACKUP_FILE="/var/log/kiro-xlibre-swap-packages.txt"
 # most direct checks: which package owns the Xorg binary, and the
 # version banner the binary itself reports (XLibre vs X.Org).
 check_x_server_status() {
-    log_subsection "Current X server"
+    log_subsection "$(_t "Current X server")"
 
     local owner
     owner="$(pacman -Qo /usr/lib/Xorg 2>/dev/null | awk '{print $NF, $(NF-1)}')" || owner="unknown"
-    echo "  Package: ${owner}"
+    echo "$(_tf '  Package: $owner')"
 
     local banner
+    # shellcheck disable=SC2034  # read by _tf (eval_gettext), which shellcheck cannot see
     banner="$(/usr/lib/Xorg -version 2>&1 | grep -E '^(XLibre|X\.Org) X Server' | head -1)" || banner="unknown"
-    echo "  Binary reports: ${banner}"
+    echo "$(_tf '  Binary reports: $banner')"
 
     if echo "${owner}" | grep -qi xlibre; then
-        log_success "Running XLibre"
+        log_success "$(_t "Running XLibre")"
     elif echo "${owner}" | grep -qi xorg-server; then
-        log_info "Running stock Xorg"
+        log_info "$(_t "Running stock Xorg")"
     else
-        log_warn "Could not determine which X server is installed"
+        log_warn "$(_t "Could not determine which X server is installed")"
     fi
 }
 
 backup_package_list() {
-    log_subsection "Backing up current package list"
+    log_subsection "$(_t "Backing up current package list")"
     if [[ "${DRY_RUN}" == "true" ]]; then
-        log_info "[DRY-RUN] Would save 'pacman -Qe' output to ${BACKUP_FILE}"
+        log_info "$(_tf "[DRY-RUN] Would save 'pacman -Qe' output to \$BACKUP_FILE")"
     else
         pacman -Qe > "${BACKUP_FILE}"
-        log_success "Saved to ${BACKUP_FILE}"
+        log_success "$(_tf 'Saved to $BACKUP_FILE')"
     fi
 }
 
 warn_proprietary_nvidia() {
     if pkg_installed nvidia-utils; then
-        log_warn "Proprietary nvidia-utils detected. Before xlibre-xserver 26.0.0.16,
-its X driver ABI may lag XLibre's. If X fails to start after the swap, add:
+        log_warn "$(_t "Proprietary nvidia-utils detected. Before xlibre-xserver 26.0.0.16,
+its X driver ABI may lag XLibre's. If X fails to start after the swap, add:")
     /etc/X11/xorg.conf.d/xlibre.conf
         Section \"ServerFlags\"
             Option \"IgnoreABI\" \"true\"
         EndSection
-See: https://github.com/X11Libre/xserver/wiki/Compatibility-of-XLibre#nvidia-proprietary-driver"
+$(_t "See:") https://github.com/X11Libre/xserver/wiki/Compatibility-of-XLibre#nvidia-proprietary-driver"
     fi
 }
 
 add_xlibre_repo() {
-    log_subsection "Adding the [xlibre] pacman repo"
+    log_subsection "$(_t "Adding the [xlibre] pacman repo")"
 
     # Always receive + locally sign — never gate on `pacman-key -f`. pacman's
     # own transaction-time prompt (or a prior run) can leave the key in the
@@ -102,7 +103,7 @@ add_xlibre_repo() {
     # "signature is unknown trust". Both commands are idempotent, so running
     # them unconditionally is safe. The repo publishes no standalone key file,
     # so the key comes from the default keyserver, exactly as pacman fetches it.
-    log_info "Receiving and locally signing the XLibre packaging key"
+    log_info "$(_t "Receiving and locally signing the XLibre packaging key")"
     execute_or_dryrun "Receive XLibre key" sudo pacman-key --recv-keys "${XLIBRE_REPO_KEY}"
     execute_or_dryrun "Locally sign XLibre key" sudo pacman-key --lsign-key "${XLIBRE_REPO_KEY}"
 
@@ -114,7 +115,7 @@ add_xlibre_repo() {
     # writes to /etc/pacman.conf unconditionally. Guard it explicitly here
     # so --dry-run actually makes no changes, matching every other step.
     if [[ "${DRY_RUN}" == "true" ]]; then
-        log_info "[DRY-RUN] Would add '[xlibre]' repository to /etc/pacman.conf"
+        log_info "$(_t "[DRY-RUN] Would add '[xlibre]' repository to /etc/pacman.conf")"
     else
         append_repo_to_pacman "xlibre" "[xlibre]
 Server = ${XLIBRE_REPO_URL}"
@@ -154,9 +155,9 @@ install_xlibre() {
 
     if [[ "${#driver_replacements[@]}" -gt 0 ]]; then
         packages+=("${driver_replacements[@]}")
-        log_info "Matching installed xf86-*/xorg-server-* packages to: ${driver_replacements[*]}"
+        log_info "$(_t "Matching installed xf86-*/xorg-server-* packages to:") ${driver_replacements[*]}"
     else
-        log_info "No installed xf86-* driver packages found — nothing extra to match"
+        log_info "$(_t "No installed xf86-* driver packages found — nothing extra to match")"
     fi
 
     # Remove every installed xorg-server(-*)/xf86-* package explicitly first —
@@ -171,11 +172,11 @@ install_xlibre() {
     local xorg_installed=()
     mapfile -t xorg_installed < <(pacman -Qq | grep -E '^xorg-server(-.+)?$|^xf86-' || true)
     if [[ "${#xorg_installed[@]}" -gt 0 ]]; then
-        log_info "Removing Xorg packages first: ${xorg_installed[*]}"
+        log_info "$(_t "Removing Xorg packages first:") ${xorg_installed[*]}"
         execute_or_dryrun "Remove Xorg packages" sudo pacman -Rdd --noconfirm "${xorg_installed[@]}"
     fi
 
-    log_subsection "Installing XLibre: ${packages[*]}"
+    log_subsection "$(_t "Installing XLibre:") ${packages[*]}"
     execute_or_dryrun "Install XLibre packages" sudo pacman -S --noconfirm --needed "${packages[@]}"
 }
 
@@ -197,14 +198,14 @@ find_xorg_driver_replacements() {
 }
 
 perform_rollback() {
-    log_subsection "Rolling back to Xorg"
+    log_subsection "$(_t "Rolling back to Xorg")"
     local packages=("xorg-server" "xf86-input-libinput")
     local xorg_replacements=()
     mapfile -t xorg_replacements < <(find_xorg_driver_replacements)
 
     if [[ "${#xorg_replacements[@]}" -gt 0 ]]; then
         packages+=("${xorg_replacements[@]}")
-        log_info "Restoring matching xf86 drivers: ${xorg_replacements[*]}"
+        log_info "$(_t "Restoring matching xf86 drivers:") ${xorg_replacements[*]}"
     fi
 
     # Remove every installed xlibre-* package explicitly first, rather than
@@ -216,7 +217,7 @@ perform_rollback() {
     local xlibre_installed=()
     mapfile -t xlibre_installed < <(pacman -Qq | grep -E '^xlibre-(xserver|input|video)' || true)
     if [[ "${#xlibre_installed[@]}" -gt 0 ]]; then
-        log_info "Removing XLibre packages first: ${xlibre_installed[*]}"
+        log_info "$(_t "Removing XLibre packages first:") ${xlibre_installed[*]}"
         execute_or_dryrun "Remove XLibre packages" sudo pacman -Rdd --noconfirm "${xlibre_installed[@]}"
     fi
 
@@ -225,7 +226,7 @@ perform_rollback() {
     # remove_repo_from_pacman (kiro-common.sh) has no DRY_RUN awareness either
     # — same guard as add_xlibre_repo above.
     if [[ "${DRY_RUN}" == "true" ]]; then
-        log_info "[DRY-RUN] Would remove '[xlibre]' repository from /etc/pacman.conf"
+        log_info "$(_t "[DRY-RUN] Would remove '[xlibre]' repository from /etc/pacman.conf")"
     else
         remove_repo_from_pacman "xlibre"
     fi
@@ -234,38 +235,41 @@ perform_rollback() {
     fi
     execute_or_dryrun "Refresh pacman databases" sudo pacman -Syy
 
-    log_success "Xorg restored"
+    log_success "$(_t "Xorg restored")"
 }
 
 show_menu() {
-    log_warn "This script swaps your X display server. A bad swap can leave you
+    log_warn "$(_t "This script swaps your X display server. A bad swap can leave you
 without a graphical session — know how to reach a TTY (Ctrl+Alt+F2) and
-log in there before choosing either option."
-    log_section "XLibre / Xorg swap"
-    echo "  1) Install XLibre — adds the official xlibre.net pacman repo,"
-    echo "     removes xorg-server, installs xlibre-xserver + drivers"
-    echo "  2) Restore Xorg — removes XLibre, reinstalls xorg-server + drivers,"
-    echo "     removes the [xlibre] pacman repo"
-    echo "  3) Check status — show which X server is currently installed"
+log in there before choosing either option.")"
+    log_section "$(_t "XLibre / Xorg swap")"
+    # Translators: keep the numbers 1) 2) 3); the menu answers with them. Keep the indentation of each line.
+    echo "$(_t "  1) Install XLibre — adds the official xlibre.net pacman repo,
+     removes xorg-server, installs xlibre-xserver + drivers")"
+    # Translators: keep the number 2) and the indentation of each line.
+    echo "$(_t "  2) Restore Xorg — removes XLibre, reinstalls xorg-server + drivers,
+     removes the [xlibre] pacman repo")"
+    # Translators: keep the number 3).
+    echo "$(_t "  3) Check status — show which X server is currently installed")"
     echo
 }
 
 do_install() {
     backup_package_list
     warn_proprietary_nvidia
-    confirm_with_dryrun "This will add the third-party [xlibre] repo and replace xorg-server
-with XLibre. Make sure you have a TTY fallback (Ctrl+Alt+F2). Continue?" || exit 0
+    confirm_with_dryrun "$(_t "This will add the third-party [xlibre] repo and replace xorg-server
+with XLibre. Make sure you have a TTY fallback (Ctrl+Alt+F2). Continue?")" || exit 0
     add_xlibre_repo
     install_xlibre
     check_x_server_status
-    log_info "To roll back later, run: sudo $(basename "$0") --rollback
-Pre-swap package list: ${BACKUP_FILE}
-Note: XLibre enables the 'TearFree' option by default, unlike Xorg."
+    log_info "$(_tf "To roll back later, run: sudo \$SCRIPT_NAME --rollback
+Pre-swap package list: \$BACKUP_FILE
+Note: XLibre enables the 'TearFree' option by default, unlike Xorg.")"
 }
 
 do_rollback() {
-    confirm_with_dryrun "This will remove XLibre, restore xorg-server, and remove the
-[xlibre] pacman repo. Make sure you have a TTY fallback (Ctrl+Alt+F2). Continue?" || exit 0
+    confirm_with_dryrun "$(_t "This will remove XLibre, restore xorg-server, and remove the
+[xlibre] pacman repo. Make sure you have a TTY fallback (Ctrl+Alt+F2). Continue?")" || exit 0
     perform_rollback
     check_x_server_status
 }
@@ -290,7 +294,7 @@ main() {
                 ;;
             -d|--dry-run)
                 DRY_RUN=true
-                log_info "Dry-run mode enabled — no changes will be made"
+                log_info "$(_t "Dry-run mode enabled — no changes will be made")"
                 ;;
             1|--xlibre)
                 choice="1"
@@ -302,7 +306,7 @@ main() {
                 choice="3"
                 ;;
             *)
-                echo "${RED}Unknown option: ${arg}${RESET}" >&2
+                echo "${RED}$(_t "Unknown option:") ${arg}${RESET}" >&2
                 exit 1
                 ;;
         esac
@@ -312,7 +316,8 @@ main() {
 
     if [[ -z "${choice}" ]]; then
         show_menu
-        read -r -p "Choose [1/2/3]: " choice
+        # Translators: keep 1/2/3; the menu answers with those numbers.
+        read -r -p "$(_t "Choose [1/2/3]: ")" choice
     fi
 
     if [[ "${choice}" == "3" ]]; then
@@ -333,12 +338,12 @@ main() {
         1) do_install ;;
         2) do_rollback ;;
         *)
-            log_warn "Invalid choice: ${choice}"
+            log_warn "$(_tf 'Invalid choice: $choice')"
             exit 1
             ;;
     esac
 
-    log_success "$(basename "$0") done"
+    log_success "$(_tf '$SCRIPT_NAME done')"
 }
 
 main "$@"

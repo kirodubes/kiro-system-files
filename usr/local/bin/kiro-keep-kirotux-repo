@@ -47,22 +47,22 @@ main() {
                 DRY_RUN=true
                 ;;
             *)
-                echo "${RED}Unknown option: $arg${RESET}" >&2
+                echo "${RED}$(_t "Unknown option:") ${arg}${RESET}" >&2
                 exit 1
                 ;;
         esac
     done
 
     if ! is_kirotux; then
-        log_info "Not a KiroTux system: nothing to do"
+        log_info "$(_t "Not a KiroTux system: nothing to do")"
         return 0
     fi
     if grep -q '^\[kirotux_repo\]' "${conf}" 2>/dev/null; then
-        log_info "[kirotux_repo] is already in ${conf}"
+        log_info "$(_tf '[kirotux_repo] is already in $conf')"
         return 0
     fi
     if [[ "${DRY_RUN}" == true ]]; then
-        log_info "[DRY-RUN] Would add [kirotux_repo] before [nemesis_repo] in ${conf}"
+        log_info "$(_tf '[DRY-RUN] Would add [kirotux_repo] before [nemesis_repo] in $conf')"
         return 0
     fi
     ensure_kirotux_repo "${conf}"

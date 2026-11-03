@@ -38,6 +38,28 @@ else
 fi
 
 #####################################################################
+# Translation (same block as /usr/local/lib/kiro-common.sh): headings and prompts only;
+# the findings stay English because users paste this report into Discussions.
+#####################################################################
+export TEXTDOMAIN=kiro-system-files
+if [[ -z "${LANGUAGE:-}" ]]; then
+    case "${LC_ALL:-${LC_MESSAGES:-${LANG:-}}}" in
+        pt_BR*|zh_CN*) ;;
+        pt*) export LANGUAGE=pt_BR ;;
+        zh*) export LANGUAGE=zh_CN ;;
+    esac
+fi
+if command -v gettext >/dev/null 2>&1 && command -v gettext.sh >/dev/null 2>&1; then
+    # shellcheck source=/dev/null
+    . gettext.sh
+    _t() { gettext "$1"; }
+    _tf() { eval_gettext "$1"; }
+else
+    _t() { printf '%s' "$1"; }
+    _tf() { local _s="$1"; eval "printf '%s' \"${_s//\"/\\\"}\""; }
+fi
+
+#####################################################################
 # Logging
 #####################################################################
 # In --json mode (JSON_MODE=true), stdout stays pure JSON, so these
@@ -134,11 +156,20 @@ ensure_root() {
     trap - ERR
     local self
     self="$(realpath "${BASH_SOURCE[-1]}")"
+    local name v
+    name="$(basename "$self")"
     if [[ -n "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ]] && command -v pkexec >/dev/null 2>&1; then
-        echo "${YELLOW}$(basename "$self") needs root — requesting your password...${RESET}" >&2
-        exec pkexec env TERM="${TERM:-xterm-256color}" "$self" "$@"
+        echo "${YELLOW}$(_tf '$name needs root — requesting your password...')${RESET}" >&2
+        # pkexec scrubs the environment: pass TERM (color) and the caller's language.
+        local -a env_args=("TERM=${TERM:-xterm-256color}")
+        for v in LANG LANGUAGE LC_ALL LC_MESSAGES; do
+            if [[ -n "${!v:-}" ]]; then
+                env_args+=("${v}=${!v}")
+            fi
+        done
+        exec pkexec env "${env_args[@]}" "$self" "$@"
     fi
-    echo "${YELLOW}$(basename "$self") needs root — re-running with sudo...${RESET}" >&2
+    echo "${YELLOW}$(_tf '$name needs root — re-running with sudo...')${RESET}" >&2
     exec sudo "$self" "$@"
 }
 
@@ -308,7 +339,7 @@ detect_kernels() {
 }
 
 check_kernel() {
-    log_section "Kernel"
+    log_section "$(_t "Kernel")"
 
     local -a kernels=()
     mapfile -t kernels < <(detect_kernels)
@@ -356,7 +387,7 @@ microcode_in_initramfs() {
 }
 
 check_microcode() {
-    log_section "Microcode"
+    log_section "$(_t "Microcode")"
 
     if [[ -f /boot/intel-ucode.img ]]; then
         pass "intel-ucode.img present in /boot"
@@ -374,7 +405,7 @@ check_microcode() {
 }
 
 check_mkinitcpio() {
-    log_section "mkinitcpio"
+    log_section "$(_t "mkinitcpio")"
 
     local hooks
     hooks=$(grep '^HOOKS=' /etc/mkinitcpio.conf | head -1)
@@ -413,7 +444,7 @@ check_mkinitcpio() {
 }
 
 check_audio() {
-    log_section "Audio stack"
+    log_section "$(_t "Audio stack")"
 
     for pkg in pipewire pipewire-alsa pipewire-audio pipewire-pulse wireplumber; do
         pkg_installed "${pkg}" && pass "${pkg} installed" || fail "${pkg} missing"
@@ -423,7 +454,7 @@ check_audio() {
 }
 
 check_calamares_cleanup() {
-    log_section "Calamares cleanup"
+    log_section "$(_t "Calamares cleanup")"
 
     pkg_missing calamares              && pass "calamares binary removed"              || fail "calamares still installed"
     pkg_missing mkinitcpio-archiso     && pass "mkinitcpio-archiso removed"            || fail "mkinitcpio-archiso still installed"
@@ -484,7 +515,7 @@ check_calamares_cleanup() {
 }
 
 check_kiro_final_config() {
-    log_section "kiro_final configuration"
+    log_section "$(_t "kiro_final configuration")"
 
     # /root permissions
     local root_perm
@@ -526,7 +557,7 @@ check_kiro_final_config() {
 }
 
 check_pacman_repos() {
-    log_section "Pacman repositories"
+    log_section "$(_t "Pacman repositories")"
 
     grep -q '^\[nemesis_repo\]' /etc/pacman.conf && pass "nemesis_repo in pacman.conf" || fail "nemesis_repo missing from pacman.conf"
     grep -q '^\[chaotic-aur\]'  /etc/pacman.conf && pass "chaotic-aur in pacman.conf"  || fail "chaotic-aur missing from pacman.conf"
@@ -626,7 +657,7 @@ check_pacman_repos() {
 }
 
 check_desktop() {
-    log_section "Desktop environments"
+    log_section "$(_t "Desktop environments")"
 
     # Edition-agnostic: KIB can build any edition (XFCE, ohmychadwm, the TWMs, Budgie, …),
     # so we don't demand a specific desktop — we verify at least one valid login session
@@ -649,7 +680,7 @@ check_desktop() {
 }
 
 check_sddm() {
-    log_section "SDDM"
+    log_section "$(_t "SDDM")"
 
     pkg_installed sddm && pass "sddm installed" || fail "sddm not installed"
     systemctl is-enabled sddm &>/dev/null && pass "sddm.service enabled" || fail "sddm.service not enabled"
@@ -665,7 +696,7 @@ check_sddm() {
 }
 
 check_user_groups() {
-    log_section "User groups"
+    log_section "$(_t "User groups")"
 
     local user
     user=$(getent passwd 1000 | cut -d: -f1)
@@ -684,7 +715,7 @@ check_user_groups() {
 }
 
 check_services() {
-    log_section "Systemd services"
+    log_section "$(_t "Systemd services")"
 
     for svc in NetworkManager sddm bluetooth; do
         systemctl is-enabled "${svc}" &>/dev/null && pass "${svc} enabled" || warn "${svc} not enabled"
@@ -736,7 +767,7 @@ check_services() {
 }
 
 check_permissions() {
-    log_section "Key file permissions"
+    log_section "$(_t "Key file permissions")"
 
     local shadow_perm gshadow_perm
     shadow_perm=$(stat -c '%a' /etc/shadow   2>/dev/null || echo "missing")
@@ -769,7 +800,7 @@ check_permissions() {
 }
 
 check_dev_rel() {
-    log_section "ISO version"
+    log_section "$(_t "ISO version")"
 
     if [[ -f /etc/dev-rel ]]; then
         pass "/etc/dev-rel present"
@@ -780,7 +811,7 @@ check_dev_rel() {
 }
 
 check_nvidia() {
-    log_section "NVIDIA"
+    log_section "$(_t "NVIDIA")"
 
     if lspci 2>/dev/null | grep -qi nvidia; then
         log_info "NVIDIA GPU detected"
@@ -793,7 +824,7 @@ check_nvidia() {
 }
 
 check_chwd() {
-    log_section "chwd driver install"
+    log_section "$(_t "chwd driver install")"
 
     # The Calamares chwd module leaves this breadcrumb when it could not install
     # the detected driver profile (e.g. a profile package was missing from the
@@ -813,7 +844,7 @@ check_chwd() {
 }
 
 check_package_integrity() {
-    log_section "Package integrity (pacman -Qk)"
+    log_section "$(_t "Package integrity (pacman -Qk)")"
 
     local missing
     missing=$(pacman -Qk 2>/dev/null \
@@ -837,7 +868,7 @@ check_package_integrity() {
 }
 
 check_sysctl_security() {
-    log_section "Sysctl security baseline"
+    log_section "$(_t "Sysctl security baseline")"
 
     local key expected actual
     declare -A expected_values=(
@@ -865,7 +896,7 @@ check_sysctl_security() {
 }
 
 check_zram() {
-    log_section "ZRAM"
+    log_section "$(_t "ZRAM")"
 
     pkg_installed zram-generator && pass "zram-generator installed" || fail "zram-generator not installed"
     [[ -f /etc/systemd/zram-generator.conf ]] && pass "zram-generator.conf present" || fail "zram-generator.conf missing"
@@ -887,7 +918,7 @@ check_zram() {
 }
 
 check_udev_rules() {
-    log_section "Udev rules"
+    log_section "$(_t "Udev rules")"
 
     # All rule files the edu-system-files package ships
     local expected_rules=(
@@ -922,7 +953,7 @@ check_udev_rules() {
 }
 
 check_systemd_dropins() {
-    log_section "Systemd drop-ins"
+    log_section "$(_t "Systemd drop-ins")"
 
     local dropins=(
         /etc/systemd/system.conf.d/10-kiro-system.conf
@@ -938,7 +969,7 @@ check_systemd_dropins() {
 }
 
 check_modprobe_thp() {
-    log_section "Modprobe & THP tuning"
+    log_section "$(_t "Modprobe & THP tuning")"
 
     local f
     for f in intel-ethernet.conf realtek-ethernet.conf; do
@@ -952,7 +983,7 @@ check_modprobe_thp() {
 
 check_hardening_tuning() {
     # 5 hardening / tuning items adopted 2026-05-28, each verified kernel-agnostic
-    log_section "Hardening & tuning (2026-05-28)"
+    log_section "$(_t "Hardening & tuning (2026-05-28)")"
 
     # 1. systemd-oomd — config drop-ins + active daemon
     local oomd_files=(
@@ -1025,7 +1056,7 @@ check_hardening_tuning() {
 
 
 check_resolved_config() {
-    log_section "systemd-resolved configuration"
+    log_section "$(_t "systemd-resolved configuration")"
 
     local drop_in
     drop_in=$(grep -rl 'MulticastDNS=no' /etc/systemd/resolved.conf /etc/systemd/resolved.conf.d/ 2>/dev/null | head -1 || true)
@@ -1045,7 +1076,7 @@ check_resolved_config() {
 }
 
 check_tuned_profile() {
-    log_section "tuned-ppd power profile"
+    log_section "$(_t "tuned-ppd power profile")"
 
     # Source of truth on an installed Kiro system:
     #   /etc/tuned/ppd_base_profile must contain "performance"
@@ -1081,7 +1112,7 @@ check_tuned_profile() {
 }
 
 check_tumbler() {
-    log_section "Tumbler / thumbnailing"
+    log_section "$(_t "Tumbler / thumbnailing")"
 
     pkg_installed libgepub \
         && pass "libgepub installed (tumbler EPUB thumbnailer)" \
@@ -1089,7 +1120,7 @@ check_tumbler() {
 }
 
 check_failed_units() {
-    log_section "Failed systemd units"
+    log_section "$(_t "Failed systemd units")"
 
     local failed_count
     failed_count=$(systemctl --failed --no-legend 2>/dev/null | wc -l)
@@ -1107,7 +1138,7 @@ check_failed_units() {
 }
 
 check_boot_and_updates() {
-    log_section "Boot time and updates (info)"
+    log_section "$(_t "Boot time and updates (info)")"
 
     local boot_summary
     boot_summary=$(systemd-analyze 2>/dev/null | head -1)
@@ -1123,7 +1154,7 @@ check_boot_and_updates() {
 }
 
 check_bootloader() {
-    log_section "Bootloader"
+    log_section "$(_t "Bootloader")"
 
     if [[ -d /sys/firmware/efi ]]; then
         pass "System booted via UEFI"
@@ -1155,7 +1186,7 @@ check_bootloader() {
 }
 
 check_btrfs_snapshots() {
-    log_section "Btrfs snapshots"
+    log_section "$(_t "Btrfs snapshots")"
 
     # Only meaningful on a btrfs root. On ext4/xfs/etc. (and on the live ISO, which
     # is not btrfs) the snapshot stack simply does not apply — pass and move on.
@@ -1235,7 +1266,7 @@ check_btrfs_snapshots() {
 }
 
 check_disk_format() {
-    log_section "Disk format & encryption"
+    log_section "$(_t "Disk format & encryption")"
 
     # The partitioning/filesystem layout is a user choice in the Calamares
     # partition step (ext4 or btrfs root, optional full-disk LUKS, optional
@@ -1338,7 +1369,7 @@ check_kiro_plasma() {
     # Only relevant on a Plasma install — silent no-op on the tiling/XFCE editions
     pkg_installed plasma-desktop || command -v plasmashell &>/dev/null || return 0
 
-    log_section "Kiro Plasma theme/config"
+    log_section "$(_t "Kiro Plasma theme/config")"
 
     local pkgs
     pkgs=$(pacman -Qq 2>/dev/null | grep '^kiro-plasma-' || true)
@@ -1438,7 +1469,7 @@ check_kiro_plasma() {
 # Main
 #####################################################################
 main() {
-    log_section "Kiro ISO — Installed System Audit"
+    log_section "$(_t "Kiro ISO — Installed System Audit")"
     if [[ "${JSON_MODE}" != true ]]; then
         echo "  Host   : $(hostname)"
         echo "  Kernel : $(uname -r)"
@@ -1485,7 +1516,7 @@ main() {
     check_package_integrity
 
     if [[ "${JSON_MODE}" != true ]]; then
-        log_section "Audit Summary"
+        log_section "$(_t "Audit Summary")"
         echo "  ${GREEN}PASS: ${PASS}${RESET}"
         echo "  ${YELLOW}WARN: ${WARN}${RESET}"
         echo "  ${RED}FAIL: ${FAIL}${RESET}"

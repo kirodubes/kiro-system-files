@@ -48,14 +48,14 @@ main() {
                 ;;
             -d|--dry-run)
                 DRY_RUN=true
-                log_info "Dry-run mode enabled — no changes will be made"
+                log_info "$(_t "Dry-run mode enabled — no changes will be made")"
                 ;;
             -s|--save)
                 DO_SAVE=true
                 if [[ $# -gt 1 && "$2" != -* ]]; then SAVE_DIR="$2"; shift; fi
                 ;;
             *)
-                echo "${RED}Unknown option: $1${RESET}" >&2
+                echo "${RED}$(_t "Unknown option:") ${1}${RESET}" >&2
                 exit 1
                 ;;
         esac
@@ -63,7 +63,7 @@ main() {
     done
 
     if ! pacman -Qi hw-probe &>/dev/null; then
-        log_info "hw-probe is not installed. Installing it..."
+        log_info "$(_t "hw-probe is not installed. Installing it...")"
         execute_or_dryrun "Install hw-probe" sudo pacman -S --noconfirm --needed hw-probe
     fi
 
@@ -84,12 +84,12 @@ main() {
         [[ "${DRY_RUN}" == true ]] && report_args+=(--dry-run)
         execute_or_dryrun "Generate HTML report" "${report_cmd}" "${report_args[@]}"
 
-        [[ "${DRY_RUN}" == false ]] && log_info "We have put the files in your home directory."
+        [[ "${DRY_RUN}" == false ]] && log_info "$(_t "We have put the files in your home directory.")"
     else
         execute_or_dryrun "Run hardware probe and upload" sudo -E /usr/bin/hw-probe -all -upload
     fi
 
-    log_success "$(basename "$0") done"
+    log_success "$(_tf '$SCRIPT_NAME done')"
 }
 
 main "$@"

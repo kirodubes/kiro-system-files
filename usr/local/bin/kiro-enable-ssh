@@ -49,10 +49,10 @@ main() {
                 ;;
             -d|--dry-run)
                 DRY_RUN=true
-                log_info "Dry-run mode enabled — no changes will be made"
+                log_info "$(_t "Dry-run mode enabled — no changes will be made")"
                 ;;
             *)
-                echo "${RED}Unknown option: $arg${RESET}" >&2
+                echo "${RED}$(_t "Unknown option:") ${arg}${RESET}" >&2
                 exit 1
                 ;;
         esac
@@ -60,20 +60,20 @@ main() {
 
     ensure_root "$@"
 
-    log_section "Enabling SSH"
+    log_section "$(_t "Enabling SSH")"
 
-    log_subsection "Refreshing pacman database"
+    log_subsection "$(_t "Refreshing pacman database")"
     # Live ISO ships a seeded /var/lib/pacman/sync/ that may be empty or stale;
     # always refresh first so `pacman -S openssh` succeeds without manual `-Sy`.
     execute_or_dryrun "Refresh pacman database" pacman -Sy --noconfirm
 
-    log_subsection "Installing openssh"
+    log_subsection "$(_t "Installing openssh")"
     execute_or_dryrun "Install openssh" pacman -S openssh --noconfirm
 
-    log_subsection "Enabling and starting sshd"
+    log_subsection "$(_t "Enabling and starting sshd")"
     execute_or_dryrun "Enable sshd" systemctl enable --now sshd
 
-    log_subsection "Allowing SSH through the firewall"
+    log_subsection "$(_t "Allowing SSH through the firewall")"
     if command -v firewall-cmd >/dev/null 2>&1; then
         # firewall-cmd (even --permanent) needs the daemon over D-Bus; when it's
         # not running — e.g. on the live ISO — use firewall-offline-cmd instead.
@@ -82,17 +82,17 @@ main() {
                 firewall-cmd --permanent --add-service=ssh
             execute_or_dryrun "Reload firewalld" firewall-cmd --reload
         elif command -v firewall-offline-cmd >/dev/null 2>&1; then
-            log_info "firewalld not running — applying permanent rule offline"
+            log_info "$(_t "firewalld not running — applying permanent rule offline")"
             execute_or_dryrun "Allow ssh service in firewalld (offline)" \
                 firewall-offline-cmd --add-service=ssh
         else
-            log_info "firewalld not running — nothing is blocking SSH, skipping firewall rule"
+            log_info "$(_t "firewalld not running — nothing is blocking SSH, skipping firewall rule")"
         fi
     else
-        log_info "firewalld not installed — skipping firewall rule"
+        log_info "$(_t "firewalld not installed — skipping firewall rule")"
     fi
 
-    log_subsection "Setting liveuser password (live ISO only)"
+    log_subsection "$(_t "Setting liveuser password (live ISO only)")"
     # On the live ISO, liveuser has no password set, so sshd's password auth
     # refuses the login. Detect the live ISO via /run/archiso/bootmnt (the
     # mount point archiso always creates) and set 'erik' as the password.
@@ -101,15 +101,15 @@ main() {
         execute_or_dryrun "Set liveuser password to 'erik'" \
             bash -c "echo 'liveuser:erik' | chpasswd"
     else
-        log_info "Not on live ISO (or no liveuser) — skipping liveuser password setup"
+        log_info "$(_t "Not on live ISO (or no liveuser) — skipping liveuser password setup")"
     fi
 
-    log_success "$(basename "$0") done"
+    log_success "$(_tf '$SCRIPT_NAME done')"
 
     # The source address of the default route is the one other machines reach us on.
     local ip_addr
     ip_addr="$(ip -4 route get 1.1.1.1 2>/dev/null | awk '{for (i = 1; i < NF; i++) if ($i == "src") { print $(i + 1); exit }}')"
-    log_info "IP address: ${ip_addr:-unknown (no network route)}"
+    log_info "$(_t "IP address:") ${ip_addr:-$(_t "unknown (no network route)")}"
 }
 
 main "$@"

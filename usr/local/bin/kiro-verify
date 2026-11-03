@@ -103,7 +103,7 @@ skip_check() {
 # Config file presence
 ##################################################################################################################
 check_config_files() {
-    log_subsection "Config File Presence"
+    log_subsection "$(_t "Config File Presence")"
 
     local files=(
         /etc/sysctl.d/99-kiro-optimizations.conf
@@ -195,7 +195,7 @@ explain_ip_forward() {
 # Sysctl values
 ##################################################################################################################
 check_sysctl() {
-    log_subsection "Sysctl Runtime Values"
+    log_subsection "$(_t "Sysctl Runtime Values")"
 
     local conf="/etc/sysctl.d/99-kiro-optimizations.conf"
     if [[ ! -f "$conf" ]]; then
@@ -240,7 +240,7 @@ check_sysctl() {
 # ZRAM
 ##################################################################################################################
 check_zram() {
-    log_subsection "ZRAM"
+    log_subsection "$(_t "ZRAM")"
 
     if [[ ! -b /dev/zram0 ]]; then
         ko "ZRAM: /dev/zram0 not found (zram-generator not running or not installed)"
@@ -301,7 +301,7 @@ _check_scheduler() {
 }
 
 check_io_schedulers() {
-    log_subsection "IO Schedulers"
+    log_subsection "$(_t "IO Schedulers")"
 
     local found_any=0
 
@@ -353,7 +353,7 @@ check_io_schedulers() {
 # Transparent Huge Pages
 ##################################################################################################################
 check_thp() {
-    log_subsection "Transparent Huge Pages"
+    log_subsection "$(_t "Transparent Huge Pages")"
 
     local thp_base="/sys/kernel/mm/transparent_hugepage"
 
@@ -415,7 +415,7 @@ check_thp() {
 # Blacklisted modules
 ##################################################################################################################
 check_modules() {
-    log_subsection "Blacklisted Modules"
+    log_subsection "$(_t "Blacklisted Modules")"
 
     local blacklisted=(iTCO_wdt sp5100_tco)
 
@@ -439,7 +439,7 @@ check_modules() {
 # Systemd units
 ##################################################################################################################
 check_systemd_units() {
-    log_subsection "Systemd Unit State"
+    log_subsection "$(_t "Systemd Unit State")"
 
     local failed_count
     failed_count=$(systemctl list-units --state=failed --no-legend --no-pager 2>/dev/null | grep -c "." || true)
@@ -491,7 +491,7 @@ check_systemd_units() {
 # Journal error scan
 ##################################################################################################################
 check_journal() {
-    log_subsection "Journal Error Scan"
+    log_subsection "$(_t "Journal Error Scan")"
 
     # Boot-level errors
     local boot_errors
@@ -561,7 +561,7 @@ check_journal() {
 # Main
 ##################################################################################################################
 main() {
-    log_section "Kiro System Configuration Verifier"
+    log_section "$(_t "Kiro System Configuration Verifier")"
 
     check_config_files
     check_sysctl
@@ -574,7 +574,7 @@ main() {
 
     # ── Summary ──────────────────────────────────────────────────────────────
     if [[ "${JSON_MODE}" != true ]]; then
-        log_section "Verification Summary"
+        log_section "$(_t "Verification Summary")"
         echo "  ${GREEN}PASS: ${PASS}${RESET}"
         echo "  ${RED}FAIL: ${FAIL}${RESET}"
         echo "  ${YELLOW}WARN: ${WARN}${RESET}"

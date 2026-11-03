@@ -43,25 +43,25 @@ main() {
                 ;;
             -d|--dry-run)
                 DRY_RUN=true
-                log_info "Dry-run mode enabled — no changes will be made"
+                log_info "$(_t "Dry-run mode enabled — no changes will be made")"
                 ;;
             *)
-                echo "${RED}Unknown option: $arg${RESET}" >&2
+                echo "${RED}$(_t "Unknown option:") ${arg}${RESET}" >&2
                 exit 1
                 ;;
         esac
     done
 
     if [ ! -x /usr/bin/rate-mirrors ]; then
-        echo "${RED}rate-mirrors is not installed. Please install the 'rate-mirrors' package.${RESET}" >&2
+        echo "${RED}$(_t "rate-mirrors is not installed. Please install the 'rate-mirrors' package.")${RESET}" >&2
         exit 1
     fi
 
-    log_section "Using rate-mirrors"
+    log_section "$(_t "Using rate-mirrors")"
     execute_or_dryrun "Rank mirrors and save to /etc/pacman.d/mirrorlist" \
         sudo rate-mirrors --allow-root --disable-comments-in-file --save /etc/pacman.d/mirrorlist arch
 
-    log_success "$(basename "$0") done"
+    log_success "$(_tf '$SCRIPT_NAME done')"
 }
 
 main "$@"

@@ -43,26 +43,26 @@ main() {
                 ;;
             -d|--dry-run)
                 DRY_RUN=true
-                log_info "Dry-run mode enabled — no changes will be made"
+                log_info "$(_t "Dry-run mode enabled — no changes will be made")"
                 ;;
             *)
-                echo "${RED}Unknown option: $arg${RESET}" >&2
+                echo "${RED}$(_t "Unknown option:") ${arg}${RESET}" >&2
                 exit 1
                 ;;
         esac
     done
 
     if test -f /usr/bin/reflector; then
-        log_info "reflector is present"
+        log_info "$(_t "reflector is present")"
     else
-        log_info "Installing reflector"
+        log_info "$(_t "Installing reflector")"
         execute_or_dryrun "Install reflector" sudo pacman -S reflector --noconfirm
     fi
 
     execute_or_dryrun "Rank mirrors and save to /etc/pacman.d/mirrorlist" \
         sudo /usr/bin/reflector --score 100 --fastest 10 --number 10 --verbose --save /etc/pacman.d/mirrorlist
 
-    log_success "$(basename "$0") done"
+    log_success "$(_tf '$SCRIPT_NAME done')"
 }
 
 main "$@"

@@ -43,27 +43,27 @@ main() {
                 ;;
             -d|--dry-run)
                 DRY_RUN=true
-                log_info "Dry-run mode enabled — no changes will be made"
+                log_info "$(_t "Dry-run mode enabled — no changes will be made")"
                 ;;
             *)
-                echo "${RED}Unknown option: $arg${RESET}" >&2
+                echo "${RED}$(_t "Unknown option:") ${arg}${RESET}" >&2
                 exit 1
                 ;;
         esac
     done
 
-    log_section "Copying /etc/pacman.d/gnupg/gpg.conf"
+    log_section "$(_t "Copying /etc/pacman.d/gnupg/gpg.conf")"
 
     local gpg_conf="/usr/local/share/kiro/gpg.conf"
     if [[ -f "$gpg_conf" ]]; then
-        log_info "$gpg_conf exists"
+        log_info "$(_tf '$gpg_conf exists')"
         execute_or_dryrun "Copy gpg.conf to /etc/pacman.d/gnupg/gpg.conf" sudo cp "$gpg_conf" /etc/pacman.d/gnupg/gpg.conf
-        log_success "/etc/pacman.d/gnupg/gpg.conf copied from local system"
+        log_success "$(_t "/etc/pacman.d/gnupg/gpg.conf copied from local system")"
     else
-        log_warn "$gpg_conf not found — skipping"
+        log_warn "$(_tf '$gpg_conf not found — skipping')"
     fi
 
-    log_success "$(basename "$0") done"
+    log_success "$(_tf '$SCRIPT_NAME done')"
 }
 
 main "$@"

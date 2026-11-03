@@ -44,45 +44,45 @@ main() {
                 ;;
             -d|--dry-run)
                 DRY_RUN=true
-                log_info "Dry-run mode enabled — no changes will be made"
+                log_info "$(_t "Dry-run mode enabled — no changes will be made")"
                 ;;
             *)
-                echo "${RED}Unknown option: $arg${RESET}" >&2
+                echo "${RED}$(_t "Unknown option:") ${arg}${RESET}" >&2
                 exit 1
                 ;;
         esac
     done
 
-    log_warn "Some commands will give no output or error messages — one of them should give you info"
+    log_warn "$(_t "Some commands will give no output or error messages — one of them should give you info")"
 
-    log_section "Check 1 — lspci"
-    echo "command 1:"
+    log_section "$(_t "Check 1 — lspci")"
+    echo "$(_t "command 1:")"
     lspci -vnnn | perl -lne 'print if /^\d+\:.+(\[\S+\:\S+\])/' | grep VGA
     echo
-    echo "command 2:"
+    echo "$(_t "command 2:")"
     lspci -x | grep VGA
 
-    log_section "Check 2 — glxinfo"
+    log_section "$(_t "Check 2 — glxinfo")"
     if test -f /usr/bin/glxinfo; then
-        log_info "glxinfo is present"
+        log_info "$(_t "glxinfo is present")"
     else
-        log_info "Installing glxinfo (note: conflicts with mesa-demos)"
+        log_info "$(_t "Installing glxinfo (note: conflicts with mesa-demos)")"
         execute_or_dryrun "Install glxinfo" sudo pacman -S glxinfo --noconfirm
     fi
     if [[ "$DRY_RUN" == "true" ]] && ! command -v glxinfo &>/dev/null; then
-        log_info "[DRY-RUN] Would run: glxinfo | grep OpenGL vendor/renderer"
+        log_info "$(_t "[DRY-RUN] Would run: glxinfo | grep OpenGL vendor/renderer")"
     else
         glxinfo | grep -E "OpenGL vendor|OpenGL renderer*"
     fi
 
-    log_section "Check 3 — nvidia-smi"
+    log_section "$(_t "Check 3 — nvidia-smi")"
     if test -f /usr/bin/nvidia-smi; then
         nvidia-smi -L
     else
-        log_info "No nvidia driver present"
+        log_info "$(_t "No nvidia driver present")"
     fi
 
-    log_success "$(basename "$0") done"
+    log_success "$(_tf '$SCRIPT_NAME done')"
 }
 
 main "$@"

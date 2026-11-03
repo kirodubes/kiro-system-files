@@ -40,7 +40,7 @@ main() {
                 exit 0
                 ;;
             *)
-                echo "${RED}Unknown option: $arg${RESET}" >&2
+                echo "${RED}$(_t "Unknown option:") ${arg}${RESET}" >&2
                 exit 1
                 ;;
         esac
@@ -49,9 +49,9 @@ main() {
     if [[ -f /etc/dev-rel ]]; then
         cat /etc/dev-rel
     else
-        log_info "Not on a Kiro ISO."
+        log_info "$(_t "Not on a Kiro ISO.")"
     fi
-    log_success "$(basename "$0") done"
+    log_success "$(_tf '$SCRIPT_NAME done')"
 }
 
 main "$@"

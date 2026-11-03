@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kiro-system-files\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-03 04:52+0100\n"
+"POT-Creation-Date: 2026-11-03 04:55+0100\n"
 "PO-Revision-Date: 2026-11-03 00:00+0100\n"
 "Last-Translator: Kiro\n"
 "Language-Team: Kiro\n"
@@ -114,3 +114,1458 @@ msgstr "Tam sistem ve donanım raporu (inxi)"
 #: po/desktop/kiro-sysinfo.desktop.in:12
 msgid "inxi;system;hardware;info;information;"
 msgstr "sistem;donanım;bilgi;inxi;system;hardware;info;information;"
+
+#: usr/local/bin/kiro-audit:162 usr/local/lib/kiro-common.sh:233
+#, sh-format
+msgid "$name needs root — requesting your password..."
+msgstr "$name root yetkisi gerektiriyor — parolanız isteniyor..."
+
+#: usr/local/bin/kiro-audit:172 usr/local/lib/kiro-common.sh:240
+#, sh-format
+msgid "$name needs root — re-running with sudo..."
+msgstr "$name root yetkisi gerektiriyor — sudo ile yeniden çalıştırılıyor..."
+
+#: usr/local/bin/kiro-audit:342 usr/local/bin/kiro-diag:227
+msgid "Kernel"
+msgstr "Çekirdek"
+
+#: usr/local/bin/kiro-audit:390
+msgid "Microcode"
+msgstr "Mikrokod"
+
+#: usr/local/bin/kiro-audit:408
+msgid "mkinitcpio"
+msgstr "mkinitcpio"
+
+#: usr/local/bin/kiro-audit:447
+msgid "Audio stack"
+msgstr "Ses yığını"
+
+#: usr/local/bin/kiro-audit:457
+msgid "Calamares cleanup"
+msgstr "Calamares temizliği"
+
+#: usr/local/bin/kiro-audit:518
+msgid "kiro_final configuration"
+msgstr "kiro_final yapılandırması"
+
+#: usr/local/bin/kiro-audit:560
+msgid "Pacman repositories"
+msgstr "Pacman depoları"
+
+#: usr/local/bin/kiro-audit:660
+msgid "Desktop environments"
+msgstr "Masaüstü ortamları"
+
+#: usr/local/bin/kiro-audit:683
+msgid "SDDM"
+msgstr "SDDM"
+
+#: usr/local/bin/kiro-audit:699
+msgid "User groups"
+msgstr "Kullanıcı grupları"
+
+#: usr/local/bin/kiro-audit:718
+msgid "Systemd services"
+msgstr "Systemd hizmetleri"
+
+#: usr/local/bin/kiro-audit:770
+msgid "Key file permissions"
+msgstr "Önemli dosya izinleri"
+
+#: usr/local/bin/kiro-audit:803
+msgid "ISO version"
+msgstr "ISO sürümü"
+
+#: usr/local/bin/kiro-audit:814
+msgid "NVIDIA"
+msgstr "NVIDIA"
+
+#: usr/local/bin/kiro-audit:827
+msgid "chwd driver install"
+msgstr "chwd sürücü kurulumu"
+
+#: usr/local/bin/kiro-audit:847
+msgid "Package integrity (pacman -Qk)"
+msgstr "Paket bütünlüğü (pacman -Qk)"
+
+#: usr/local/bin/kiro-audit:871
+msgid "Sysctl security baseline"
+msgstr "Sysctl güvenlik taban çizgisi"
+
+#: usr/local/bin/kiro-audit:899 usr/local/bin/kiro-verify:243
+msgid "ZRAM"
+msgstr "ZRAM"
+
+#: usr/local/bin/kiro-audit:921
+msgid "Udev rules"
+msgstr "Udev kuralları"
+
+#: usr/local/bin/kiro-audit:956
+msgid "Systemd drop-ins"
+msgstr "Systemd drop-in dosyaları"
+
+#: usr/local/bin/kiro-audit:972
+msgid "Modprobe & THP tuning"
+msgstr "Modprobe ve THP ayarları"
+
+#: usr/local/bin/kiro-audit:986
+msgid "Hardening & tuning (2026-05-28)"
+msgstr "Sıkılaştırma ve ayarlama (2026-05-28)"
+
+#: usr/local/bin/kiro-audit:1059
+msgid "systemd-resolved configuration"
+msgstr "systemd-resolved yapılandırması"
+
+#: usr/local/bin/kiro-audit:1079
+msgid "tuned-ppd power profile"
+msgstr "tuned-ppd güç profili"
+
+#: usr/local/bin/kiro-audit:1115
+msgid "Tumbler / thumbnailing"
+msgstr "Tumbler / küçük resimler"
+
+#: usr/local/bin/kiro-audit:1123
+msgid "Failed systemd units"
+msgstr "Başarısız systemd birimleri"
+
+#: usr/local/bin/kiro-audit:1141
+msgid "Boot time and updates (info)"
+msgstr "Açılış süresi ve güncellemeler (bilgi)"
+
+#: usr/local/bin/kiro-audit:1157 usr/local/bin/kiro-diag:252
+msgid "Bootloader"
+msgstr "Önyükleyici"
+
+#: usr/local/bin/kiro-audit:1189
+msgid "Btrfs snapshots"
+msgstr "Btrfs anlık görüntüleri"
+
+#: usr/local/bin/kiro-audit:1269
+msgid "Disk format & encryption"
+msgstr "Disk biçimi ve şifreleme"
+
+#: usr/local/bin/kiro-audit:1372
+msgid "Kiro Plasma theme/config"
+msgstr "Kiro Plasma teması/yapılandırması"
+
+#: usr/local/bin/kiro-audit:1472
+msgid "Kiro ISO — Installed System Audit"
+msgstr "Kiro ISO — Kurulu Sistem Denetimi"
+
+#: usr/local/bin/kiro-audit:1519
+msgid "Audit Summary"
+msgstr "Denetim Özeti"
+
+#: usr/local/bin/kiro-calamares-log:173 usr/local/bin/kiro-diag:388
+#: usr/local/bin/kiro-enable-ssh:55 usr/local/bin/kiro-fix-gpg-conf:49
+#: usr/local/bin/kiro-fix-mirrors:49 usr/local/bin/kiro-fix-pacman-conf:51
+#: usr/local/bin/kiro-fix-pacman-keys:49 usr/local/bin/kiro-get-mirrors:49
+#: usr/local/bin/kiro-get-nemesis:51 usr/local/bin/kiro-iso-version:43
+#: usr/local/bin/kiro-keep-kirotux-repo:50 usr/local/bin/kiro-lint:431
+#: usr/local/bin/kiro-probe:58 usr/local/bin/kiro-probe-report:137
+#: usr/local/bin/kiro-report:346 usr/local/bin/kiro-set-cores:49
+#: usr/local/bin/kiro-set-cores-min1:50 usr/local/bin/kiro-set-cores-min2:50
+#: usr/local/bin/kiro-skell:138 usr/local/bin/kiro-skell-all:139
+#: usr/local/bin/kiro-which-vga:50 usr/local/bin/kiro-xlibre-swap:309
+msgid "Unknown option:"
+msgstr "Bilinmeyen seçenek:"
+
+#: usr/local/bin/kiro-calamares-log:216
+msgid "Kiro — Calamares Install Summary"
+msgstr "Kiro — Calamares Kurulum Özeti"
+
+#: usr/local/bin/kiro-calamares-log:233
+msgid "Install timeline (per-job duration)"
+msgstr "Kurulum zaman çizelgesi (iş başına süre)"
+
+#: usr/local/bin/kiro-calamares-log:283
+msgid "Warnings"
+msgstr "Uyarılar"
+
+#: usr/local/bin/kiro-calamares-log:299
+msgid "Errors / tracebacks"
+msgstr "Hatalar / traceback"
+
+#: usr/local/bin/kiro-diag:46
+msgid "System"
+msgstr "Sistem"
+
+#: usr/local/bin/kiro-diag:79
+msgid "Hardware"
+msgstr "Donanım"
+
+#: usr/local/bin/kiro-diag:102
+msgid "GPU"
+msgstr "GPU"
+
+#: usr/local/bin/kiro-diag:153
+msgid "Storage"
+msgstr "Depolama"
+
+#: usr/local/bin/kiro-diag:176
+msgid "Network"
+msgstr "Ağ"
+
+#: usr/local/bin/kiro-diag:199
+msgid "Desktop"
+msgstr "Masaüstü"
+
+#: usr/local/bin/kiro-diag:288
+msgid "Packages"
+msgstr "Paketler"
+
+#: usr/local/bin/kiro-diag:306
+msgid "Audio"
+msgstr "Ses"
+
+#: usr/local/bin/kiro-diag:332
+msgid "Bluetooth"
+msgstr "Bluetooth"
+
+#: usr/local/bin/kiro-diag:349
+msgid "Temperatures"
+msgstr "Sıcaklıklar"
+
+#: usr/local/bin/kiro-diag:396
+msgid "Kiro System Diagnostics"
+msgstr "Kiro Sistem Tanılama"
+
+#: usr/local/bin/kiro-diag:417 usr/local/bin/kiro-enable-ssh:107
+#: usr/local/bin/kiro-fix-gpg-conf:66 usr/local/bin/kiro-fix-mirrors:64
+#: usr/local/bin/kiro-fix-pacman-keys:92 usr/local/bin/kiro-get-mirrors:65
+#: usr/local/bin/kiro-get-nemesis:69 usr/local/bin/kiro-iso-version:54
+#: usr/local/bin/kiro-pci-latency:80 usr/local/bin/kiro-probe:92
+#: usr/local/bin/kiro-probe-report:168 usr/local/bin/kiro-probe-report:182
+#: usr/local/bin/kiro-probe-report:219 usr/local/bin/kiro-report:389
+#: usr/local/bin/kiro-set-cores:71 usr/local/bin/kiro-set-cores-min1:74
+#: usr/local/bin/kiro-set-cores-min2:74 usr/local/bin/kiro-which-vga:85
+#: usr/local/bin/kiro-xlibre-swap:346
+#, sh-format
+msgid "$SCRIPT_NAME done"
+msgstr "$SCRIPT_NAME tamamlandı"
+
+#: usr/local/bin/kiro-enable-ssh:52 usr/local/bin/kiro-fix-gpg-conf:46
+#: usr/local/bin/kiro-fix-mirrors:46 usr/local/bin/kiro-fix-pacman-conf:48
+#: usr/local/bin/kiro-fix-pacman-keys:46 usr/local/bin/kiro-get-mirrors:46
+#: usr/local/bin/kiro-get-nemesis:48 usr/local/bin/kiro-pci-latency:49
+#: usr/local/bin/kiro-probe:51 usr/local/bin/kiro-set-cores:46
+#: usr/local/bin/kiro-set-cores-min1:47 usr/local/bin/kiro-set-cores-min2:47
+#: usr/local/bin/kiro-skell:135 usr/local/bin/kiro-skell-all:136
+#: usr/local/bin/kiro-which-vga:47 usr/local/bin/kiro-xlibre-swap:297
+msgid "Dry-run mode enabled — no changes will be made"
+msgstr "Deneme modu etkin — hiçbir değişiklik yapılmayacak"
+
+#: usr/local/bin/kiro-enable-ssh:63
+msgid "Enabling SSH"
+msgstr "SSH etkinleştiriliyor"
+
+#: usr/local/bin/kiro-enable-ssh:65
+msgid "Refreshing pacman database"
+msgstr "Pacman veritabanı yenileniyor"
+
+#: usr/local/bin/kiro-enable-ssh:70
+msgid "Installing openssh"
+msgstr "openssh kuruluyor"
+
+#: usr/local/bin/kiro-enable-ssh:73
+msgid "Enabling and starting sshd"
+msgstr "sshd etkinleştirilip başlatılıyor"
+
+#: usr/local/bin/kiro-enable-ssh:76
+msgid "Allowing SSH through the firewall"
+msgstr "SSH için güvenlik duvarında izin veriliyor"
+
+#: usr/local/bin/kiro-enable-ssh:85
+msgid "firewalld not running — applying permanent rule offline"
+msgstr "firewalld çalışmıyor — kalıcı kural çevrimdışı uygulanıyor"
+
+#: usr/local/bin/kiro-enable-ssh:89
+msgid "firewalld not running — nothing is blocking SSH, skipping firewall rule"
+msgstr ""
+"firewalld çalışmıyor — SSH'yi engelleyen bir şey yok, güvenlik duvarı kuralı "
+"atlanıyor"
+
+#: usr/local/bin/kiro-enable-ssh:92
+msgid "firewalld not installed — skipping firewall rule"
+msgstr "firewalld kurulu değil — güvenlik duvarı kuralı atlanıyor"
+
+#: usr/local/bin/kiro-enable-ssh:95
+msgid "Setting liveuser password (live ISO only)"
+msgstr "liveuser parolası ayarlanıyor (yalnızca live ISO'da)"
+
+#: usr/local/bin/kiro-enable-ssh:104
+msgid "Not on live ISO (or no liveuser) — skipping liveuser password setup"
+msgstr ""
+"Live ISO üzerinde değil (veya liveuser yok) — liveuser parola ayarı atlanıyor"
+
+#: usr/local/bin/kiro-enable-ssh:112
+msgid "IP address:"
+msgstr "IP adresi:"
+
+#: usr/local/bin/kiro-enable-ssh:112
+msgid "unknown (no network route)"
+msgstr "bilinmiyor (ağ rotası yok)"
+
+#: usr/local/bin/kiro-fix-gpg-conf:55
+msgid "Copying /etc/pacman.d/gnupg/gpg.conf"
+msgstr "/etc/pacman.d/gnupg/gpg.conf kopyalanıyor"
+
+#: usr/local/bin/kiro-fix-gpg-conf:59
+#, sh-format
+msgid "$gpg_conf exists"
+msgstr "$gpg_conf mevcut"
+
+#: usr/local/bin/kiro-fix-gpg-conf:61
+msgid "/etc/pacman.d/gnupg/gpg.conf copied from local system"
+msgstr "/etc/pacman.d/gnupg/gpg.conf yerel sistemden kopyalandı"
+
+#: usr/local/bin/kiro-fix-gpg-conf:63
+#, sh-format
+msgid "$gpg_conf not found — skipping"
+msgstr "$gpg_conf bulunamadı — atlanıyor"
+
+#: usr/local/bin/kiro-fix-mirrors:56
+msgid ""
+"rate-mirrors is not installed. Please install the 'rate-mirrors' package."
+msgstr "rate-mirrors kurulu değil. Lütfen 'rate-mirrors' paketini kurun."
+
+#: usr/local/bin/kiro-fix-mirrors:60
+msgid "Using rate-mirrors"
+msgstr "rate-mirrors kullanılıyor"
+
+#: usr/local/bin/kiro-fix-pacman-conf:57
+msgid "Getting /etc/pacman.conf"
+msgstr "/etc/pacman.conf alınıyor"
+
+#: usr/local/bin/kiro-fix-pacman-conf:62
+#, sh-format
+msgid "Local pacman.conf not found at: $local_pacman — cannot proceed"
+msgstr "Yerel pacman.conf bulunamadı: $local_pacman — devam edilemiyor"
+
+#: usr/local/bin/kiro-fix-pacman-conf:66
+msgid "Using local pacman.conf"
+msgstr "Yerel pacman.conf kullanılıyor"
+
+#: usr/local/bin/kiro-fix-pacman-conf:68
+msgid "pacman.conf copied from local system"
+msgstr "pacman.conf yerel sistemden kopyalandı"
+
+#: usr/local/bin/kiro-fix-pacman-conf:70
+msgid "[DRY-RUN] Would put [kirotux_repo] back (KiroTux system)"
+msgstr "[DRY-RUN] [kirotux_repo] deposu geri konulacak (KiroTux sistemi)"
+
+#: usr/local/bin/kiro-fix-pacman-conf:76
+msgid "Failed to copy local pacman.conf"
+msgstr "Yerel pacman.conf kopyalanamadı"
+
+#: usr/local/bin/kiro-fix-pacman-keys:56
+msgid "Installing the latest archlinux-keyring package"
+msgstr "En son archlinux-keyring paketi kuruluyor"
+
+#: usr/local/bin/kiro-fix-pacman-keys:57
+msgid "Failed to install archlinux-keyring"
+msgstr "archlinux-keyring kurulamadı"
+
+#: usr/local/bin/kiro-fix-pacman-keys:60
+msgid "Fixing pacman database and GPG configuration"
+msgstr "Pacman veritabanı ve GPG yapılandırması onarılıyor"
+
+#: usr/local/bin/kiro-fix-pacman-keys:62
+msgid "Removing pacman sync databases"
+msgstr "Pacman eşitleme veritabanları kaldırılıyor"
+
+#: usr/local/bin/kiro-fix-pacman-keys:64
+msgid "Failed to remove all sync databases"
+msgstr "Tüm eşitleme veritabanları kaldırılamadı"
+
+#: usr/local/bin/kiro-fix-pacman-keys:66
+msgid "Directory not found: /var/lib/pacman/sync"
+msgstr "Dizin bulunamadı: /var/lib/pacman/sync"
+
+#: usr/local/bin/kiro-fix-pacman-keys:69
+msgid "Removing pacman GPG keys"
+msgstr "Pacman GPG anahtarları kaldırılıyor"
+
+#: usr/local/bin/kiro-fix-pacman-keys:71
+msgid "Failed to remove GPG keys"
+msgstr "GPG anahtarları kaldırılamadı"
+
+#: usr/local/bin/kiro-fix-pacman-keys:73
+msgid "Directory not found: /etc/pacman.d/gnupg"
+msgstr "Dizin bulunamadı: /etc/pacman.d/gnupg"
+
+#: usr/local/bin/kiro-fix-pacman-keys:76
+msgid "Initializing pacman keys"
+msgstr "Pacman anahtarları başlatılıyor"
+
+#: usr/local/bin/kiro-fix-pacman-keys:77
+msgid "Failed to initialize pacman keys"
+msgstr "Pacman anahtarları başlatılamadı"
+
+#: usr/local/bin/kiro-fix-pacman-keys:79
+msgid "Populating keyring"
+msgstr "Anahtarlık dolduruluyor"
+
+#: usr/local/bin/kiro-fix-pacman-keys:80
+msgid "Failed to populate keyring"
+msgstr "Anahtarlık doldurulamadı"
+
+#: usr/local/bin/kiro-fix-pacman-keys:82
+msgid "Adding Ubuntu keyserver to gpg.conf"
+msgstr "gpg.conf dosyasına Ubuntu anahtar sunucusu ekleniyor"
+
+#: usr/local/bin/kiro-fix-pacman-keys:86
+msgid "File not found: /etc/pacman.d/gnupg/gpg.conf"
+msgstr "Dosya bulunamadı: /etc/pacman.d/gnupg/gpg.conf"
+
+#: usr/local/bin/kiro-fix-pacman-keys:89
+msgid "Refreshing pacman databases"
+msgstr "Pacman veritabanları yenileniyor"
+
+#: usr/local/bin/kiro-fix-pacman-keys:90 usr/local/lib/kiro-common.sh:923
+msgid "Failed to refresh pacman databases"
+msgstr "Pacman veritabanları yenilenemedi"
+
+#: usr/local/bin/kiro-get-mirrors:56
+msgid "reflector is present"
+msgstr "reflector mevcut"
+
+#: usr/local/bin/kiro-get-mirrors:58
+msgid "Installing reflector"
+msgstr "reflector kuruluyor"
+
+#: usr/local/bin/kiro-get-nemesis:57
+msgid "Clone arcolinux-nemesis"
+msgstr "arcolinux-nemesis klonlanıyor"
+
+#: usr/local/bin/kiro-get-nemesis:60
+msgid "git is present"
+msgstr "git mevcut"
+
+#: usr/local/bin/kiro-get-nemesis:62
+msgid "Installing git"
+msgstr "git kuruluyor"
+
+#: usr/local/bin/kiro-iso-version:52
+msgid "Not on a Kiro ISO."
+msgstr "Bir Kiro ISO üzerinde değilsiniz."
+
+#: usr/local/bin/kiro-keep-kirotux-repo:57
+msgid "Not a KiroTux system: nothing to do"
+msgstr "KiroTux sistemi değil: yapılacak bir şey yok"
+
+#: usr/local/bin/kiro-keep-kirotux-repo:61
+#, sh-format
+msgid "[kirotux_repo] is already in $conf"
+msgstr "[kirotux_repo] zaten şurada: $conf"
+
+#: usr/local/bin/kiro-keep-kirotux-repo:65
+#, sh-format
+msgid "[DRY-RUN] Would add [kirotux_repo] before [nemesis_repo] in $conf"
+msgstr ""
+"[DRY-RUN] [kirotux_repo] deposu, [nemesis_repo] deposundan önce şuraya "
+"eklenecek: $conf"
+
+#: usr/local/bin/kiro-lint:69
+msgid "Sysctl: Duplicate Keys"
+msgstr "Sysctl: Yinelenen Anahtarlar"
+
+#: usr/local/bin/kiro-lint:115
+msgid "Modprobe: Parameters vs /sys/module/"
+msgstr "Modprobe: Parametreler ve /sys/module/ karşılaştırması"
+
+#: usr/local/bin/kiro-lint:178
+msgid "Cross-file: Conflicting Settings"
+msgstr "Dosyalar Arası: Çakışan Ayarlar"
+
+#: usr/local/bin/kiro-lint:362
+msgid "Udev: ATTR Write Targets in Sysfs"
+msgstr "Udev: Sysfs'te ATTR Yazma Hedefleri"
+
+#: usr/local/bin/kiro-lint:435
+msgid "Kiro Config Linter"
+msgstr "Kiro Yapılandırma Linter'ı"
+
+#: usr/local/bin/kiro-lint:443
+msgid "Lint Summary"
+msgstr "Lint Özeti"
+
+#: usr/local/bin/kiro-pci-latency:58
+msgid "setpci not found — install pciutils"
+msgstr "setpci bulunamadı — pciutils paketini kurun"
+
+#: usr/local/bin/kiro-pci-latency:63
+msgid "PCI Latency Timer Optimization"
+msgstr "PCI Gecikme Zamanlayıcısı Optimizasyonu"
+
+#: usr/local/bin/kiro-pci-latency:66
+msgid "[DRY-RUN] Would execute: setpci -s '*:*' latency_timer=20"
+msgstr "[DRY-RUN] Çalıştırılacak komut: setpci -s '*:*' latency_timer=20"
+
+#: usr/local/bin/kiro-pci-latency:67
+msgid "[DRY-RUN] Would execute: setpci -s '0:0' latency_timer=0"
+msgstr "[DRY-RUN] Çalıştırılacak komut: setpci -s '0:0' latency_timer=0"
+
+#: usr/local/bin/kiro-pci-latency:68
+msgid "[DRY-RUN] Would execute: setpci -s '*:*:04xx' latency_timer=80"
+msgstr "[DRY-RUN] Çalıştırılacak komut: setpci -s '*:*:04xx' latency_timer=80"
+
+#: usr/local/bin/kiro-probe:66
+msgid "hw-probe is not installed. Installing it..."
+msgstr "hw-probe kurulu değil. Kuruluyor..."
+
+#: usr/local/bin/kiro-probe:87
+msgid "We have put the files in your home directory."
+msgstr "Dosyaları ev dizininize yerleştirdik."
+
+#: usr/local/bin/kiro-probe-report:206
+msgid "Generate hardware probe report"
+msgstr "Donanım yoklama raporu oluştur"
+
+#: usr/local/bin/kiro-report:95
+msgid "Recent Issues (debug)"
+msgstr "Son Sorunlar (hata ayıklama)"
+
+#: usr/local/bin/kiro-report:124
+msgid "Graphics / driver packages"
+msgstr "Grafik / sürücü paketleri"
+
+#: usr/local/bin/kiro-report:134
+msgid "Explicitly installed packages"
+msgstr "Açıkça kurulan paketler"
+
+#: usr/local/bin/kiro-report:148
+msgid "Install audit (kiro-audit)"
+msgstr "Kurulum denetimi (kiro-audit)"
+
+#: usr/local/bin/kiro-report:182
+msgid "Calamares install log"
+msgstr "Calamares kurulum günlüğü"
+
+#: usr/local/bin/kiro-report:208
+msgid "Disk encryption"
+msgstr "Disk şifreleme"
+
+#: usr/local/bin/kiro-report:358
+msgid "Generating Kiro report"
+msgstr "Kiro raporu oluşturuluyor"
+
+#: usr/local/bin/kiro-set-cores:55
+msgid "kiro-set-cores"
+msgstr "kiro-set-cores"
+
+#: usr/local/bin/kiro-set-cores:61
+#, sh-format
+msgid "Changing the makeflags for $numberofcores cores."
+msgstr "makeflags $numberofcores çekirdek için değiştiriliyor."
+
+#: usr/local/bin/kiro-set-cores:64 usr/local/bin/kiro-set-cores-min1:70
+#: usr/local/bin/kiro-set-cores-min2:70
+msgid "Changing the PKGEXT to pkg.tar.zst"
+msgstr "PKGEXT şu değere değiştiriliyor: pkg.tar.zst"
+
+#: usr/local/bin/kiro-set-cores:68
+msgid "Single core detected — no change."
+msgstr "Tek çekirdek algılandı — değişiklik yok."
+
+#: usr/local/bin/kiro-set-cores-min1:63 usr/local/bin/kiro-set-cores-min2:63
+#, sh-format
+msgid "Only $numberofcores core(s) detected — flooring MAKEFLAGS to -j1."
+msgstr ""
+"Yalnızca $numberofcores çekirdek algılandı — MAKEFLAGS en az -j1 olarak "
+"ayarlanıyor."
+
+#: usr/local/bin/kiro-set-cores-min1:67
+#, sh-format
+msgid ""
+"Detected $numberofcores cores — setting MAKEFLAGS to -j$targetcores (leaving "
+"$RESERVE core free)."
+msgstr ""
+"$numberofcores çekirdek algılandı — MAKEFLAGS -j$targetcores olarak "
+"ayarlanıyor ($RESERVE çekirdek boş bırakılıyor)."
+
+#: usr/local/bin/kiro-set-cores-min2:67
+#, sh-format
+msgid ""
+"Detected $numberofcores cores — setting MAKEFLAGS to -j$targetcores (leaving "
+"$RESERVE cores free)."
+msgstr ""
+"$numberofcores çekirdek algılandı — MAKEFLAGS -j$targetcores olarak "
+"ayarlanıyor ($RESERVE çekirdek boş bırakılıyor)."
+
+#: usr/local/bin/kiro-skell:106 usr/local/bin/kiro-skell-all:104
+#: usr/local/lib/kiro-common.sh:357
+#, sh-format
+msgid "Would execute: $description"
+msgstr "Çalıştırılacak: $description"
+
+#: usr/local/bin/kiro-skell:107 usr/local/bin/kiro-skell-all:105
+#: usr/local/lib/kiro-common.sh:179 usr/local/lib/kiro-common.sh:358
+msgid "Command:"
+msgstr "Komut:"
+
+#: usr/local/bin/kiro-skell:117 usr/local/bin/kiro-skell-all:115
+#, sh-format
+msgid "ERROR on line $line: $cmd"
+msgstr "HATA (satır: $line): $cmd"
+
+#: usr/local/bin/kiro-skell:144
+#, sh-format
+msgid "$NAME — restore default configuration from /etc/skel (fast backup)"
+msgstr ""
+"$NAME — varsayılan yapılandırmayı /etc/skel dizininden geri yükle (hızlı "
+"yedekleme)"
+
+#: usr/local/bin/kiro-skell:145
+#, sh-format
+msgid ""
+"$NAME copies /etc/skel to your home directory after backing up only the "
+"configs it is about to overwrite — not your entire ~/.config."
+msgstr ""
+"$NAME, yalnızca üzerine yazacağı yapılandırmaları yedekledikten sonra /etc/"
+"skel dizinini ev dizininize kopyalar — ~/.config dizininin tamamını değil."
+
+#: usr/local/bin/kiro-skell:147 usr/local/bin/kiro-skell-all:148
+#, sh-format
+msgid ""
+"New configurations often end up in /etc/skel — $NAME brings them into use."
+msgstr ""
+"Yeni yapılandırmalar çoğu zaman /etc/skel içinde yer alır — $NAME bunları "
+"kullanıma alır."
+
+#: usr/local/bin/kiro-skell:149
+msgid ""
+"It backs up each ~/.config entry that /etc/skel/.config contains (date/time "
+"stamped), then overwrites your configs with everything in /etc/skel."
+msgstr ""
+"/etc/skel/.config içinde bulunan her ~/.config girdisini yedekler (tarih/"
+"saat damgalı), ardından yapılandırmalarınızın üzerine /etc/skel içindeki her "
+"şeyi yazar."
+
+#: usr/local/bin/kiro-skell:151
+msgid "For a full ~/.config backup instead, use kiro-skell-all."
+msgstr ""
+"Bunun yerine ~/.config dizininin tam yedeği için kiro-skell-all komutunu "
+"kullanın."
+
+#: usr/local/bin/kiro-skell:153 usr/local/bin/kiro-skell-all:152
+#, sh-format
+msgid ""
+"Useful when a tiling WM is crashing — run $NAME in a terminal or TTY to "
+"recover."
+msgstr ""
+"Bir döşemeli pencere yöneticisi çöktüğünde işe yarar — kurtarmak için bir "
+"terminalde veya TTY'de şunu çalıştırın: $NAME"
+
+#. Translators: keep the answer keys (y/n) as they are; the script only accepts y or Y.
+#: usr/local/bin/kiro-skell:158 usr/local/bin/kiro-skell-all:157
+msgid ""
+"Can we copy/paste the content from /etc/skel to your home directory? (y/n) "
+msgstr "/etc/skel içeriğini ev dizininize kopyalayabilir miyiz? (y/n) "
+
+#: usr/local/bin/kiro-skell:160 usr/local/bin/kiro-skell-all:159
+msgid "Nothing has been changed."
+msgstr "Hiçbir şey değiştirilmedi."
+
+#: usr/local/bin/kiro-skell:172
+#, sh-format
+msgid "Backing up only the configs /etc/skel overwrites to $backup_dir"
+msgstr ""
+"Yalnızca /etc/skel tarafından üzerine yazılan yapılandırmalar şuraya "
+"yedekleniyor: $backup_dir"
+
+#: usr/local/bin/kiro-skell:178
+#, sh-format
+msgid "backing up ~/.config/$name"
+msgstr "yedekleniyor: ~/.config/$name"
+
+#: usr/local/bin/kiro-skell:183
+msgid "No /etc/skel/.config found — nothing to back up"
+msgstr "/etc/skel/.config bulunamadı — yedeklenecek bir şey yok"
+
+#: usr/local/bin/kiro-skell:187 usr/local/bin/kiro-skell-all:171
+msgid "Copying /etc/skel to home — be patient"
+msgstr "/etc/skel ev dizinine kopyalanıyor — lütfen sabırlı olun"
+
+#: usr/local/bin/kiro-skell:190 usr/local/bin/kiro-skell-all:174
+#, sh-format
+msgid "$NAME done"
+msgstr "$NAME tamamlandı"
+
+#: usr/local/bin/kiro-skell-all:145
+#, sh-format
+msgid "$NAME — restore default configuration from /etc/skel"
+msgstr "$NAME — varsayılan yapılandırmayı /etc/skel dizininden geri yükle"
+
+#: usr/local/bin/kiro-skell-all:146
+#, sh-format
+msgid ""
+"$NAME copies /etc/skel to your home directory after making a backup of "
+"~/.config."
+msgstr ""
+"$NAME, ~/.config yedeğini aldıktan sonra /etc/skel dizinini ev dizininize "
+"kopyalar."
+
+#: usr/local/bin/kiro-skell-all:150
+msgid ""
+"It will make a backup of ~/.config with a date/time stamp, then overwrite "
+"your configs with what is in /etc/skel."
+msgstr ""
+"~/.config dizininin tarih/saat damgalı bir yedeğini alır, ardından "
+"yapılandırmalarınızın üzerine /etc/skel içindekileri yazar."
+
+#: usr/local/bin/kiro-skell-all:168
+#, sh-format
+msgid "Making a backup of ~/.config to ~/.config-backup-$time"
+msgstr "~/.config şuraya yedekleniyor: ~/.config-backup-$time"
+
+#: usr/local/bin/kiro-verify:106
+msgid "Config File Presence"
+msgstr "Yapılandırma Dosyalarının Varlığı"
+
+#: usr/local/bin/kiro-verify:198
+msgid "Sysctl Runtime Values"
+msgstr "Sysctl Çalışma Zamanı Değerleri"
+
+#: usr/local/bin/kiro-verify:304
+msgid "IO Schedulers"
+msgstr "IO Zamanlayıcıları"
+
+#: usr/local/bin/kiro-verify:356
+msgid "Transparent Huge Pages"
+msgstr "Saydam Büyük Sayfalar (THP)"
+
+#: usr/local/bin/kiro-verify:418
+msgid "Blacklisted Modules"
+msgstr "Kara Listedeki Modüller"
+
+#: usr/local/bin/kiro-verify:442
+msgid "Systemd Unit State"
+msgstr "Systemd Birim Durumu"
+
+#: usr/local/bin/kiro-verify:494
+msgid "Journal Error Scan"
+msgstr "Günlük Hata Taraması"
+
+#: usr/local/bin/kiro-verify:564
+msgid "Kiro System Configuration Verifier"
+msgstr "Kiro Sistem Yapılandırması Doğrulayıcısı"
+
+#: usr/local/bin/kiro-verify:577
+msgid "Verification Summary"
+msgstr "Doğrulama Özeti"
+
+#: usr/local/bin/kiro-which-vga:56
+msgid ""
+"Some commands will give no output or error messages — one of them should "
+"give you info"
+msgstr ""
+"Bazı komutlar çıktı vermez veya hata mesajı verir — bunlardan biri size "
+"bilgi vermelidir"
+
+#: usr/local/bin/kiro-which-vga:58
+msgid "Check 1 — lspci"
+msgstr "Kontrol 1 — lspci"
+
+#: usr/local/bin/kiro-which-vga:59
+msgid "command 1:"
+msgstr "komut 1:"
+
+#: usr/local/bin/kiro-which-vga:62
+msgid "command 2:"
+msgstr "komut 2:"
+
+#: usr/local/bin/kiro-which-vga:65
+msgid "Check 2 — glxinfo"
+msgstr "Kontrol 2 — glxinfo"
+
+#: usr/local/bin/kiro-which-vga:67
+msgid "glxinfo is present"
+msgstr "glxinfo mevcut"
+
+#: usr/local/bin/kiro-which-vga:69
+msgid "Installing glxinfo (note: conflicts with mesa-demos)"
+msgstr "glxinfo kuruluyor (not: mesa-demos ile çakışır)"
+
+#: usr/local/bin/kiro-which-vga:73
+msgid "[DRY-RUN] Would run: glxinfo | grep OpenGL vendor/renderer"
+msgstr "[DRY-RUN] Çalıştırılacak: glxinfo | grep OpenGL vendor/renderer"
+
+#: usr/local/bin/kiro-which-vga:78
+msgid "Check 3 — nvidia-smi"
+msgstr "Kontrol 3 — nvidia-smi"
+
+#: usr/local/bin/kiro-which-vga:82
+msgid "No nvidia driver present"
+msgstr "Mevcut nvidia sürücüsü yok"
+
+#: usr/local/bin/kiro-xlibre-swap:54
+msgid "Current X server"
+msgstr "Geçerli X sunucusu"
+
+#: usr/local/bin/kiro-xlibre-swap:58
+#, sh-format
+msgid "  Package: $owner"
+msgstr "  Paket: $owner"
+
+#: usr/local/bin/kiro-xlibre-swap:63
+#, sh-format
+msgid "  Binary reports: $banner"
+msgstr "  Çalıştırılabilir dosya bildiriyor: $banner"
+
+#: usr/local/bin/kiro-xlibre-swap:66
+msgid "Running XLibre"
+msgstr "XLibre çalışıyor"
+
+#: usr/local/bin/kiro-xlibre-swap:68
+msgid "Running stock Xorg"
+msgstr "Standart Xorg çalışıyor"
+
+#: usr/local/bin/kiro-xlibre-swap:70
+msgid "Could not determine which X server is installed"
+msgstr "Hangi X sunucusunun kurulu olduğu belirlenemedi"
+
+#: usr/local/bin/kiro-xlibre-swap:75
+msgid "Backing up current package list"
+msgstr "Geçerli paket listesi yedekleniyor"
+
+#: usr/local/bin/kiro-xlibre-swap:77
+#, sh-format
+msgid "[DRY-RUN] Would save 'pacman -Qe' output to $BACKUP_FILE"
+msgstr "[DRY-RUN] 'pacman -Qe' çıktısı şuraya kaydedilecek: $BACKUP_FILE"
+
+#: usr/local/bin/kiro-xlibre-swap:80
+#, sh-format
+msgid "Saved to $BACKUP_FILE"
+msgstr "Şuraya kaydedildi: $BACKUP_FILE"
+
+#: usr/local/bin/kiro-xlibre-swap:86
+msgid ""
+"Proprietary nvidia-utils detected. Before xlibre-xserver 26.0.0.16,\n"
+"its X driver ABI may lag XLibre's. If X fails to start after the swap, add:"
+msgstr ""
+"Kapalı kaynaklı nvidia-utils algılandı. xlibre-xserver 26.0.0.16 öncesinde,\n"
+"X sürücüsünün ABI'si XLibre'nin gerisinde kalabilir. Değişimden sonra X "
+"başlamazsa şunu ekleyin:"
+
+#: usr/local/bin/kiro-xlibre-swap:92
+msgid "See:"
+msgstr "Bkz.:"
+
+#: usr/local/bin/kiro-xlibre-swap:97
+msgid "Adding the [xlibre] pacman repo"
+msgstr "[xlibre] pacman deposu ekleniyor"
+
+#: usr/local/bin/kiro-xlibre-swap:106
+msgid "Receiving and locally signing the XLibre packaging key"
+msgstr "XLibre paketleme anahtarı alınıyor ve yerel olarak imzalanıyor"
+
+#: usr/local/bin/kiro-xlibre-swap:118
+msgid "[DRY-RUN] Would add '[xlibre]' repository to /etc/pacman.conf"
+msgstr "[DRY-RUN] '[xlibre]' deposu /etc/pacman.conf dosyasına eklenecek"
+
+#: usr/local/bin/kiro-xlibre-swap:158
+msgid "Matching installed xf86-*/xorg-server-* packages to:"
+msgstr "Kurulu xf86-*/xorg-server-* paketleri şununla eşleştiriliyor:"
+
+#: usr/local/bin/kiro-xlibre-swap:160
+msgid "No installed xf86-* driver packages found — nothing extra to match"
+msgstr "Kurulu xf86-* sürücü paketi bulunamadı — eşleştirilecek ek bir şey yok"
+
+#: usr/local/bin/kiro-xlibre-swap:175
+msgid "Removing Xorg packages first:"
+msgstr "Önce Xorg paketleri kaldırılıyor:"
+
+#: usr/local/bin/kiro-xlibre-swap:179
+msgid "Installing XLibre:"
+msgstr "XLibre kuruluyor:"
+
+#: usr/local/bin/kiro-xlibre-swap:201
+msgid "Rolling back to Xorg"
+msgstr "Xorg'a geri dönülüyor"
+
+#: usr/local/bin/kiro-xlibre-swap:208
+msgid "Restoring matching xf86 drivers:"
+msgstr "Eşleşen xf86 sürücüleri geri yükleniyor:"
+
+#: usr/local/bin/kiro-xlibre-swap:220
+msgid "Removing XLibre packages first:"
+msgstr "Önce XLibre paketleri kaldırılıyor:"
+
+#: usr/local/bin/kiro-xlibre-swap:229
+msgid "[DRY-RUN] Would remove '[xlibre]' repository from /etc/pacman.conf"
+msgstr "[DRY-RUN] '[xlibre]' deposu /etc/pacman.conf dosyasından kaldırılacak"
+
+#: usr/local/bin/kiro-xlibre-swap:238
+msgid "Xorg restored"
+msgstr "Xorg geri yüklendi"
+
+#: usr/local/bin/kiro-xlibre-swap:242
+msgid ""
+"This script swaps your X display server. A bad swap can leave you\n"
+"without a graphical session — know how to reach a TTY (Ctrl+Alt+F2) and\n"
+"log in there before choosing either option."
+msgstr ""
+"Bu betik X ekran sunucunuzu değiştirir. Hatalı bir değişim sizi grafik\n"
+"oturumu olmadan bırakabilir — bir TTY'ye (Ctrl+Alt+F2) nasıl geçeceğinizi "
+"bilin ve\n"
+"seçeneklerden birini seçmeden önce orada oturum açın."
+
+#: usr/local/bin/kiro-xlibre-swap:245
+msgid "XLibre / Xorg swap"
+msgstr "XLibre / Xorg değişimi"
+
+#. Translators: keep the numbers 1) 2) 3); the menu answers with them. Keep the indentation of each line.
+#: usr/local/bin/kiro-xlibre-swap:247
+msgid ""
+"  1) Install XLibre — adds the official xlibre.net pacman repo,\n"
+"     removes xorg-server, installs xlibre-xserver + drivers"
+msgstr ""
+"  1) XLibre kurulumu — resmi xlibre.net pacman deposunu ekler,\n"
+"     xorg-server paketini kaldırır, xlibre-xserver paketini ve sürücüleri "
+"kurar"
+
+#. Translators: keep the number 2) and the indentation of each line.
+#: usr/local/bin/kiro-xlibre-swap:250
+msgid ""
+"  2) Restore Xorg — removes XLibre, reinstalls xorg-server + drivers,\n"
+"     removes the [xlibre] pacman repo"
+msgstr ""
+"  2) Xorg'u geri yükleme — XLibre kaldırılır, xorg-server paketi ve "
+"sürücüler yeniden kurulur,\n"
+"     [xlibre] pacman deposu kaldırılır"
+
+#. Translators: keep the number 3).
+#: usr/local/bin/kiro-xlibre-swap:253
+msgid "  3) Check status — show which X server is currently installed"
+msgstr ""
+"  3) Durumu denetleme — şu anda hangi X sunucusunun kurulu olduğunu gösterir"
+
+#: usr/local/bin/kiro-xlibre-swap:260
+msgid ""
+"This will add the third-party [xlibre] repo and replace xorg-server\n"
+"with XLibre. Make sure you have a TTY fallback (Ctrl+Alt+F2). Continue?"
+msgstr ""
+"Bu işlem üçüncü taraf [xlibre] deposunu ekler ve xorg-server paketini\n"
+"XLibre ile değiştirir. Bir TTY yedeğiniz olduğundan emin olun (Ctrl+Alt+F2). "
+"Devam edilsin mi?"
+
+#: usr/local/bin/kiro-xlibre-swap:265
+#, sh-format
+msgid ""
+"To roll back later, run: sudo $SCRIPT_NAME --rollback\n"
+"Pre-swap package list: $BACKUP_FILE\n"
+"Note: XLibre enables the 'TearFree' option by default, unlike Xorg."
+msgstr ""
+"Daha sonra geri almak için şunu çalıştırın: sudo $SCRIPT_NAME --rollback\n"
+"Değişim öncesi paket listesi: $BACKUP_FILE\n"
+"Not: XLibre, Xorg'dan farklı olarak 'TearFree' seçeneğini varsayılan olarak "
+"etkinleştirir."
+
+#: usr/local/bin/kiro-xlibre-swap:271
+msgid ""
+"This will remove XLibre, restore xorg-server, and remove the\n"
+"[xlibre] pacman repo. Make sure you have a TTY fallback (Ctrl+Alt+F2). "
+"Continue?"
+msgstr ""
+"Bu işlem XLibre'yi kaldırır, xorg-server paketini geri yükler ve\n"
+"[xlibre] pacman deposunu kaldırır. Bir TTY yedeğiniz olduğundan emin olun "
+"(Ctrl+Alt+F2). Devam edilsin mi?"
+
+#. Translators: keep 1/2/3; the menu answers with those numbers.
+#: usr/local/bin/kiro-xlibre-swap:320
+msgid "Choose [1/2/3]: "
+msgstr "Seçin [1/2/3]: "
+
+#: usr/local/bin/kiro-xlibre-swap:341
+#, sh-format
+msgid "Invalid choice: $choice"
+msgstr "Geçersiz seçim: $choice"
+
+#: usr/local/lib/kiro-common.sh:163
+msgid "WARNING"
+msgstr "UYARI"
+
+#: usr/local/lib/kiro-common.sh:176
+msgid "ERROR DETECTED"
+msgstr "HATA ALGILANDI"
+
+#: usr/local/lib/kiro-common.sh:177
+#, sh-format
+msgid "Line: $lineno"
+msgstr "Satır: $lineno"
+
+#: usr/local/lib/kiro-common.sh:181
+msgid "Waiting 10 seconds before continuing..."
+msgstr "Devam etmeden önce 10 saniye bekleniyor..."
+
+#: usr/local/lib/kiro-common.sh:215
+#, sh-format
+msgid "Required command not found: $cmd"
+msgstr "Gerekli komut bulunamadı: $cmd"
+
+#: usr/local/lib/kiro-common.sh:249
+msgid "Waiting for user input to continue. Debug mode is on."
+msgstr ""
+"Devam etmek için kullanıcı girdisi bekleniyor. Hata ayıklama modu açık."
+
+#: usr/local/lib/kiro-common.sh:252
+msgid "Debug mode is on. Press any key to continue..."
+msgstr "Hata ayıklama modu açık. Devam etmek için herhangi bir tuşa basın..."
+
+#: usr/local/lib/kiro-common.sh:265 usr/local/lib/kiro-common.sh:296
+#: usr/local/lib/kiro-common.sh:665 usr/local/lib/kiro-common.sh:683
+#, sh-format
+msgid "Skipping: file not found: $file"
+msgstr "Atlanıyor: dosya bulunamadı: $file"
+
+#: usr/local/lib/kiro-common.sh:270
+#, sh-format
+msgid "No replacement needed in: $file"
+msgstr "Değiştirmeye gerek yok: $file"
+
+#: usr/local/lib/kiro-common.sh:280 usr/local/lib/kiro-common.sh:284
+#, sh-format
+msgid "Updated: $file"
+msgstr "Güncellendi: $file"
+
+#: usr/local/lib/kiro-common.sh:281 usr/local/lib/kiro-common.sh:285
+#, sh-format
+msgid "Failed to update: $file"
+msgstr "Güncellenemedi: $file"
+
+#: usr/local/lib/kiro-common.sh:302
+#, sh-format
+msgid "Processing pattern: $pattern"
+msgstr "Desen işleniyor: $pattern"
+
+#: usr/local/lib/kiro-common.sh:408
+msgid "Installing packages"
+msgstr "Paketler kuruluyor"
+
+#: usr/local/lib/kiro-common.sh:424
+msgid "Removing packages"
+msgstr "Paketler kaldırılıyor"
+
+#: usr/local/lib/kiro-common.sh:427
+msgid "No packages to remove"
+msgstr "Kaldırılacak paket yok"
+
+#: usr/local/lib/kiro-common.sh:437
+#, sh-format
+msgid "Removing package with dependencies: $pkg"
+msgstr "Paket bağımlılıklarıyla kaldırılıyor: $pkg"
+
+#: usr/local/lib/kiro-common.sh:440 usr/local/lib/kiro-common.sh:454
+#, sh-format
+msgid "No package named '$pkg' is installed"
+msgstr "'$pkg' adlı paket kurulu değil"
+
+#: usr/local/lib/kiro-common.sh:451
+#, sh-format
+msgid "Force removing package: $pkg"
+msgstr "Paket zorla kaldırılıyor: $pkg"
+
+#: usr/local/lib/kiro-common.sh:465
+msgid "No package directory provided"
+msgstr "Paket dizini belirtilmedi"
+
+#: usr/local/lib/kiro-common.sh:470
+#, sh-format
+msgid "Directory not found: $dir"
+msgstr "Dizin bulunamadı: $dir"
+
+#: usr/local/lib/kiro-common.sh:475
+msgid "pacman not found"
+msgstr "pacman bulunamadı"
+
+#: usr/local/lib/kiro-common.sh:482
+#, sh-format
+msgid "No local packages found in $dir"
+msgstr "Şurada yerel paket bulunamadı: $dir"
+
+#: usr/local/lib/kiro-common.sh:486
+#, sh-format
+msgid "Installing local packages from $dir"
+msgstr "Yerel paketler şuradan kuruluyor: $dir"
+
+#: usr/local/lib/kiro-common.sh:497
+#, sh-format
+msgid "Enabling and starting service: $service"
+msgstr "Hizmet etkinleştirilip başlatılıyor: $service"
+
+#: usr/local/lib/kiro-common.sh:507
+#, sh-format
+msgid "Disabling service: $service"
+msgstr "Hizmet devre dışı bırakılıyor: $service"
+
+#: usr/local/lib/kiro-common.sh:510
+#, sh-format
+msgid "Service $service already disabled"
+msgstr "Hizmet zaten devre dışı: $service"
+
+#: usr/local/lib/kiro-common.sh:513
+#, sh-format
+msgid "Service $service not installed"
+msgstr "Hizmet kurulu değil: $service"
+
+#: usr/local/lib/kiro-common.sh:520
+#, sh-format
+msgid "Starting service: $service"
+msgstr "Hizmet başlatılıyor: $service"
+
+#: usr/local/lib/kiro-common.sh:529
+#, sh-format
+msgid "Restarting service: $service"
+msgstr "Hizmet yeniden başlatılıyor: $service"
+
+#: usr/local/lib/kiro-common.sh:532
+#, sh-format
+msgid "Service $service not found"
+msgstr "Hizmet bulunamadı: $service"
+
+#: usr/local/lib/kiro-common.sh:546 usr/local/lib/kiro-common.sh:565
+#: usr/local/lib/kiro-common.sh:589
+#, sh-format
+msgid "Backup already exists: $dst"
+msgstr "Yedek zaten mevcut: $dst"
+
+#: usr/local/lib/kiro-common.sh:551 usr/local/lib/kiro-common.sh:570
+#, sh-format
+msgid "Source folder does not exist: $src"
+msgstr "Kaynak klasör mevcut değil: $src"
+
+#: usr/local/lib/kiro-common.sh:555 usr/local/lib/kiro-common.sh:574
+#, sh-format
+msgid "Creating folder backup: $src -> $dst"
+msgstr "Klasör yedeği oluşturuluyor: $src -> $dst"
+
+#: usr/local/lib/kiro-common.sh:584
+#, sh-format
+msgid "Source file does not exist: $src"
+msgstr "Kaynak dosya mevcut değil: $src"
+
+#: usr/local/lib/kiro-common.sh:591
+#, sh-format
+msgid "Creating backup: $dst"
+msgstr "Yedek oluşturuluyor: $dst"
+
+#: usr/local/lib/kiro-common.sh:602 usr/local/lib/kiro-common.sh:616
+#: usr/local/lib/kiro-common.sh:630 usr/local/lib/kiro-common.sh:644
+#, sh-format
+msgid "Source file missing: $src"
+msgstr "Kaynak dosya eksik: $src"
+
+#: usr/local/lib/kiro-common.sh:606
+#, sh-format
+msgid "Copying $src -> $dst"
+msgstr "Kopyalanıyor: $src -> $dst"
+
+#: usr/local/lib/kiro-common.sh:620
+#, sh-format
+msgid "Copying (user: $TARGET_USER) $src -> $dst"
+msgstr "Kopyalanıyor (kullanıcı: $TARGET_USER) $src -> $dst"
+
+#: usr/local/lib/kiro-common.sh:634
+#, sh-format
+msgid "Moving $src -> $dst"
+msgstr "Taşınıyor: $src -> $dst"
+
+#: usr/local/lib/kiro-common.sh:648
+#, sh-format
+msgid "Moving (user: $TARGET_USER) $src -> $dst"
+msgstr "Taşınıyor (kullanıcı: $TARGET_USER) $src -> $dst"
+
+#: usr/local/lib/kiro-common.sh:655
+#, sh-format
+msgid "Writing $target"
+msgstr "Yazılıyor: $target"
+
+#: usr/local/lib/kiro-common.sh:670 usr/local/lib/kiro-common.sh:688
+#, sh-format
+msgid "Line already present in $file"
+msgstr "Satır zaten mevcut: $file"
+
+#: usr/local/lib/kiro-common.sh:673 usr/local/lib/kiro-common.sh:691
+#, sh-format
+msgid "Added line to $file"
+msgstr "Satır eklendi: $file"
+
+#: usr/local/lib/kiro-common.sh:701
+#, sh-format
+msgid "Removed: $target"
+msgstr "Kaldırıldı: $target"
+
+#: usr/local/lib/kiro-common.sh:703
+#, sh-format
+msgid "Already removed: $target"
+msgstr "Zaten kaldırılmış: $target"
+
+#: usr/local/lib/kiro-common.sh:713
+#, sh-format
+msgid "Removed folder: $target"
+msgstr "Klasör kaldırıldı: $target"
+
+#: usr/local/lib/kiro-common.sh:715
+#, sh-format
+msgid "Folder already removed: $target"
+msgstr "Klasör zaten kaldırılmış: $target"
+
+#: usr/local/lib/kiro-common.sh:725
+#, sh-format
+msgid "Source folder does not exist: $source"
+msgstr "Kaynak klasör mevcut değil: $source"
+
+#: usr/local/lib/kiro-common.sh:730
+#, sh-format
+msgid "Destination already exists: $destination"
+msgstr "Hedef zaten mevcut: $destination"
+
+#: usr/local/lib/kiro-common.sh:735
+#, sh-format
+msgid "Moved folder: $source -> $destination"
+msgstr "Klasör taşındı: $source -> $destination"
+
+#: usr/local/lib/kiro-common.sh:754
+#, sh-format
+msgid "User $user already in group $group"
+msgstr "Kullanıcı $user zaten şu grupta: $group"
+
+#: usr/local/lib/kiro-common.sh:756
+#, sh-format
+msgid "Adding $user to group $group"
+msgstr "Kullanıcı $user şu gruba ekleniyor: $group"
+
+#. Translators: the answer keys Y/y and N/n stay as they are; the script only accepts those.
+#: usr/local/lib/kiro-common.sh:771
+msgid "Answer with Y/y or N/n (default: Y)"
+msgstr "Y/y veya N/n ile yanıtlayın (varsayılan: Y)"
+
+#. Translators: the answer keys Y/y and N/n stay as they are.
+#: usr/local/lib/kiro-common.sh:780
+msgid "Invalid answer. Please use Y/y or N/n."
+msgstr "Geçersiz yanıt. Lütfen Y/y veya N/n kullanın."
+
+#: usr/local/lib/kiro-common.sh:796
+#, sh-format
+msgid "Downloading $name"
+msgstr "İndiriliyor: $name"
+
+#: usr/local/lib/kiro-common.sh:798
+#, sh-format
+msgid "Failed to download: $url"
+msgstr "İndirilemedi: $url"
+
+#: usr/local/lib/kiro-common.sh:801
+#, sh-format
+msgid "Downloaded: $name"
+msgstr "İndirildi: $name"
+
+#: usr/local/lib/kiro-common.sh:813
+#, sh-format
+msgid "Setting ParallelDownloads to $value"
+msgstr "ParallelDownloads şu değere ayarlanıyor: $value"
+
+#: usr/local/lib/kiro-common.sh:816
+#, sh-format
+msgid "File not found: $file"
+msgstr "Dosya bulunamadı: $file"
+
+#: usr/local/lib/kiro-common.sh:823
+#, sh-format
+msgid "ParallelDownloads set to $value"
+msgstr "ParallelDownloads şu değere ayarlandı: $value"
+
+#: usr/local/lib/kiro-common.sh:831
+msgid "Downloading pacman configuration"
+msgstr "Pacman yapılandırması indiriliyor"
+
+#: usr/local/lib/kiro-common.sh:836
+#, sh-format
+msgid "Backup created: $backup_file"
+msgstr "Yedek oluşturuldu: $backup_file"
+
+#: usr/local/lib/kiro-common.sh:841
+msgid "Failed to download pacman.conf"
+msgstr "pacman.conf indirilemedi"
+
+#: usr/local/lib/kiro-common.sh:847
+msgid "Downloaded file is empty or missing"
+msgstr "İndirilen dosya boş veya eksik"
+
+#: usr/local/lib/kiro-common.sh:853
+msgid "pacman.conf updated"
+msgstr "pacman.conf güncellendi"
+
+#: usr/local/lib/kiro-common.sh:863
+#, sh-format
+msgid "Repository '$repo_name' already present in pacman.conf"
+msgstr "Depo zaten pacman.conf içinde mevcut: '$repo_name'"
+
+#: usr/local/lib/kiro-common.sh:867
+#, sh-format
+msgid "Adding '$repo_name' repository to pacman.conf"
+msgstr "pacman.conf dosyasına depo ekleniyor: '$repo_name'"
+
+#: usr/local/lib/kiro-common.sh:869
+msgid "Repository added"
+msgstr "Depo eklendi"
+
+#: usr/local/lib/kiro-common.sh:877
+#, sh-format
+msgid "Repository '$repo_name' not found in pacman.conf"
+msgstr "Depo pacman.conf içinde bulunamadı: '$repo_name'"
+
+#: usr/local/lib/kiro-common.sh:881
+#, sh-format
+msgid "Removing '$repo_name' repository from pacman.conf"
+msgstr "pacman.conf dosyasından depo kaldırılıyor: '$repo_name'"
+
+#: usr/local/lib/kiro-common.sh:883
+msgid "Repository removed"
+msgstr "Depo kaldırıldı"
+
+#: usr/local/lib/kiro-common.sh:903
+#, sh-format
+msgid "KiroTux: putting [kirotux_repo] back in $conf"
+msgstr "KiroTux: [kirotux_repo] deposu geri konuluyor: $conf"
+
+#: usr/local/lib/kiro-common.sh:914
+msgid "[kirotux_repo] restored"
+msgstr "[kirotux_repo] geri konuldu"
+
+#: usr/local/lib/kiro-common.sh:919
+msgid "Refreshing pacman keys and databases"
+msgstr "Pacman anahtarları ve veritabanları yenileniyor"
+
+#: usr/local/lib/kiro-common.sh:921
+msgid "Failed to init pacman keys"
+msgstr "Pacman anahtarları başlatılamadı"
+
+#: usr/local/lib/kiro-common.sh:922
+msgid "Failed to populate pacman keys"
+msgstr "Pacman anahtarları doldurulamadı"
+
+#: usr/local/lib/kiro-common.sh:925
+msgid "Pacman keys and databases refreshed"
+msgstr "Pacman anahtarları ve veritabanları yenilendi"
+
+#: usr/local/lib/kiro-common.sh:930
+msgid "Clearing pacman cache"
+msgstr "Pacman önbelleği temizleniyor"
+
+#: usr/local/lib/kiro-common.sh:933
+msgid "Failed to clean pacman cache"
+msgstr "Pacman önbelleği temizlenemedi"
+
+#: usr/local/lib/kiro-common.sh:936
+msgid "Failed to remove unneeded packages"
+msgstr "Gereksiz paketler kaldırılamadı"
+
+#: usr/local/lib/kiro-common.sh:938
+msgid "Pacman cache cleared"
+msgstr "Pacman önbelleği temizlendi"
+
+#: usr/local/lib/kiro-common.sh:943
+msgid "Fixing pacman database"
+msgstr "Pacman veritabanı onarılıyor"
+
+#: usr/local/lib/kiro-common.sh:946
+msgid "Removing corrupted sync databases..."
+msgstr "Bozuk eşitleme veritabanları kaldırılıyor..."
+
+#: usr/local/lib/kiro-common.sh:950
+msgid "Refreshing pacman databases..."
+msgstr "Pacman veritabanları yenileniyor..."
+
+#: usr/local/lib/kiro-common.sh:952
+msgid "Failed to refresh databases"
+msgstr "Veritabanları yenilenemedi"
+
+#: usr/local/lib/kiro-common.sh:956
+msgid "Pacman database fixed"
+msgstr "Pacman veritabanı onarıldı"
+
+#: usr/local/lib/kiro-common.sh:961
+msgid "Fixing pacman GPG configuration"
+msgstr "Pacman GPG yapılandırması onarılıyor"
+
+#: usr/local/lib/kiro-common.sh:970
+msgid "Initializing pacman GPG keys..."
+msgstr "Pacman GPG anahtarları başlatılıyor..."
+
+#: usr/local/lib/kiro-common.sh:972
+msgid "Failed to init GPG keys"
+msgstr "GPG anahtarları başlatılamadı"
+
+#: usr/local/lib/kiro-common.sh:976
+msgid "Populating pacman GPG keys..."
+msgstr "Pacman GPG anahtarları dolduruluyor..."
+
+#: usr/local/lib/kiro-common.sh:978
+msgid "Failed to populate GPG keys"
+msgstr "GPG anahtarları doldurulamadı"
+
+#: usr/local/lib/kiro-common.sh:982
+msgid "Pacman GPG configuration fixed"
+msgstr "Pacman GPG yapılandırması onarıldı"
+
+#: usr/local/lib/kiro-common.sh:994
+msgid "Checking internet connectivity"
+msgstr "İnternet bağlantısı denetleniyor"
+
+#: usr/local/lib/kiro-common.sh:997
+msgid "Internet connection detected"
+msgstr "İnternet bağlantısı algılandı"
+
+#: usr/local/lib/kiro-common.sh:1000
+msgid "No internet connection detected"
+msgstr "İnternet bağlantısı algılanmadı"
+
+#: usr/local/lib/kiro-common.sh:1022
+#, sh-format
+msgid "Setting DNS servers: $dns1, $dns2"
+msgstr "DNS sunucuları ayarlanıyor: $dns1, $dns2"
+
+#: usr/local/lib/kiro-common.sh:1027
+msgid "DNS servers configured"
+msgstr "DNS sunucuları yapılandırıldı"
+
+#: usr/local/lib/kiro-common.sh:1043
+#, sh-format
+msgid "Setting MAKEFLAGS to -j$cores"
+msgstr "MAKEFLAGS ayarlanıyor: -j$cores"
+
+#: usr/local/lib/kiro-common.sh:1050
+msgid "Failed to set MAKEFLAGS in ~/.makepkg.conf"
+msgstr "MAKEFLAGS ~/.makepkg.conf içinde ayarlanamadı"
+
+#: usr/local/lib/kiro-common.sh:1053
+#, sh-format
+msgid "MAKEFLAGS set to -j$cores"
+msgstr "MAKEFLAGS ayarlandı: -j$cores"
+
+#: usr/local/lib/kiro-common.sh:1083
+msgid "Operation cancelled by user"
+msgstr "İşlem kullanıcı tarafından iptal edildi"
+
+#: usr/local/lib/kiro-common.sh:1099
+#, sh-format
+msgid "$description completed successfully"
+msgstr "$description başarıyla tamamlandı"
+
+#: usr/local/lib/kiro-common.sh:1104
+#, sh-format
+msgid "$description failed with exit code $rc"
+msgstr "$description başarısız oldu, çıkış kodu: $rc"
+
+#: usr/local/lib/kiro-common.sh:1113
+#, sh-format
+msgid "Creating system report: $report_file"
+msgstr "Sistem raporu oluşturuluyor: $report_file"
+
+#: usr/local/lib/kiro-common.sh:1138
+#, sh-format
+msgid "System report created: $report_file"
+msgstr "Sistem raporu oluşturuldu: $report_file"

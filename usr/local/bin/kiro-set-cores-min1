@@ -44,10 +44,10 @@ main() {
                 ;;
             -d|--dry-run)
                 DRY_RUN=true
-                log_info "Dry-run mode enabled — no changes will be made"
+                log_info "$(_t "Dry-run mode enabled — no changes will be made")"
                 ;;
             *)
-                echo "${RED}Unknown option: $arg${RESET}" >&2
+                echo "${RED}$(_t "Unknown option:") ${arg}${RESET}" >&2
                 exit 1
                 ;;
         esac
@@ -60,18 +60,18 @@ main() {
     targetcores=$((numberofcores - RESERVE))
 
     if [ "$targetcores" -lt 1 ]; then
-        log_warn "Only $numberofcores core(s) detected — flooring MAKEFLAGS to -j1."
+        log_warn "$(_tf 'Only $numberofcores core(s) detected — flooring MAKEFLAGS to -j1.')"
         targetcores=1
     fi
 
-    log_info "Detected $numberofcores cores — setting MAKEFLAGS to -j$targetcores (leaving $RESERVE core free)."
+    log_info "$(_tf 'Detected $numberofcores cores — setting MAKEFLAGS to -j$targetcores (leaving $RESERVE core free).')"
     execute_or_dryrun "Set MAKEFLAGS=-j${targetcores} in makepkg.conf" \
         sudo sed -i -E 's/^#?MAKEFLAGS=.*/MAKEFLAGS="-j'"$targetcores"'"/' /etc/makepkg.conf
-    log_info "Changing the PKGEXT to pkg.tar.zst"
+    log_info "$(_t "Changing the PKGEXT to pkg.tar.zst")"
     execute_or_dryrun "Set PKGEXT=.pkg.tar.zst in makepkg.conf" \
         sudo sed -i "s/PKGEXT='.pkg.tar.xz'/PKGEXT='.pkg.tar.zst'/g" /etc/makepkg.conf
 
-    log_success "$(basename "$0") done"
+    log_success "$(_tf '$SCRIPT_NAME done')"
 }
 
 main "$@"
