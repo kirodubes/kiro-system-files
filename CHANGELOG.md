@@ -24,8 +24,11 @@
   package copies `usr/` as is.
 - The init block lives in `kiro-common.sh`; kiro-skell, kiro-skell-all, kiro-audit and kiro-calamares-log are
   self-contained and carry their own copy. Off-Kiro (ATT's `skell` copy) there is no catalog, so it stays English.
-- Sibling fallback: without `LANGUAGE`, a pt_PT / pt_* system reads pt_BR and zh_TW / zh_HK reads zh_CN (glibc
-  never falls back across countries by itself).
+- Sibling fallback: without `LANGUAGE`, a pt_PT system gets `LANGUAGE=pt_PT:pt_BR` and zh_TW / zh_HK gets
+  `zh_TW:zh_CN` (glibc never falls back across countries by itself). The user's locale stays first, so pacman and
+  other programs keep their own pt_PT / zh_TW text; glibc falls through the list per message.
+- kiro-report drops kiro-diag's closing "done" line by its translated text (it matched the English before), and
+  `kiro-set-cores`, a bare script name, is no longer sent through gettext.
 - pkexec scrubs the environment; `ensure_root` (kiro-common.sh) and kiro-audit's own copy now pass LANG,
   LANGUAGE, LC_ALL and LC_MESSAGES through `pkexec env`, next to TERM and PATH.
 - Answer keys (`y/n`, `Y/y`, `[1/2/3]`, the menu numbers) stay literal, with a `Translators:` comment. `--help`

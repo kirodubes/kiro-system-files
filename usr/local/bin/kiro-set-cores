@@ -52,7 +52,7 @@ main() {
         esac
     done
 
-    log_section "$(_t "kiro-set-cores")"
+    log_section "kiro-set-cores"
 
     local numberofcores
     numberofcores=$(nproc)

@@ -62,12 +62,16 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 # English is the fallback. kiro-skell, kiro-skell-all and kiro-calamares-log carry their own copy of this block.
 export TEXTDOMAIN=kiro-system-files
 # Portugal and Taiwan/Hong Kong read the sibling catalog: glibc never falls from pt_PT to pt_BR by itself.
+# The user's own locale stays first, so other programs (pacman) keep their pt_PT / zh_TW catalogs;
+# glibc falls through the list message by message.
 if [[ -z "${LANGUAGE:-}" ]]; then
-    case "${LC_ALL:-${LC_MESSAGES:-${LANG:-}}}" in
+    _kiro_loc="${LC_ALL:-${LC_MESSAGES:-${LANG:-}}}"
+    case "${_kiro_loc}" in
         pt_BR*|zh_CN*) ;;
-        pt*) export LANGUAGE=pt_BR ;;
-        zh*) export LANGUAGE=zh_CN ;;
+        pt*) export LANGUAGE="${_kiro_loc%%[.@]*}:pt_BR" ;;
+        zh*) export LANGUAGE="${_kiro_loc%%[.@]*}:zh_CN" ;;
     esac
+    unset _kiro_loc
 fi
 # _t "Text" translates; _tf 'Text with $var' translates a whole sentence and then fills in $var
 # (gettext's eval_gettext), so translators can move the value where their language needs it.

@@ -32,12 +32,16 @@ NAME="$(basename "$0")"
 # ── Translation (same block as /usr/local/lib/kiro-common.sh) ───────────────
 # gettext domain kiro-system-files; off-Kiro there is no catalog, so the text stays English.
 export TEXTDOMAIN=kiro-system-files
+# The user's own locale stays first, so other programs (pacman) keep their pt_PT / zh_TW catalogs;
+# glibc falls through the list message by message.
 if [[ -z "${LANGUAGE:-}" ]]; then
-    case "${LC_ALL:-${LC_MESSAGES:-${LANG:-}}}" in
+    _kiro_loc="${LC_ALL:-${LC_MESSAGES:-${LANG:-}}}"
+    case "${_kiro_loc}" in
         pt_BR*|zh_CN*) ;;
-        pt*) export LANGUAGE=pt_BR ;;
-        zh*) export LANGUAGE=zh_CN ;;
+        pt*) export LANGUAGE="${_kiro_loc%%[.@]*}:pt_BR" ;;
+        zh*) export LANGUAGE="${_kiro_loc%%[.@]*}:zh_CN" ;;
     esac
+    unset _kiro_loc
 fi
 if command -v gettext >/dev/null 2>&1 && command -v gettext.sh >/dev/null 2>&1; then
     # shellcheck source=/dev/null

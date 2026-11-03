@@ -246,7 +246,8 @@ build_report() {
         RED='' GREEN='' YELLOW='' BLUE='' PURPLE='' CYAN='' BOLD='' RESET=''
         report_header
         echo
-        kiro-diag 2>&1 | grep -v 'kiro-diag done' || true
+        # kiro-diag's closing line is translated; drop it in the user's language.
+        kiro-diag 2>&1 | grep -vF "$(SCRIPT_NAME=kiro-diag; _tf '$SCRIPT_NAME done')" || true
         section_encryption
         section_drivers
         section_debug
