@@ -819,8 +819,18 @@ check_nvidia() {
 
     if lspci 2>/dev/null | grep -qi nvidia; then
         log_info "NVIDIA GPU detected"
-        pkg_installed nvidia-open-dkms  && pass "nvidia-open-dkms installed"  || warn "NVIDIA GPU present but nvidia-open-dkms not installed"
-        pkg_installed nvidia-utils       && pass "nvidia-utils installed"       || warn "nvidia-utils not installed"
+        # kiro-hwd picks nvidia-open (Turing+) or nvidia-580xx (Maxwell/Pascal); driver=free keeps nouveau
+        if pkg_installed nvidia-open-dkms; then
+            pass "nvidia-open-dkms installed"
+            pkg_installed nvidia-utils && pass "nvidia-utils installed" || warn "nvidia-utils not installed"
+        elif pkg_installed nvidia-580xx-dkms; then
+            pass "nvidia-580xx-dkms installed"
+            pkg_installed nvidia-580xx-utils && pass "nvidia-580xx-utils installed" || warn "nvidia-580xx-utils not installed"
+        elif [[ -d /sys/module/nouveau ]]; then
+            pass "nouveau in use (driver=free) — no NVIDIA driver package expected"
+        else
+            warn "NVIDIA GPU present but no NVIDIA driver package installed and nouveau not loaded"
+        fi
     else
         pass "No NVIDIA GPU detected — DKMS packages not expected"
         pkg_missing nvidia-open-dkms && pass "nvidia-open-dkms not installed (no GPU, good)" || warn "nvidia-open-dkms installed but no NVIDIA GPU detected"

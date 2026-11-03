@@ -24,6 +24,10 @@
   padded by character count, so they line up in every language.
 - **New `tests/check.sh`**, run by `up.sh` before every push: a FAIL blocks the push. `--installed` checks the
   built package after the flow.
+- **kiro-audit no longer warns about a missing NVIDIA driver on `driver=free` installs.** With an NVIDIA card and
+  nouveau driving it, the audit warned "nvidia-open-dkms not installed" and "nvidia-utils not installed" (seen on
+  two test laptops). It now passes with "nouveau in use (driver=free)". Pascal/Maxwell installs that got
+  `nvidia-580xx` from kiro-hwd no longer get that warning either.
 
 ### Technical Details
 - Removed `DefaultEnvironment="LANG=en_US.UTF-8"` and its Environment header from
@@ -83,6 +87,9 @@
   per the register rules. Localised Keywords keep the English terms after the local ones, so an English search
   still finds the entry in every language.
 - The link entries' Comment is the URL and stays untranslated (4 empty msgstr per language, on purpose).
+- `check_nvidia` (kiro-audit): with an NVIDIA GPU it checks `nvidia-open-dkms` + `nvidia-utils`, else
+  `nvidia-580xx-dkms` + `nvidia-580xx-utils` (the two kiro-hwd profiles), else passes when `/sys/module/nouveau`
+  exists, else warns once. The finding stays English like the other findings.
 - `.codespellrc` skips the generated entries and the catalogs; the English `.in` sources are still checked.
 - Second pass by a fresh Claude reviewer: 17 findings, all taken. The Czech "přehled" (overview) became "zpráva"
   (report). The half-English "Probe" in German and Dutch became "Analyse". The Dutch keyword "uitgaven" (reads as
@@ -97,6 +104,7 @@
 - `usr/local/lib/kiro-common.sh`, `usr/local/bin/kiro-*` (all 26), `usr/share/locale/*/LC_MESSAGES/kiro-system-files.mo`
   (new, 16)
 - `tests/check.sh` (new), `up.sh`
+- `usr/local/bin/kiro-audit`, `usr/share/man/man8/kiro-audit.8`
 - `CLAUDE.md`, `CHANGELOG.md`
 
 ## 2026.10.20
