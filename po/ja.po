@@ -127,7 +127,8 @@ msgstr "$name には root 権限が必要です — パスワードを要求し�
 msgid "$name needs root — re-running with sudo..."
 msgstr "$name には root 権限が必要です — sudo で再実行します..."
 
-#: usr/local/bin/kiro-audit:346 usr/local/bin/kiro-diag:227
+#: usr/local/bin/kiro-audit:346 usr/local/bin/kiro-audit:1480
+#: usr/local/bin/kiro-diag:227
 msgid "Kernel"
 msgstr "カーネル"
 
@@ -166,6 +167,11 @@ msgstr "SDDM"
 #: usr/local/bin/kiro-audit:703
 msgid "User groups"
 msgstr "ユーザーグループ"
+
+#: usr/local/bin/kiro-audit:712
+#, sh-format
+msgid "Checking groups for user: $user"
+msgstr "ユーザーのグループを確認しています: $user"
 
 #: usr/local/bin/kiro-audit:722
 msgid "Systemd services"
@@ -255,9 +261,62 @@ msgstr "Kiro Plasma のテーマ/設定"
 msgid "Kiro ISO — Installed System Audit"
 msgstr "Kiro ISO — インストール済みシステム監査"
 
-#: usr/local/bin/kiro-audit:1523
+#: usr/local/bin/kiro-audit:1480
+msgid "Date"
+msgstr "日付"
+
+#: usr/local/bin/kiro-audit:1480
+msgid "Host"
+msgstr "ホスト"
+
+#: usr/local/bin/kiro-audit:1480
+msgid "Virt"
+msgstr "仮想化"
+
+#: usr/local/bin/kiro-audit:1494
+#, sh-format
+msgid "$vm_type (virtual machine)"
+msgstr "$vm_type (仮想マシン)"
+
+#: usr/local/bin/kiro-audit:1531
 msgid "Audit Summary"
 msgstr "監査サマリー"
+
+#: usr/local/bin/kiro-audit:1542
+#, sh-format
+msgid ""
+"Audit found $FAIL failure(s); $FIXED fix(es) applied — re-run to confirm"
+msgstr ""
+"監査で失敗が見つかりました: $FAIL 件、適用した修正: $FIXED 件 — 確認のため再"
+"実行してください"
+
+#: usr/local/bin/kiro-audit:1544
+#, sh-format
+msgid "Audit completed with $FAIL failure(s)"
+msgstr "監査が完了しました (失敗: $FAIL 件)"
+
+#: usr/local/bin/kiro-audit:1548
+#, sh-format
+msgid "Audit completed with $WARN warning(s)"
+msgstr "監査が完了しました (警告: $WARN 件)"
+
+#: usr/local/bin/kiro-audit:1552
+#, sh-format
+msgid "$name — all checks passed"
+msgstr "$name — すべてのチェックに合格しました"
+
+#: usr/local/bin/kiro-audit:1558
+#, sh-format
+msgid ""
+"You are running on a virtual machine ($vm_type).\n"
+"kiro-audit is intended for real (bare-metal) hardware — the\n"
+"failures above are most likely VM / live-environment artifacts,\n"
+"not a broken install."
+msgstr ""
+"仮想マシン ($vm_type) 上で実行しています。\n"
+"kiro-audit は実機 (ベアメタル) 向けです。\n"
+"上記の失敗は VM やライブ環境によるものである可能性が高く、\n"
+"インストールの破損ではありません。"
 
 #: usr/local/bin/kiro-calamares-log:177 usr/local/bin/kiro-diag:388
 #: usr/local/bin/kiro-enable-ssh:55 usr/local/bin/kiro-fix-gpg-conf:49

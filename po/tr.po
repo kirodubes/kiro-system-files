@@ -125,7 +125,8 @@ msgstr "$name root yetkisi gerektiriyor — parolanız isteniyor..."
 msgid "$name needs root — re-running with sudo..."
 msgstr "$name root yetkisi gerektiriyor — sudo ile yeniden çalıştırılıyor..."
 
-#: usr/local/bin/kiro-audit:346 usr/local/bin/kiro-diag:227
+#: usr/local/bin/kiro-audit:346 usr/local/bin/kiro-audit:1480
+#: usr/local/bin/kiro-diag:227
 msgid "Kernel"
 msgstr "Çekirdek"
 
@@ -164,6 +165,11 @@ msgstr "SDDM"
 #: usr/local/bin/kiro-audit:703
 msgid "User groups"
 msgstr "Kullanıcı grupları"
+
+#: usr/local/bin/kiro-audit:712
+#, sh-format
+msgid "Checking groups for user: $user"
+msgstr "Kullanıcının grupları denetleniyor: $user"
 
 #: usr/local/bin/kiro-audit:722
 msgid "Systemd services"
@@ -253,9 +259,62 @@ msgstr "Kiro Plasma teması/yapılandırması"
 msgid "Kiro ISO — Installed System Audit"
 msgstr "Kiro ISO — Kurulu Sistem Denetimi"
 
-#: usr/local/bin/kiro-audit:1523
+#: usr/local/bin/kiro-audit:1480
+msgid "Date"
+msgstr "Tarih"
+
+#: usr/local/bin/kiro-audit:1480
+msgid "Host"
+msgstr "Ana makine"
+
+#: usr/local/bin/kiro-audit:1480
+msgid "Virt"
+msgstr "Sanallaştırma"
+
+#: usr/local/bin/kiro-audit:1494
+#, sh-format
+msgid "$vm_type (virtual machine)"
+msgstr "$vm_type (sanal makine)"
+
+#: usr/local/bin/kiro-audit:1531
 msgid "Audit Summary"
 msgstr "Denetim Özeti"
+
+#: usr/local/bin/kiro-audit:1542
+#, sh-format
+msgid ""
+"Audit found $FAIL failure(s); $FIXED fix(es) applied — re-run to confirm"
+msgstr ""
+"Denetim hata buldu: $FAIL; uygulanan düzeltme: $FIXED — doğrulamak için "
+"yeniden çalıştırın"
+
+#: usr/local/bin/kiro-audit:1544
+#, sh-format
+msgid "Audit completed with $FAIL failure(s)"
+msgstr "Denetim tamamlandı, hata sayısı: $FAIL"
+
+#: usr/local/bin/kiro-audit:1548
+#, sh-format
+msgid "Audit completed with $WARN warning(s)"
+msgstr "Denetim tamamlandı, uyarı sayısı: $WARN"
+
+#: usr/local/bin/kiro-audit:1552
+#, sh-format
+msgid "$name — all checks passed"
+msgstr "$name — tüm denetimler başarılı"
+
+#: usr/local/bin/kiro-audit:1558
+#, sh-format
+msgid ""
+"You are running on a virtual machine ($vm_type).\n"
+"kiro-audit is intended for real (bare-metal) hardware — the\n"
+"failures above are most likely VM / live-environment artifacts,\n"
+"not a broken install."
+msgstr ""
+"Sanal bir makinede çalışıyorsunuz ($vm_type).\n"
+"kiro-audit gerçek donanım (bare metal) için tasarlanmıştır — yukarıdaki\n"
+"hatalar büyük olasılıkla sanal makineden veya canlı ortamdan kaynaklanıyor,\n"
+"bozuk bir kurulumdan değil."
 
 #: usr/local/bin/kiro-calamares-log:177 usr/local/bin/kiro-diag:388
 #: usr/local/bin/kiro-enable-ssh:55 usr/local/bin/kiro-fix-gpg-conf:49

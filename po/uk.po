@@ -126,7 +126,8 @@ msgstr ""
 msgid "$name needs root — re-running with sudo..."
 msgstr ""
 
-#: usr/local/bin/kiro-audit:346 usr/local/bin/kiro-diag:227
+#: usr/local/bin/kiro-audit:346 usr/local/bin/kiro-audit:1480
+#: usr/local/bin/kiro-diag:227
 msgid "Kernel"
 msgstr ""
 
@@ -164,6 +165,11 @@ msgstr ""
 
 #: usr/local/bin/kiro-audit:703
 msgid "User groups"
+msgstr ""
+
+#: usr/local/bin/kiro-audit:712
+#, sh-format
+msgid "Checking groups for user: $user"
 msgstr ""
 
 #: usr/local/bin/kiro-audit:722
@@ -254,8 +260,55 @@ msgstr ""
 msgid "Kiro ISO — Installed System Audit"
 msgstr ""
 
-#: usr/local/bin/kiro-audit:1523
+#: usr/local/bin/kiro-audit:1480
+msgid "Date"
+msgstr ""
+
+#: usr/local/bin/kiro-audit:1480
+msgid "Host"
+msgstr ""
+
+#: usr/local/bin/kiro-audit:1480
+msgid "Virt"
+msgstr ""
+
+#: usr/local/bin/kiro-audit:1494
+#, sh-format
+msgid "$vm_type (virtual machine)"
+msgstr ""
+
+#: usr/local/bin/kiro-audit:1531
 msgid "Audit Summary"
+msgstr ""
+
+#: usr/local/bin/kiro-audit:1542
+#, sh-format
+msgid ""
+"Audit found $FAIL failure(s); $FIXED fix(es) applied — re-run to confirm"
+msgstr ""
+
+#: usr/local/bin/kiro-audit:1544
+#, sh-format
+msgid "Audit completed with $FAIL failure(s)"
+msgstr ""
+
+#: usr/local/bin/kiro-audit:1548
+#, sh-format
+msgid "Audit completed with $WARN warning(s)"
+msgstr ""
+
+#: usr/local/bin/kiro-audit:1552
+#, sh-format
+msgid "$name — all checks passed"
+msgstr ""
+
+#: usr/local/bin/kiro-audit:1558
+#, sh-format
+msgid ""
+"You are running on a virtual machine ($vm_type).\n"
+"kiro-audit is intended for real (bare-metal) hardware — the\n"
+"failures above are most likely VM / live-environment artifacts,\n"
+"not a broken install."
 msgstr ""
 
 #: usr/local/bin/kiro-calamares-log:177 usr/local/bin/kiro-diag:388

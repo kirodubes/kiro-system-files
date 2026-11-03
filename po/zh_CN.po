@@ -125,7 +125,8 @@ msgstr "$name 需要 root 权限 — 正在请求你的密码..."
 msgid "$name needs root — re-running with sudo..."
 msgstr "$name 需要 root 权限 — 正在使用 sudo 重新运行..."
 
-#: usr/local/bin/kiro-audit:346 usr/local/bin/kiro-diag:227
+#: usr/local/bin/kiro-audit:346 usr/local/bin/kiro-audit:1480
+#: usr/local/bin/kiro-diag:227
 msgid "Kernel"
 msgstr "内核"
 
@@ -164,6 +165,11 @@ msgstr "SDDM"
 #: usr/local/bin/kiro-audit:703
 msgid "User groups"
 msgstr "用户组"
+
+#: usr/local/bin/kiro-audit:712
+#, sh-format
+msgid "Checking groups for user: $user"
+msgstr "正在检查用户的组：$user"
 
 #: usr/local/bin/kiro-audit:722
 msgid "Systemd services"
@@ -253,9 +259,60 @@ msgstr "Kiro Plasma 主题/配置"
 msgid "Kiro ISO — Installed System Audit"
 msgstr "Kiro ISO — 已安装系统审计"
 
-#: usr/local/bin/kiro-audit:1523
+#: usr/local/bin/kiro-audit:1480
+msgid "Date"
+msgstr "日期"
+
+#: usr/local/bin/kiro-audit:1480
+msgid "Host"
+msgstr "主机"
+
+#: usr/local/bin/kiro-audit:1480
+msgid "Virt"
+msgstr "虚拟化"
+
+#: usr/local/bin/kiro-audit:1494
+#, sh-format
+msgid "$vm_type (virtual machine)"
+msgstr "$vm_type（虚拟机）"
+
+#: usr/local/bin/kiro-audit:1531
 msgid "Audit Summary"
 msgstr "审计摘要"
+
+#: usr/local/bin/kiro-audit:1542
+#, sh-format
+msgid ""
+"Audit found $FAIL failure(s); $FIXED fix(es) applied — re-run to confirm"
+msgstr "审计发现失败：$FAIL 项；已应用修复：$FIXED 项 — 请重新运行以确认"
+
+#: usr/local/bin/kiro-audit:1544
+#, sh-format
+msgid "Audit completed with $FAIL failure(s)"
+msgstr "审计完成，失败：$FAIL 项"
+
+#: usr/local/bin/kiro-audit:1548
+#, sh-format
+msgid "Audit completed with $WARN warning(s)"
+msgstr "审计完成，警告：$WARN 项"
+
+#: usr/local/bin/kiro-audit:1552
+#, sh-format
+msgid "$name — all checks passed"
+msgstr "$name — 所有检查均已通过"
+
+#: usr/local/bin/kiro-audit:1558
+#, sh-format
+msgid ""
+"You are running on a virtual machine ($vm_type).\n"
+"kiro-audit is intended for real (bare-metal) hardware — the\n"
+"failures above are most likely VM / live-environment artifacts,\n"
+"not a broken install."
+msgstr ""
+"你正在虚拟机（$vm_type）上运行。\n"
+"kiro-audit 面向真实硬件（裸机）——\n"
+"上面的失败很可能是虚拟机或 live 环境造成的，\n"
+"并不代表安装已损坏。"
 
 #: usr/local/bin/kiro-calamares-log:177 usr/local/bin/kiro-diag:388
 #: usr/local/bin/kiro-enable-ssh:55 usr/local/bin/kiro-fix-gpg-conf:49

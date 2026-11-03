@@ -709,7 +709,7 @@ check_user_groups() {
         return
     fi
 
-    log_info "Checking groups for user: ${user}"
+    log_info "$(_tf 'Checking groups for user: $user')"
     local groups
     groups=$(groups "${user}")
 
@@ -1474,17 +1474,26 @@ check_kiro_plasma() {
 #####################################################################
 main() {
     log_section "$(_t "Kiro ISO — Installed System Audit")"
+    # Translated labels differ in length: pad them to the longest so the colons line up.
+    # (by characters, not bytes: printf's width would misalign Cyrillic and CJK labels)
+    local l_host l_kernel l_date l_virt l w=0
+    l_host="$(_t "Host")"; l_kernel="$(_t "Kernel")"; l_date="$(_t "Date")"; l_virt="$(_t "Virt")"
+    for l in "$l_host" "$l_kernel" "$l_date" "$l_virt"; do (( ${#l} > w )) && w=${#l}; done
+    _kv() { printf '  %s%*s : %s\n' "$1" $(( w - ${#1} )) "" "$2"; }
     if [[ "${JSON_MODE}" != true ]]; then
-        echo "  Host   : $(hostname)"
-        echo "  Kernel : $(uname -r)"
-        echo "  Date   : $(date)"
+        _kv "$l_host" "$(hostname)"
+        _kv "$l_kernel" "$(uname -r)"
+        _kv "$l_date" "$(date)"
     fi
 
     local is_vm=false vm_type=""
     if systemd-detect-virt --vm --quiet 2>/dev/null; then
         is_vm=true
+        # shellcheck disable=SC2034  # read by _tf (eval_gettext), which shellcheck cannot see
         vm_type="$(systemd-detect-virt --vm 2>/dev/null || true)"
-        if [[ "${JSON_MODE}" != true ]]; then echo "  Virt   : ${vm_type} (virtual machine)"; fi
+        if [[ "${JSON_MODE}" != true ]]; then
+            _kv "$l_virt" "$(_tf '$vm_type (virtual machine)')"
+        fi
     fi
 
     check_kernel
@@ -1531,24 +1540,26 @@ main() {
     local rc=0
     if [[ ${FAIL} -gt 0 ]]; then
         if [[ "${FIX_MODE}" == true && ${FIXED} -gt 0 ]]; then
-            log_warn "Audit found ${FAIL} failure(s); ${FIXED} fix(es) applied — re-run to confirm"
+            log_warn "$(_tf 'Audit found $FAIL failure(s); $FIXED fix(es) applied — re-run to confirm')"
         else
-            log_error "Audit completed with ${FAIL} failure(s)"
+            log_error "$(_tf 'Audit completed with $FAIL failure(s)')"
         fi
         rc=1
     elif [[ ${WARN} -gt 0 ]]; then
-        log_warn "Audit completed with ${WARN} warning(s)"
+        log_warn "$(_tf 'Audit completed with $WARN warning(s)')"
     else
-        log_success "$(basename "$0") — all checks passed"
+        local name
+        name="$(basename "$0")"
+        log_success "$(_tf '$name — all checks passed')"
     fi
 
     # Keep this last: on a VM the failures above are mostly environment
     # artifacts, so reassure the user rather than let them panic.
     if [[ "${is_vm}" == true ]]; then
-        log_warn "You are running on a virtual machine (${vm_type}).
+        log_warn "$(_tf 'You are running on a virtual machine ($vm_type).
 kiro-audit is intended for real (bare-metal) hardware — the
 failures above are most likely VM / live-environment artifacts,
-not a broken install."
+not a broken install.')"
     fi
 
     if [[ "${JSON_MODE}" == true ]]; then

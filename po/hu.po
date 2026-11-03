@@ -125,7 +125,8 @@ msgstr "$name rootjogosultságot igényel — a jelszavad kérése..."
 msgid "$name needs root — re-running with sudo..."
 msgstr "$name rootjogosultságot igényel — újrafuttatás sudo-val..."
 
-#: usr/local/bin/kiro-audit:346 usr/local/bin/kiro-diag:227
+#: usr/local/bin/kiro-audit:346 usr/local/bin/kiro-audit:1480
+#: usr/local/bin/kiro-diag:227
 msgid "Kernel"
 msgstr "Kernel"
 
@@ -164,6 +165,11 @@ msgstr "SDDM"
 #: usr/local/bin/kiro-audit:703
 msgid "User groups"
 msgstr "Felhasználói csoportok"
+
+#: usr/local/bin/kiro-audit:712
+#, sh-format
+msgid "Checking groups for user: $user"
+msgstr "Felhasználó csoportjainak ellenőrzése: $user"
 
 #: usr/local/bin/kiro-audit:722
 msgid "Systemd services"
@@ -253,9 +259,62 @@ msgstr "Kiro Plasma téma/beállítás"
 msgid "Kiro ISO — Installed System Audit"
 msgstr "Kiro ISO — Telepített rendszer auditja"
 
-#: usr/local/bin/kiro-audit:1523
+#: usr/local/bin/kiro-audit:1480
+msgid "Date"
+msgstr "Dátum"
+
+#: usr/local/bin/kiro-audit:1480
+msgid "Host"
+msgstr "Gép"
+
+#: usr/local/bin/kiro-audit:1480
+msgid "Virt"
+msgstr "Virtualizáció"
+
+#: usr/local/bin/kiro-audit:1494
+#, sh-format
+msgid "$vm_type (virtual machine)"
+msgstr "$vm_type (virtuális gép)"
+
+#: usr/local/bin/kiro-audit:1531
 msgid "Audit Summary"
 msgstr "Audit összegzés"
+
+#: usr/local/bin/kiro-audit:1542
+#, sh-format
+msgid ""
+"Audit found $FAIL failure(s); $FIXED fix(es) applied — re-run to confirm"
+msgstr ""
+"Az audit hibákat talált: $FAIL; alkalmazott javítások: $FIXED — futtasd újra "
+"a megerősítéshez"
+
+#: usr/local/bin/kiro-audit:1544
+#, sh-format
+msgid "Audit completed with $FAIL failure(s)"
+msgstr "Audit befejezve, hibák: $FAIL"
+
+#: usr/local/bin/kiro-audit:1548
+#, sh-format
+msgid "Audit completed with $WARN warning(s)"
+msgstr "Audit befejezve, figyelmeztetések: $WARN"
+
+#: usr/local/bin/kiro-audit:1552
+#, sh-format
+msgid "$name — all checks passed"
+msgstr "$name — minden ellenőrzés sikeres"
+
+#: usr/local/bin/kiro-audit:1558
+#, sh-format
+msgid ""
+"You are running on a virtual machine ($vm_type).\n"
+"kiro-audit is intended for real (bare-metal) hardware — the\n"
+"failures above are most likely VM / live-environment artifacts,\n"
+"not a broken install."
+msgstr ""
+"Virtuális gépen futtatod ($vm_type).\n"
+"A kiro-audit valódi hardverre (bare metal) készült — a\n"
+"fenti hibákat valószínűleg a VM vagy a live környezet okozza,\n"
+"nem hibás telepítés."
 
 #: usr/local/bin/kiro-calamares-log:177 usr/local/bin/kiro-diag:388
 #: usr/local/bin/kiro-enable-ssh:55 usr/local/bin/kiro-fix-gpg-conf:49

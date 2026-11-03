@@ -125,7 +125,8 @@ msgstr "$name necesita root — solicitando tu contraseña..."
 msgid "$name needs root — re-running with sudo..."
 msgstr "$name necesita root — volviendo a ejecutar con sudo..."
 
-#: usr/local/bin/kiro-audit:346 usr/local/bin/kiro-diag:227
+#: usr/local/bin/kiro-audit:346 usr/local/bin/kiro-audit:1480
+#: usr/local/bin/kiro-diag:227
 msgid "Kernel"
 msgstr "Kernel"
 
@@ -164,6 +165,11 @@ msgstr "SDDM"
 #: usr/local/bin/kiro-audit:703
 msgid "User groups"
 msgstr "Grupos de usuarios"
+
+#: usr/local/bin/kiro-audit:712
+#, sh-format
+msgid "Checking groups for user: $user"
+msgstr "Comprobando los grupos del usuario: $user"
 
 #: usr/local/bin/kiro-audit:722
 msgid "Systemd services"
@@ -253,9 +259,62 @@ msgstr "Tema/configuración de Kiro Plasma"
 msgid "Kiro ISO — Installed System Audit"
 msgstr "Kiro ISO — Auditoría del sistema instalado"
 
-#: usr/local/bin/kiro-audit:1523
+#: usr/local/bin/kiro-audit:1480
+msgid "Date"
+msgstr "Fecha"
+
+#: usr/local/bin/kiro-audit:1480
+msgid "Host"
+msgstr "Equipo"
+
+#: usr/local/bin/kiro-audit:1480
+msgid "Virt"
+msgstr "Virtualización"
+
+#: usr/local/bin/kiro-audit:1494
+#, sh-format
+msgid "$vm_type (virtual machine)"
+msgstr "$vm_type (máquina virtual)"
+
+#: usr/local/bin/kiro-audit:1531
 msgid "Audit Summary"
 msgstr "Resumen de la auditoría"
+
+#: usr/local/bin/kiro-audit:1542
+#, sh-format
+msgid ""
+"Audit found $FAIL failure(s); $FIXED fix(es) applied — re-run to confirm"
+msgstr ""
+"La auditoría encontró fallos: $FAIL; correcciones aplicadas: $FIXED — vuelve "
+"a ejecutarla para confirmar"
+
+#: usr/local/bin/kiro-audit:1544
+#, sh-format
+msgid "Audit completed with $FAIL failure(s)"
+msgstr "Auditoría completada, fallos: $FAIL"
+
+#: usr/local/bin/kiro-audit:1548
+#, sh-format
+msgid "Audit completed with $WARN warning(s)"
+msgstr "Auditoría completada, advertencias: $WARN"
+
+#: usr/local/bin/kiro-audit:1552
+#, sh-format
+msgid "$name — all checks passed"
+msgstr "$name — todas las comprobaciones superadas"
+
+#: usr/local/bin/kiro-audit:1558
+#, sh-format
+msgid ""
+"You are running on a virtual machine ($vm_type).\n"
+"kiro-audit is intended for real (bare-metal) hardware — the\n"
+"failures above are most likely VM / live-environment artifacts,\n"
+"not a broken install."
+msgstr ""
+"Estás en una máquina virtual ($vm_type).\n"
+"kiro-audit está pensado para hardware real (bare metal) — los\n"
+"fallos anteriores probablemente se deben a la VM o al entorno live,\n"
+"no a una instalación rota."
 
 #: usr/local/bin/kiro-calamares-log:177 usr/local/bin/kiro-diag:388
 #: usr/local/bin/kiro-enable-ssh:55 usr/local/bin/kiro-fix-gpg-conf:49

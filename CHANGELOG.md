@@ -18,6 +18,10 @@
   (kiro-audit, kiro-verify, kiro-report, kiro-calamares-log, kiro-diag, kiro-lint, kiro-probe-report) translate
   their headings and prompts only: users paste their findings into Discussions, so the findings stay English.
 - When a script asks for root through the polkit dialog (pkexec), the root run now keeps the user's language.
+- kiro-audit: the header labels (Host, Kernel, Date, Virt), the closing "Audit completed with …" lines, the
+  virtual-machine notice and "Checking groups for user" are translated too (found on a test VM: they were plain
+  `echo` lines the first round missed). The PASS/WARN/FAIL findings and counters stay English. The labels are
+  padded by character count, so they line up in every language.
 - **New `tests/check.sh`**, run by `up.sh` before every push: a FAIL blocks the push. `--installed` checks the
   built package after the flow.
 
