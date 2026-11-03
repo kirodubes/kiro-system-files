@@ -28,8 +28,16 @@
   nouveau driving it, the audit warned "nvidia-open-dkms not installed" and "nvidia-utils not installed" (seen on
   two test laptops). It now passes with "nouveau in use (driver=free)". Pascal/Maxwell installs that got
   `nvidia-580xx` from kiro-hwd no longer get that warning either.
+- **The password dialog is fully Dutch on a Dutch install.** polkit-gnome, the agent that draws it, never had a
+  Dutch translation (upstream archived at 0.105; the other 12 Kiro languages are covered), so the dialog mixed a
+  Dutch heading with English body text, "Password:" and "Authenticate". Kiro now ships the missing catalog.
 
 ### Technical Details
+- `po/polkit-gnome/nl.po` (46 strings, informal "je", "rootgebruiker" as in polkit's own Dutch heading); same
+  msgids as upstream (`msgcmp` against the German catalog). `po/make-mo.sh` compiles it to
+  `usr/share/locale/nl/LC_MESSAGES/polkit-gnome-1.mo` with `msgfmt --check`, no msgmerge since the strings are
+  frozen. polkit-gnome doesn't own that path, so no file conflict. Checked on a test VM (nl_BE): heading, body,
+  Wachtwoord, Annuleren and Authenticeren all Dutch. The `.po` line-number references were refreshed by the same run.
 - Removed `DefaultEnvironment="LANG=en_US.UTF-8"` and its Environment header from
   `etc/systemd/system.conf.d/10-kiro-system.conf` (there since the first commit, no stated reason). systemd now
   takes LANG from `/etc/locale.conf`, the Arch default. Tested on a Kiro VM with a Dutch system: with the line
@@ -105,6 +113,7 @@
   (new, 16)
 - `tests/check.sh` (new), `up.sh`
 - `usr/local/bin/kiro-audit`, `usr/share/man/man8/kiro-audit.8`
+- `po/polkit-gnome/nl.po` (new), `usr/share/locale/nl/LC_MESSAGES/polkit-gnome-1.mo` (new), `po/make-mo.sh`
 - `CLAUDE.md`, `CHANGELOG.md`
 
 ## 2026.10.20

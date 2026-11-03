@@ -20,6 +20,8 @@ set -euo pipefail
 #   - Compile each <lang>.po into
 #     usr/share/locale/<lang>/LC_MESSAGES/kiro-system-files.mo for the
 #     scripts (the PKGBUILD ships usr/ as is).
+#   - Compile po/polkit-gnome/<lang>.po into polkit-gnome-1.mo for the
+#     languages upstream polkit-gnome (archived) never got (Dutch).
 #
 #   Why: run it after any change to a menu entry or a script's text,
 #   before the flow script builds the package, so the menu and the
@@ -133,6 +135,20 @@ merge_and_compile() {
     done
 }
 
+# polkit-gnome's own password dialog: upstream ships no catalog for these languages.
+# No msgmerge: the strings are frozen (upstream archived at 0.105).
+compile_polkit_gnome() {
+    local po lang mo
+    for po in "$SCRIPT_DIR"/polkit-gnome/*.po; do
+        [[ -e "$po" ]] || continue
+        lang="$(basename "$po" .po)"
+        log_section "polkit-gnome $lang"
+        mo="$REPO/usr/share/locale/$lang/LC_MESSAGES/polkit-gnome-1.mo"
+        mkdir -p "$(dirname "$mo")"
+        msgfmt --check --statistics -o "$mo" "$po"
+    done
+}
+
 write_desktop() {
     local src
     log_section "Menu entries"
@@ -150,6 +166,7 @@ write_desktop() {
 main() {
     extract
     merge_and_compile
+    compile_polkit_gnome
     write_desktop
     log_success "$(basename "$0") done"
 }

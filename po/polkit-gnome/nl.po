@@ -1,0 +1,183 @@
+# Dutch translation of polkit-gnome, shipped by Kiro: upstream (archived at 0.105) has none.
+# Source strings: polkit-gnome 0.105 (msgunfmt of the German catalog). Register: informal "je".
+msgid ""
+msgstr ""
+"Project-Id-Version: polkit-gnome 0.105\n"
+"PO-Revision-Date: 2026-11-03 16:40+0100\n"
+"Last-Translator: Kiro <https://kiroproject.be>\n"
+"Language-Team: Dutch\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "%s (%s)"
+msgstr "%s (%s)"
+
+msgid "<small><b>Action:</b></small>"
+msgstr "<small><b>Actie:</b></small>"
+
+msgid "<small><b>Vendor:</b></small>"
+msgstr "<small><b>Leverancier:</b></small>"
+
+msgid "<small><b>_Details</b></small>"
+msgstr "<small><b>_Details</b></small>"
+
+msgid "Action Identifier"
+msgstr "Actie-ID"
+
+msgid ""
+"An application is attempting to perform an action that requires privileges. "
+"Authentication as one of the users below is required to perform this action."
+msgstr ""
+"Een programma probeert een actie uit te voeren waarvoor rechten nodig zijn. "
+"Meld je aan als een van de gebruikers hieronder om deze actie uit te voeren."
+
+msgid ""
+"An application is attempting to perform an action that requires privileges. "
+"Authentication as the super user is required to perform this action."
+msgstr ""
+"Een programma probeert een actie uit te voeren waarvoor rechten nodig zijn. "
+"Authenticatie als rootgebruiker is vereist om deze actie uit te voeren."
+
+msgid ""
+"An application is attempting to perform an action that requires privileges. "
+"Authentication is required to perform this action."
+msgstr ""
+"Een programma probeert een actie uit te voeren waarvoor rechten nodig zijn. "
+"Authenticatie is vereist om deze actie uit te voeren."
+
+msgid "Authenticate"
+msgstr "Authenticeren"
+
+msgid "Authentication Failure"
+msgstr "Authenticatie mislukt"
+
+msgid "Authentication dialog was dismissed by the user"
+msgstr "De gebruiker heeft het authenticatievenster gesloten"
+
+msgid "Authentication is needed to make changes."
+msgstr "Authenticatie is nodig om wijzigingen aan te brengen."
+
+msgid "Can Obtain"
+msgstr "Kan verkrijgen"
+
+msgid "Click to edit %s"
+msgstr "Klik om %s te bewerken"
+
+msgid "Click to lock down"
+msgstr "Klik om af te sluiten"
+
+msgid "Click to make changes"
+msgstr "Klik om wijzigingen aan te brengen"
+
+msgid "Click to open %s"
+msgstr "Klik om %s te openen"
+
+msgid "Click to prevent changes"
+msgstr "Klik om wijzigingen te voorkomen"
+
+msgid "Is Authorized"
+msgstr "Is gemachtigd"
+
+msgid "Is Visible"
+msgstr "Is zichtbaar"
+
+msgid "Lock Down Text"
+msgstr "Tekst voor afsluiten"
+
+msgid "Lock Down Tooltip"
+msgstr "Tooltip voor afsluiten"
+
+msgid "Lock Text"
+msgstr "Tekst voor vergrendelen"
+
+msgid "Lock Tooltip"
+msgstr "Tooltip voor vergrendelen"
+
+msgid "Not authorized to make changes"
+msgstr "Niet gemachtigd om wijzigingen aan te brengen"
+
+msgid "Select user..."
+msgstr "Kies een gebruiker..."
+
+msgid "System policy prevents changes. Contact your system administator."
+msgstr "Het systeembeleid verhindert wijzigingen. Neem contact op met je systeembeheerder."
+
+msgid "The action identifier to use for the button"
+msgstr "De actie-ID voor de knop"
+
+msgid ""
+"The text to display when prompting the user to lock down the action for all "
+"users."
+msgstr ""
+"De tekst die verschijnt wanneer de gebruiker gevraagd wordt de actie voor "
+"alle gebruikers af te sluiten."
+
+msgid "The text to display when prompting the user to lock."
+msgstr "De tekst die verschijnt wanneer de gebruiker gevraagd wordt te vergrendelen."
+
+msgid "The text to display when prompting the user to unlock."
+msgstr "De tekst die verschijnt wanneer de gebruiker gevraagd wordt te ontgrendelen."
+
+msgid ""
+"The text to display when the user cannot obtain authorization through "
+"authentication."
+msgstr ""
+"De tekst die verschijnt wanneer de gebruiker via authenticatie geen "
+"machtiging kan krijgen."
+
+msgid ""
+"The tooltip to display when prompting the user to lock down the action for "
+"all users."
+msgstr ""
+"De tooltip die verschijnt wanneer de gebruiker gevraagd wordt de actie voor "
+"alle gebruikers af te sluiten."
+
+msgid "The tooltip to display when prompting the user to lock."
+msgstr "De tooltip die verschijnt wanneer de gebruiker gevraagd wordt te vergrendelen."
+
+msgid "The tooltip to display when prompting the user to unlock."
+msgstr "De tooltip die verschijnt wanneer de gebruiker gevraagd wordt te ontgrendelen."
+
+msgid ""
+"The tooltip to display when the user cannot obtain authorization through "
+"authentication."
+msgstr ""
+"De tooltip die verschijnt wanneer de gebruiker via authenticatie geen "
+"machtiging kan krijgen."
+
+msgid "To prevent further changes, click the lock."
+msgstr "Klik op het slot om verdere wijzigingen te voorkomen."
+
+msgid ""
+"To prevent users without administrative privileges from making changes, "
+"click the lock."
+msgstr ""
+"Klik op het slot om te voorkomen dat gebruikers zonder beheerdersrechten "
+"wijzigingen aanbrengen."
+
+msgid "Unlock Text"
+msgstr "Tekst voor ontgrendelen"
+
+msgid "Unlock Tooltip"
+msgstr "Tooltip voor ontgrendelen"
+
+msgid "Whether authorization can be obtained"
+msgstr "Of er een machtiging verkregen kan worden"
+
+msgid "Whether the process is authorized"
+msgstr "Of het proces gemachtigd is"
+
+msgid "Whether the widget is visible"
+msgstr "Of de widget zichtbaar is"
+
+msgid "_Authenticate"
+msgstr "_Authenticeren"
+
+msgid "_Password for %s:"
+msgstr "_Wachtwoord voor %s:"
+
+msgid "_Password:"
+msgstr "_Wachtwoord:"

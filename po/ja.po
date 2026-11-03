@@ -127,7 +127,7 @@ msgstr "$name には root 権限が必要です — パスワードを要求し�
 msgid "$name needs root — re-running with sudo..."
 msgstr "$name には root 権限が必要です — sudo で再実行します..."
 
-#: usr/local/bin/kiro-audit:346 usr/local/bin/kiro-audit:1480
+#: usr/local/bin/kiro-audit:346 usr/local/bin/kiro-audit:1490
 #: usr/local/bin/kiro-diag:227
 msgid "Kernel"
 msgstr "カーネル"
@@ -189,100 +189,100 @@ msgstr "ISO バージョン"
 msgid "NVIDIA"
 msgstr "NVIDIA"
 
-#: usr/local/bin/kiro-audit:831
+#: usr/local/bin/kiro-audit:841
 msgid "chwd driver install"
 msgstr "chwd ドライバーのインストール"
 
-#: usr/local/bin/kiro-audit:851
+#: usr/local/bin/kiro-audit:861
 msgid "Package integrity (pacman -Qk)"
 msgstr "パッケージの整合性 (pacman -Qk)"
 
-#: usr/local/bin/kiro-audit:875
+#: usr/local/bin/kiro-audit:885
 msgid "Sysctl security baseline"
 msgstr "Sysctl セキュリティベースライン"
 
-#: usr/local/bin/kiro-audit:903 usr/local/bin/kiro-verify:243
+#: usr/local/bin/kiro-audit:913 usr/local/bin/kiro-verify:243
 msgid "ZRAM"
 msgstr "ZRAM"
 
-#: usr/local/bin/kiro-audit:925
+#: usr/local/bin/kiro-audit:935
 msgid "Udev rules"
 msgstr "Udev ルール"
 
-#: usr/local/bin/kiro-audit:960
+#: usr/local/bin/kiro-audit:970
 msgid "Systemd drop-ins"
 msgstr "Systemd ドロップイン"
 
-#: usr/local/bin/kiro-audit:976
+#: usr/local/bin/kiro-audit:986
 msgid "Modprobe & THP tuning"
 msgstr "Modprobe と THP のチューニング"
 
-#: usr/local/bin/kiro-audit:990
+#: usr/local/bin/kiro-audit:1000
 msgid "Hardening & tuning (2026-05-28)"
 msgstr "堅牢化とチューニング (2026-05-28)"
 
-#: usr/local/bin/kiro-audit:1063
+#: usr/local/bin/kiro-audit:1073
 msgid "systemd-resolved configuration"
 msgstr "systemd-resolved の設定"
 
-#: usr/local/bin/kiro-audit:1083
+#: usr/local/bin/kiro-audit:1093
 msgid "tuned-ppd power profile"
 msgstr "tuned-ppd 電源プロファイル"
 
-#: usr/local/bin/kiro-audit:1119
+#: usr/local/bin/kiro-audit:1129
 msgid "Tumbler / thumbnailing"
 msgstr "Tumbler / サムネイル生成"
 
-#: usr/local/bin/kiro-audit:1127
+#: usr/local/bin/kiro-audit:1137
 msgid "Failed systemd units"
 msgstr "失敗した systemd ユニット"
 
-#: usr/local/bin/kiro-audit:1145
+#: usr/local/bin/kiro-audit:1155
 msgid "Boot time and updates (info)"
 msgstr "起動時間とアップデート (情報)"
 
-#: usr/local/bin/kiro-audit:1161 usr/local/bin/kiro-diag:252
+#: usr/local/bin/kiro-audit:1171 usr/local/bin/kiro-diag:252
 msgid "Bootloader"
 msgstr "ブートローダー"
 
-#: usr/local/bin/kiro-audit:1193
+#: usr/local/bin/kiro-audit:1203
 msgid "Btrfs snapshots"
 msgstr "Btrfs スナップショット"
 
-#: usr/local/bin/kiro-audit:1273
+#: usr/local/bin/kiro-audit:1283
 msgid "Disk format & encryption"
 msgstr "ディスクのフォーマットと暗号化"
 
-#: usr/local/bin/kiro-audit:1376
+#: usr/local/bin/kiro-audit:1386
 msgid "Kiro Plasma theme/config"
 msgstr "Kiro Plasma のテーマ/設定"
 
-#: usr/local/bin/kiro-audit:1476
+#: usr/local/bin/kiro-audit:1486
 msgid "Kiro ISO — Installed System Audit"
 msgstr "Kiro ISO — インストール済みシステム監査"
 
-#: usr/local/bin/kiro-audit:1480
+#: usr/local/bin/kiro-audit:1490
 msgid "Date"
 msgstr "日付"
 
-#: usr/local/bin/kiro-audit:1480
+#: usr/local/bin/kiro-audit:1490
 msgid "Host"
 msgstr "ホスト"
 
-#: usr/local/bin/kiro-audit:1480
+#: usr/local/bin/kiro-audit:1490
 msgid "Virt"
 msgstr "仮想化"
 
-#: usr/local/bin/kiro-audit:1494
+#: usr/local/bin/kiro-audit:1505
 #, sh-format
 msgid "$vm_type (virtual machine)"
 msgstr "$vm_type (仮想マシン)"
 
-#: usr/local/bin/kiro-audit:1531
+#: usr/local/bin/kiro-audit:1542
 msgid "Audit Summary"
 msgstr "監査サマリー"
 
-#: usr/local/bin/kiro-audit:1542
+#: usr/local/bin/kiro-audit:1553
 #, sh-format
 msgid ""
 "Audit found $FAIL failure(s); $FIXED fix(es) applied — re-run to confirm"
@@ -290,22 +290,22 @@ msgstr ""
 "監査で失敗が見つかりました: $FAIL 件、適用した修正: $FIXED 件 — 確認のため再"
 "実行してください"
 
-#: usr/local/bin/kiro-audit:1544
+#: usr/local/bin/kiro-audit:1555
 #, sh-format
 msgid "Audit completed with $FAIL failure(s)"
 msgstr "監査が完了しました (失敗: $FAIL 件)"
 
-#: usr/local/bin/kiro-audit:1548
+#: usr/local/bin/kiro-audit:1559
 #, sh-format
 msgid "Audit completed with $WARN warning(s)"
 msgstr "監査が完了しました (警告: $WARN 件)"
 
-#: usr/local/bin/kiro-audit:1552
+#: usr/local/bin/kiro-audit:1563
 #, sh-format
 msgid "$name — all checks passed"
 msgstr "$name — すべてのチェックに合格しました"
 
-#: usr/local/bin/kiro-audit:1558
+#: usr/local/bin/kiro-audit:1569
 #, sh-format
 msgid ""
 "You are running on a virtual machine ($vm_type).\n"
