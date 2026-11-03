@@ -1,0 +1,116 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: kiro-system-files\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-03 04:52+0100\n"
+"PO-Revision-Date: 2026-11-03 00:00+0100\n"
+"Last-Translator: Kiro\n"
+"Language-Team: Kiro\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: po/desktop/kiro-audit.desktop.in:4
+msgid "Kiro System Audit"
+msgstr "Kiro 系统审计"
+
+#: po/desktop/kiro-audit.desktop.in:5
+msgid "System Integrity Checker"
+msgstr "系统完整性检查器"
+
+#: po/desktop/kiro-audit.desktop.in:6
+msgid "Check and repair Kiro system integrity"
+msgstr "检查并修复 Kiro 系统完整性"
+
+#: po/desktop/kiro-audit.desktop.in:12
+msgid "kiro;audit;system;integrity;check;"
+msgstr "审计;系统;完整性;检查;kiro;audit;system;integrity;check;"
+
+#: po/desktop/kiro-link-code.desktop.in:4
+msgid "Kiro Source Code"
+msgstr "Kiro 源代码"
+
+#: po/desktop/kiro-link-code.desktop.in:5
+#: po/desktop/kiro-link-discussions.desktop.in:5
+#: po/desktop/kiro-link-releases.desktop.in:5
+#: po/desktop/kiro-link-website.desktop.in:5
+msgid "Web Bookmark"
+msgstr "网页书签"
+
+#: po/desktop/kiro-link-code.desktop.in:6
+msgid "https://github.com/kirodubes"
+msgstr ""
+
+#: po/desktop/kiro-link-code.desktop.in:11
+msgid "kiro;source;code;github;repositories;"
+msgstr "源代码;代码仓库;kiro;source;code;github;repositories;"
+
+#: po/desktop/kiro-link-discussions.desktop.in:4
+msgid "Kiro Discussions"
+msgstr "Kiro 讨论区"
+
+#: po/desktop/kiro-link-discussions.desktop.in:6
+msgid "https://github.com/kirodubes/kiro-discussions/discussions"
+msgstr ""
+
+#: po/desktop/kiro-link-discussions.desktop.in:11
+msgid "kiro;discussions;ideas;community;suggestions;"
+msgstr "讨论;想法;社区;建议;kiro;discussions;ideas;community;suggestions;"
+
+#: po/desktop/kiro-link-releases.desktop.in:4
+msgid "Kiro Releases"
+msgstr "Kiro 版本发布"
+
+#: po/desktop/kiro-link-releases.desktop.in:6
+msgid "https://kiroproject.be/releases.html"
+msgstr ""
+
+#: po/desktop/kiro-link-releases.desktop.in:11
+msgid "kiro;releases;iso;download;changelog;"
+msgstr "版本;下载;更新日志;kiro;releases;iso;download;changelog;"
+
+#: po/desktop/kiro-link-website.desktop.in:4
+msgid "Kiro Website"
+msgstr "Kiro 官网"
+
+#: po/desktop/kiro-link-website.desktop.in:6
+msgid "https://kiroproject.be"
+msgstr ""
+
+#: po/desktop/kiro-link-website.desktop.in:11
+msgid "kiro;website;home;homepage;"
+msgstr "网站;官网;主页;kiro;website;home;homepage;"
+
+#: po/desktop/kiro-probe-report.desktop.in:4
+msgid "Hardware Probe Report"
+msgstr "硬件检测报告"
+
+#: po/desktop/kiro-probe-report.desktop.in:5
+msgid "Hardware Report"
+msgstr "硬件报告"
+
+#: po/desktop/kiro-probe-report.desktop.in:6
+msgid "View the hardware probe insight report (HTML)"
+msgstr "查看硬件检测分析报告（HTML）"
+
+#: po/desktop/kiro-probe-report.desktop.in:12
+msgid "kiro;hardware;probe;report;hw-probe;"
+msgstr "硬件;报告;检测;kiro;hardware;probe;report;hw-probe;"
+
+#: po/desktop/kiro-sysinfo.desktop.in:4
+msgid "System Information"
+msgstr "系统信息"
+
+#: po/desktop/kiro-sysinfo.desktop.in:5
+msgid "System Information Viewer"
+msgstr "系统信息查看器"
+
+#: po/desktop/kiro-sysinfo.desktop.in:6
+msgid "Full system and hardware report (inxi)"
+msgstr "完整的系统和硬件报告（inxi）"
+
+#: po/desktop/kiro-sysinfo.desktop.in:12
+msgid "inxi;system;hardware;info;information;"
+msgstr "系统;硬件;信息;inxi;system;hardware;info;information;"

@@ -1,2 +1,5 @@
 [codespell]
 ignore-words-list = hda
+# The generated menu entries and the .po catalogs carry every translation; codespell only knows English typos.
+# The English sources (po/desktop/*.desktop.in) are still checked.
+skip = usr/share/applications/kiro-*.desktop,*.po,*.pot

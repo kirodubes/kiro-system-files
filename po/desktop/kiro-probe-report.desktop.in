@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Hardware Probe Report
+GenericName=Hardware Report
+Comment=View the hardware probe insight report (HTML)
+Exec=alacritty --title "Hardware Probe Report" -e bash -c "kiro-probe-report --open || read -rp 'Press Enter to close...'"
+TryExec=kiro-probe-report
+Icon=kiro
+Terminal=false
+Categories=System;Settings;X-XFCE-SettingsDialog;X-XFCE-SystemSettings;
+Keywords=kiro;hardware;probe;report;hw-probe;

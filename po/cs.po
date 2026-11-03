@@ -1,0 +1,116 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: kiro-system-files\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-03 04:52+0100\n"
+"PO-Revision-Date: 2026-11-03 00:00+0100\n"
+"Last-Translator: Kiro\n"
+"Language-Team: Kiro\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+
+#: po/desktop/kiro-audit.desktop.in:4
+msgid "Kiro System Audit"
+msgstr "Audit systému Kiro"
+
+#: po/desktop/kiro-audit.desktop.in:5
+msgid "System Integrity Checker"
+msgstr "Kontrola integrity systému"
+
+#: po/desktop/kiro-audit.desktop.in:6
+msgid "Check and repair Kiro system integrity"
+msgstr "Zkontrolujte a opravte integritu systému Kiro"
+
+#: po/desktop/kiro-audit.desktop.in:12
+msgid "kiro;audit;system;integrity;check;"
+msgstr "systém;integrita;kontrola;kiro;audit;system;integrity;check;"
+
+#: po/desktop/kiro-link-code.desktop.in:4
+msgid "Kiro Source Code"
+msgstr "Zdrojový kód Kiro"
+
+#: po/desktop/kiro-link-code.desktop.in:5
+#: po/desktop/kiro-link-discussions.desktop.in:5
+#: po/desktop/kiro-link-releases.desktop.in:5
+#: po/desktop/kiro-link-website.desktop.in:5
+msgid "Web Bookmark"
+msgstr "Webová záložka"
+
+#: po/desktop/kiro-link-code.desktop.in:6
+msgid "https://github.com/kirodubes"
+msgstr ""
+
+#: po/desktop/kiro-link-code.desktop.in:11
+msgid "kiro;source;code;github;repositories;"
+msgstr "zdrojový;kód;repozitáře;kiro;source;code;github;repositories;"
+
+#: po/desktop/kiro-link-discussions.desktop.in:4
+msgid "Kiro Discussions"
+msgstr "Diskuse Kiro"
+
+#: po/desktop/kiro-link-discussions.desktop.in:6
+msgid "https://github.com/kirodubes/kiro-discussions/discussions"
+msgstr ""
+
+#: po/desktop/kiro-link-discussions.desktop.in:11
+msgid "kiro;discussions;ideas;community;suggestions;"
+msgstr "diskuse;nápady;komunita;návrhy;kiro;discussions;ideas;community;suggestions;"
+
+#: po/desktop/kiro-link-releases.desktop.in:4
+msgid "Kiro Releases"
+msgstr "Vydání Kiro"
+
+#: po/desktop/kiro-link-releases.desktop.in:6
+msgid "https://kiroproject.be/releases.html"
+msgstr ""
+
+#: po/desktop/kiro-link-releases.desktop.in:11
+msgid "kiro;releases;iso;download;changelog;"
+msgstr "vydání;stáhnout;změny;kiro;releases;iso;download;changelog;"
+
+#: po/desktop/kiro-link-website.desktop.in:4
+msgid "Kiro Website"
+msgstr "Webové stránky Kiro"
+
+#: po/desktop/kiro-link-website.desktop.in:6
+msgid "https://kiroproject.be"
+msgstr ""
+
+#: po/desktop/kiro-link-website.desktop.in:11
+msgid "kiro;website;home;homepage;"
+msgstr "web;stránky;domovská stránka;kiro;website;home;homepage;"
+
+#: po/desktop/kiro-probe-report.desktop.in:4
+msgid "Hardware Probe Report"
+msgstr "Zpráva o analýze hardwaru"
+
+#: po/desktop/kiro-probe-report.desktop.in:5
+msgid "Hardware Report"
+msgstr "Zpráva o hardwaru"
+
+#: po/desktop/kiro-probe-report.desktop.in:6
+msgid "View the hardware probe insight report (HTML)"
+msgstr "Zobrazte zprávu o analýze hardwaru (HTML)"
+
+#: po/desktop/kiro-probe-report.desktop.in:12
+msgid "kiro;hardware;probe;report;hw-probe;"
+msgstr "zpráva;analýza;kiro;hardware;probe;report;hw-probe;"
+
+#: po/desktop/kiro-sysinfo.desktop.in:4
+msgid "System Information"
+msgstr "Informace o systému"
+
+#: po/desktop/kiro-sysinfo.desktop.in:5
+msgid "System Information Viewer"
+msgstr "Prohlížeč informací o systému"
+
+#: po/desktop/kiro-sysinfo.desktop.in:6
+msgid "Full system and hardware report (inxi)"
+msgstr "Úplná zpráva o systému a hardwaru (inxi)"
+
+#: po/desktop/kiro-sysinfo.desktop.in:12
+msgid "inxi;system;hardware;info;information;"
+msgstr "systém;informace;inxi;system;hardware;info;information;"

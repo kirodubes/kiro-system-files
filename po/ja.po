@@ -1,0 +1,118 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: kiro-system-files\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-03 04:52+0100\n"
+"PO-Revision-Date: 2026-11-03 00:00+0100\n"
+"Last-Translator: Kiro\n"
+"Language-Team: Kiro\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: po/desktop/kiro-audit.desktop.in:4
+msgid "Kiro System Audit"
+msgstr "Kiro システム監査"
+
+#: po/desktop/kiro-audit.desktop.in:5
+msgid "System Integrity Checker"
+msgstr "システム整合性チェッカー"
+
+#: po/desktop/kiro-audit.desktop.in:6
+msgid "Check and repair Kiro system integrity"
+msgstr "Kiro システムの整合性を確認・修復"
+
+#: po/desktop/kiro-audit.desktop.in:12
+msgid "kiro;audit;system;integrity;check;"
+msgstr "監査;システム;整合性;チェック;kiro;audit;system;integrity;check;"
+
+#: po/desktop/kiro-link-code.desktop.in:4
+msgid "Kiro Source Code"
+msgstr "Kiro ソースコード"
+
+#: po/desktop/kiro-link-code.desktop.in:5
+#: po/desktop/kiro-link-discussions.desktop.in:5
+#: po/desktop/kiro-link-releases.desktop.in:5
+#: po/desktop/kiro-link-website.desktop.in:5
+msgid "Web Bookmark"
+msgstr "ウェブブックマーク"
+
+#: po/desktop/kiro-link-code.desktop.in:6
+msgid "https://github.com/kirodubes"
+msgstr ""
+
+#: po/desktop/kiro-link-code.desktop.in:11
+msgid "kiro;source;code;github;repositories;"
+msgstr "ソースコード;リポジトリ;kiro;source;code;github;repositories;"
+
+#: po/desktop/kiro-link-discussions.desktop.in:4
+msgid "Kiro Discussions"
+msgstr "Kiro ディスカッション"
+
+#: po/desktop/kiro-link-discussions.desktop.in:6
+msgid "https://github.com/kirodubes/kiro-discussions/discussions"
+msgstr ""
+
+#: po/desktop/kiro-link-discussions.desktop.in:11
+msgid "kiro;discussions;ideas;community;suggestions;"
+msgstr ""
+"ディスカッション;アイデア;コミュニティ;提"
+"案;kiro;discussions;ideas;community;suggestions;"
+
+#: po/desktop/kiro-link-releases.desktop.in:4
+msgid "Kiro Releases"
+msgstr "Kiro リリース"
+
+#: po/desktop/kiro-link-releases.desktop.in:6
+msgid "https://kiroproject.be/releases.html"
+msgstr ""
+
+#: po/desktop/kiro-link-releases.desktop.in:11
+msgid "kiro;releases;iso;download;changelog;"
+msgstr "リリース;ダウンロード;変更履歴;kiro;releases;iso;download;changelog;"
+
+#: po/desktop/kiro-link-website.desktop.in:4
+msgid "Kiro Website"
+msgstr "Kiro ウェブサイト"
+
+#: po/desktop/kiro-link-website.desktop.in:6
+msgid "https://kiroproject.be"
+msgstr ""
+
+#: po/desktop/kiro-link-website.desktop.in:11
+msgid "kiro;website;home;homepage;"
+msgstr "ウェブサイト;ホームページ;kiro;website;home;homepage;"
+
+#: po/desktop/kiro-probe-report.desktop.in:4
+msgid "Hardware Probe Report"
+msgstr "ハードウェアプローブレポート"
+
+#: po/desktop/kiro-probe-report.desktop.in:5
+msgid "Hardware Report"
+msgstr "ハードウェアレポート"
+
+#: po/desktop/kiro-probe-report.desktop.in:6
+msgid "View the hardware probe insight report (HTML)"
+msgstr "ハードウェアプローブの分析レポートを表示（HTML）"
+
+#: po/desktop/kiro-probe-report.desktop.in:12
+msgid "kiro;hardware;probe;report;hw-probe;"
+msgstr "ハードウェア;レポート;kiro;hardware;probe;report;hw-probe;"
+
+#: po/desktop/kiro-sysinfo.desktop.in:4
+msgid "System Information"
+msgstr "システム情報"
+
+#: po/desktop/kiro-sysinfo.desktop.in:5
+msgid "System Information Viewer"
+msgstr "システム情報ビューア"
+
+#: po/desktop/kiro-sysinfo.desktop.in:6
+msgid "Full system and hardware report (inxi)"
+msgstr "システムとハードウェアの完全なレポート（inxi）"
+
+#: po/desktop/kiro-sysinfo.desktop.in:12
+msgid "inxi;system;hardware;info;information;"
+msgstr "システム;ハードウェア;情報;inxi;system;hardware;info;information;"

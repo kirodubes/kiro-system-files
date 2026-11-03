@@ -1,5 +1,36 @@
 # CHANGELOG
 
+## 2026.11.03
+
+### What Changed
+- **The 7 menu entries speak the user's language.** Kiro Website, Kiro Releases, Kiro Discussions, Kiro Source Code,
+  System Information, Kiro System Audit and Hardware Probe Report now carry a translated Name and search Keywords
+  in all 13 Kiro languages (de, es, fr, hu, it, ja, nl, pl, pt_BR, ro, ru, tr, zh_CN). Before, only the small
+  GenericName/Comment line was translated and the menu name stayed English. Hungarian and Romanian are new;
+  Portuguese, Ukrainian and Czech, which the entries already had, are kept.
+- The menu entries are now generated from gettext catalogs, like the other translated Kiro apps.
+
+### Technical Details
+- English sources live in `po/desktop/*.desktop.in`; `po/make-mo.sh` extracts them into `po/kiro-system-files.pot`,
+  merges each `po/<lang>.po`, checks it with `msgfmt --check` and writes `usr/share/applications/` with
+  `msgfmt --desktop`. Edit the `.in` files, never the generated entries. No `.mo` is shipped yet: the `kiro-*`
+  script round (ROADMAP §4 #16b) will add one under the same domain.
+- The existing hand-written GenericName/Comment translations seeded the `.po` files. Spanish Comments moved to "tú"
+  per the register rules. Localised Keywords keep the English terms after the local ones, so an English search
+  still finds the entry in every language.
+- The link entries' Comment is the URL and stays untranslated (4 empty msgstr per language, on purpose).
+- `.codespellrc` skips the generated entries and the catalogs; the English `.in` sources are still checked.
+- Second pass by a fresh Claude reviewer: 17 findings, all taken. The Czech "přehled" (overview) became "zpráva"
+  (report). The half-English "Probe" in German and Dutch became "Analyse". The Dutch keyword "uitgaven" (reads as
+  "expenses") became "versies". The rest were minor fixes in hu, ro, fr and it.
+
+### Files Modified
+- `po/make-mo.sh` (new), `po/desktop/*.desktop.in` (new, 7), `po/*.po` (new, 16), `po/kiro-system-files.pot`,
+  `po/LINGUAS`
+- `usr/share/applications/kiro-{audit,sysinfo,probe-report,link-website,link-releases,link-discussions,link-code}.desktop`
+- `.codespellrc`
+- `CHANGELOG.md`
+
 ## 2026.10.20
 
 ### What Changed
