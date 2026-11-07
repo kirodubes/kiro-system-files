@@ -1,0 +1,14 @@
+# Kiro override of lshw's launcher: its Icon= is a fixed path the XFCE menu leaves empty and no icon theme can
+# replace. hwinfo exists in neo-candy-icons and Surfn Kiro. Everything else is lshw's own (lshw B.02.20).
+[Desktop Entry]
+Name=LSHW
+Comment=HardWare LiSter
+Comment[fr]=Listeur de matériel
+Comment[es]=Listar equipamiento
+Categories=Application;System;X-Red-Hat-Base;X-Fedora;
+Icon=hwinfo
+Exec=/usr/sbin/gtk-lshw
+Type=Application
+Terminal=false
+Encoding=UTF-8
+X-Desktop-File-Install-Version=0.10

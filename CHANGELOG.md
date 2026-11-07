@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## 2026.11.07
+
+### What Changed
+- **LSHW (HardWare LiSter) has an icon in the menu again.** Its launcher points at a fixed file path that XFCE's
+  menu showed as an empty spot, and that no icon theme can replace. Kiro's copy of the launcher uses the `hwinfo`
+  icon, which both Kiro icon themes (neo-candy-icons and Surfn Kiro) have.
+
+### Technical Details
+- New `usr/local/share/applications/gtk-lshw.desktop`: lshw's own launcher with `Icon=/usr/share/lshw/artwork/logo.svg`
+  changed to `Icon=hwinfo`, plus a comment explaining why. `/usr/local/share` comes before `/usr/share` in
+  `XDG_DATA_DIRS`, the same way the timeshift-gtk, firewall-config and nm-connection-editor overrides work.
+  Everything else stays lshw's (B.02.20); `desktop-file-validate` only warns about lshw's own deprecated
+  `Application` category and `Encoding` key.
+
+### Files Modified
+- usr/local/share/applications/gtk-lshw.desktop (new)
+
 ## 2026.11.03
 
 ### What Changed
