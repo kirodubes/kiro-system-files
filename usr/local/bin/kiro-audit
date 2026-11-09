@@ -1087,6 +1087,14 @@ check_resolved_config() {
     else
         warn "ReadEtcHosts not disabled; resolved will parse /etc/hosts on every boot (slow with hBlock)"
     fi
+
+    local llmnr_no
+    llmnr_no=$(grep -rl '^LLMNR=no' /etc/systemd/resolved.conf /etc/systemd/resolved.conf.d/ 2>/dev/null | head -1 || true)
+    if [[ -n "${llmnr_no}" ]]; then
+        pass "LLMNR=no set (${llmnr_no}) — resolved does not answer LLMNR queries"
+    else
+        warn "LLMNR not disabled in systemd-resolved; hostname answers to anyone on the LAN (spoofable)"
+    fi
 }
 
 check_tuned_profile() {

@@ -1,5 +1,24 @@
 # CHANGELOG
 
+## 2026.11.09
+
+### What Changed
+- **systemd-resolved no longer answers LLMNR (Link-Local Multicast Name Resolution).** It was on by default, so
+  any machine on the local network could query, and spoof answers for, this computer's name. DNS plus avahi's mDNS
+  cover local names.
+- kiro-audit checks for `LLMNR=no` in the systemd-resolved configuration and warns when it is missing.
+
+### Technical Details
+- `LLMNR=no` added to the existing `etc/systemd/resolved.conf.d/10-kiro-mdns.conf` drop-in, next to
+  `MulticastDNS=no` and `ReadEtcHosts=no`; the file keeps its name so upgrades replace it in place.
+- `check_resolved_config()` in kiro-audit gets a third check in the same grep-the-drop-ins style. The finding text
+  stays English, like the other report findings.
+
+### Files Modified
+- etc/systemd/resolved.conf.d/10-kiro-mdns.conf
+- usr/local/bin/kiro-audit
+- CHANGELOG.md
+
 ## 2026.11.07
 
 ### What Changed
