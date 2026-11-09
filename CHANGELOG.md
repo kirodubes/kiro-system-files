@@ -9,6 +9,7 @@
 - **The system ignores ICMP redirects.** Before, it accepted them (IPv6 everywhere, IPv4 on new interfaces and
   "secure" ones from the gateway), so a machine on the LAN could re-route this computer's traffic through itself.
 - kiro-audit checks for `LLMNR=no` in the systemd-resolved configuration and warns when it is missing.
+- kiro-audit's sysctl security baseline also checks that ICMP redirects are ignored.
 
 ### Technical Details
 - `LLMNR=no` added to the existing `etc/systemd/resolved.conf.d/10-kiro-mdns.conf` drop-in, next to
@@ -18,6 +19,9 @@
 - `99-kiro-optimizations.conf`: `accept_redirects = 0` for `net.ipv4.conf.{all,default}` and
   `net.ipv6.conf.{all,default}`, plus `secure_redirects = 0` for IPv4, next to the existing `send_redirects = 0`.
   These are core netns sysctls, present on every kernel; IPv6 router advertisements are unaffected.
+- `check_sysctl_security()` gets the same six keys in its `expected_values` table. `default` is checked as well as
+  `all`: with forwarding off, IPv4 accepts redirects on an interface when either its own value or `all` is on,
+  and new interfaces inherit `default`.
 
 ### Files Modified
 - etc/sysctl.d/99-kiro-optimizations.conf
