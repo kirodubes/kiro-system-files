@@ -6,6 +6,8 @@
 - **systemd-resolved no longer answers LLMNR (Link-Local Multicast Name Resolution).** It was on by default, so
   any machine on the local network could query, and spoof answers for, this computer's name. DNS plus avahi's mDNS
   cover local names.
+- **The system ignores ICMP redirects.** Before, it accepted them (IPv6 everywhere, IPv4 on new interfaces and
+  "secure" ones from the gateway), so a machine on the LAN could re-route this computer's traffic through itself.
 - kiro-audit checks for `LLMNR=no` in the systemd-resolved configuration and warns when it is missing.
 
 ### Technical Details
@@ -13,8 +15,12 @@
   `MulticastDNS=no` and `ReadEtcHosts=no`; the file keeps its name so upgrades replace it in place.
 - `check_resolved_config()` in kiro-audit gets a third check in the same grep-the-drop-ins style. The finding text
   stays English, like the other report findings.
+- `99-kiro-optimizations.conf`: `accept_redirects = 0` for `net.ipv4.conf.{all,default}` and
+  `net.ipv6.conf.{all,default}`, plus `secure_redirects = 0` for IPv4, next to the existing `send_redirects = 0`.
+  These are core netns sysctls, present on every kernel; IPv6 router advertisements are unaffected.
 
 ### Files Modified
+- etc/sysctl.d/99-kiro-optimizations.conf
 - etc/systemd/resolved.conf.d/10-kiro-mdns.conf
 - usr/local/bin/kiro-audit
 - CHANGELOG.md
