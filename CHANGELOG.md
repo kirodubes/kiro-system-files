@@ -1,5 +1,29 @@
 # CHANGELOG
 
+## 2026.11.14
+
+### What Changed
+- **pamac shows app icons again.** Since `archlinux-appstream-data` 20260910 every app icon is a JPEG XL file, and
+  the GTK 4.24 call pamac uses to draw them draws nothing for JPEG XL, so all icons in pamac were blank. The new
+  pacman hook `kiro-appstream-jxl2png.hook` rewrites the icons as PNG data after every install or upgrade of
+  `archlinux-appstream-data` (and of this package, so existing installs are fixed on update).
+- New script `kiro-appstream-jxl2png` does the conversion; two new messages translated into all 16 languages.
+
+### Technical Details
+- GTK reads the image content, not the file extension, so the icons keep their `.jxl` names and pamac's paths keep
+  working. Conversion with `djxl` (libjxl, which glycin and so gtk4/pamac already depend on), in parallel with
+  `xargs -P nproc`; files that already start with the PNG signature are skipped, so a rerun is a ~2.5 s no-op.
+- Failed files are left as they were; a warning with the count is printed. `pacman -Qkk archlinux-appstream-data`
+  reports the converted icons as altered, which is expected.
+- Tested on picard (Kiro, `pamac-aur` 11.7.5, gtk4 4.24.1): blank icons before, all icons shown after; the hook
+  fired on a reinstall of `archlinux-appstream-data` and converted all 3,863 icons.
+- Temporary: remove once pamac loads its icons through GdkTexture/gdk-pixbuf (upstream issue in preparation).
+
+### Files Modified
+- usr/local/bin/kiro-appstream-jxl2png (new), etc/pacman.d/hooks/kiro-appstream-jxl2png.hook (new)
+- po/*.po, po/kiro-system-files.pot, usr/share/locale/*/LC_MESSAGES/kiro-system-files.mo
+- README.md, CHANGELOG.md
+
 ## 2026.11.09
 
 ### What Changed

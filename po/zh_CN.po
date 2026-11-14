@@ -115,6 +115,31 @@ msgstr "完整的系统和硬件报告（inxi）"
 msgid "inxi;system;hardware;info;information;"
 msgstr "系统;硬件;信息;inxi;system;hardware;info;information;"
 
+#: usr/local/bin/kiro-appstream-jxl2png:66 usr/local/bin/kiro-calamares-log:177
+#: usr/local/bin/kiro-diag:388 usr/local/bin/kiro-enable-ssh:55
+#: usr/local/bin/kiro-fix-gpg-conf:49 usr/local/bin/kiro-fix-mirrors:49
+#: usr/local/bin/kiro-fix-pacman-conf:51 usr/local/bin/kiro-fix-pacman-keys:49
+#: usr/local/bin/kiro-get-mirrors:49 usr/local/bin/kiro-get-nemesis:51
+#: usr/local/bin/kiro-iso-version:43 usr/local/bin/kiro-keep-kirotux-repo:50
+#: usr/local/bin/kiro-lint:431 usr/local/bin/kiro-probe:58
+#: usr/local/bin/kiro-probe-report:137 usr/local/bin/kiro-report:347
+#: usr/local/bin/kiro-set-cores:49 usr/local/bin/kiro-set-cores-min1:50
+#: usr/local/bin/kiro-set-cores-min2:50 usr/local/bin/kiro-skell:142
+#: usr/local/bin/kiro-skell-all:143 usr/local/bin/kiro-which-vga:50
+#: usr/local/bin/kiro-xlibre-swap:309
+msgid "Unknown option:"
+msgstr "未知选项："
+
+#: usr/local/bin/kiro-appstream-jxl2png:73
+msgid "This script must be run as root."
+msgstr "此脚本必须以 root 身份运行。"
+
+#: usr/local/bin/kiro-appstream-jxl2png:87
+#, sh-format
+msgid ""
+"Could not convert $count appstream icons to PNG; pamac shows them blank."
+msgstr "无法将 $count 个 appstream 图标转换为 PNG；pamac 会将其显示为空白。"
+
 #: usr/local/bin/kiro-audit:166 usr/local/lib/kiro-common.sh:237
 #, sh-format
 msgid "$name needs root — requesting your password..."
@@ -125,7 +150,7 @@ msgstr "$name 需要 root 权限 — 正在请求你的密码..."
 msgid "$name needs root — re-running with sudo..."
 msgstr "$name 需要 root 权限 — 正在使用 sudo 重新运行..."
 
-#: usr/local/bin/kiro-audit:346 usr/local/bin/kiro-audit:1490
+#: usr/local/bin/kiro-audit:346 usr/local/bin/kiro-audit:1504
 #: usr/local/bin/kiro-diag:227
 msgid "Kernel"
 msgstr "内核"
@@ -199,109 +224,109 @@ msgstr "软件包完整性（pacman -Qk）"
 msgid "Sysctl security baseline"
 msgstr "Sysctl 安全基线"
 
-#: usr/local/bin/kiro-audit:913 usr/local/bin/kiro-verify:243
+#: usr/local/bin/kiro-audit:919 usr/local/bin/kiro-verify:243
 msgid "ZRAM"
 msgstr "ZRAM"
 
-#: usr/local/bin/kiro-audit:935
+#: usr/local/bin/kiro-audit:941
 msgid "Udev rules"
 msgstr "Udev 规则"
 
-#: usr/local/bin/kiro-audit:970
+#: usr/local/bin/kiro-audit:976
 msgid "Systemd drop-ins"
 msgstr "Systemd 附加配置"
 
-#: usr/local/bin/kiro-audit:986
+#: usr/local/bin/kiro-audit:992
 msgid "Modprobe & THP tuning"
 msgstr "Modprobe 与 THP 调优"
 
-#: usr/local/bin/kiro-audit:1000
+#: usr/local/bin/kiro-audit:1006
 msgid "Hardening & tuning (2026-05-28)"
 msgstr "加固与调优（2026-05-28）"
 
-#: usr/local/bin/kiro-audit:1073
+#: usr/local/bin/kiro-audit:1079
 msgid "systemd-resolved configuration"
 msgstr "systemd-resolved 配置"
 
-#: usr/local/bin/kiro-audit:1093
+#: usr/local/bin/kiro-audit:1107
 msgid "tuned-ppd power profile"
 msgstr "tuned-ppd 电源配置"
 
-#: usr/local/bin/kiro-audit:1129
+#: usr/local/bin/kiro-audit:1143
 msgid "Tumbler / thumbnailing"
 msgstr "Tumbler / 缩略图"
 
-#: usr/local/bin/kiro-audit:1137
+#: usr/local/bin/kiro-audit:1151
 msgid "Failed systemd units"
 msgstr "失败的 systemd 单元"
 
-#: usr/local/bin/kiro-audit:1155
+#: usr/local/bin/kiro-audit:1169
 msgid "Boot time and updates (info)"
 msgstr "启动时间与更新（信息）"
 
-#: usr/local/bin/kiro-audit:1171 usr/local/bin/kiro-diag:252
+#: usr/local/bin/kiro-audit:1185 usr/local/bin/kiro-diag:252
 msgid "Bootloader"
 msgstr "引导程序"
 
-#: usr/local/bin/kiro-audit:1203
+#: usr/local/bin/kiro-audit:1217
 msgid "Btrfs snapshots"
 msgstr "Btrfs 快照"
 
-#: usr/local/bin/kiro-audit:1283
+#: usr/local/bin/kiro-audit:1297
 msgid "Disk format & encryption"
 msgstr "磁盘格式与加密"
 
-#: usr/local/bin/kiro-audit:1386
+#: usr/local/bin/kiro-audit:1400
 msgid "Kiro Plasma theme/config"
 msgstr "Kiro Plasma 主题/配置"
 
-#: usr/local/bin/kiro-audit:1486
+#: usr/local/bin/kiro-audit:1500
 msgid "Kiro ISO — Installed System Audit"
 msgstr "Kiro ISO — 已安装系统审计"
 
-#: usr/local/bin/kiro-audit:1490
+#: usr/local/bin/kiro-audit:1504
 msgid "Date"
 msgstr "日期"
 
-#: usr/local/bin/kiro-audit:1490
+#: usr/local/bin/kiro-audit:1504
 msgid "Host"
 msgstr "主机"
 
-#: usr/local/bin/kiro-audit:1490
+#: usr/local/bin/kiro-audit:1504
 msgid "Virt"
 msgstr "虚拟化"
 
-#: usr/local/bin/kiro-audit:1505
+#: usr/local/bin/kiro-audit:1519
 #, sh-format
 msgid "$vm_type (virtual machine)"
 msgstr "$vm_type（虚拟机）"
 
-#: usr/local/bin/kiro-audit:1542
+#: usr/local/bin/kiro-audit:1556
 msgid "Audit Summary"
 msgstr "审计摘要"
 
-#: usr/local/bin/kiro-audit:1553
+#: usr/local/bin/kiro-audit:1567
 #, sh-format
 msgid ""
 "Audit found $FAIL failure(s); $FIXED fix(es) applied — re-run to confirm"
 msgstr "审计发现失败：$FAIL 项；已应用修复：$FIXED 项 — 请重新运行以确认"
 
-#: usr/local/bin/kiro-audit:1555
+#: usr/local/bin/kiro-audit:1569
 #, sh-format
 msgid "Audit completed with $FAIL failure(s)"
 msgstr "审计完成，失败：$FAIL 项"
 
-#: usr/local/bin/kiro-audit:1559
+#: usr/local/bin/kiro-audit:1573
 #, sh-format
 msgid "Audit completed with $WARN warning(s)"
 msgstr "审计完成，警告：$WARN 项"
 
-#: usr/local/bin/kiro-audit:1563
+#: usr/local/bin/kiro-audit:1577
 #, sh-format
 msgid "$name — all checks passed"
 msgstr "$name — 所有检查均已通过"
 
-#: usr/local/bin/kiro-audit:1569
+#: usr/local/bin/kiro-audit:1583
 #, sh-format
 msgid ""
 "You are running on a virtual machine ($vm_type).\n"
@@ -313,20 +338,6 @@ msgstr ""
 "kiro-audit 面向真实硬件（裸机）——\n"
 "上面的失败很可能是虚拟机或 live 环境造成的，\n"
 "并不代表安装已损坏。"
-
-#: usr/local/bin/kiro-calamares-log:177 usr/local/bin/kiro-diag:388
-#: usr/local/bin/kiro-enable-ssh:55 usr/local/bin/kiro-fix-gpg-conf:49
-#: usr/local/bin/kiro-fix-mirrors:49 usr/local/bin/kiro-fix-pacman-conf:51
-#: usr/local/bin/kiro-fix-pacman-keys:49 usr/local/bin/kiro-get-mirrors:49
-#: usr/local/bin/kiro-get-nemesis:51 usr/local/bin/kiro-iso-version:43
-#: usr/local/bin/kiro-keep-kirotux-repo:50 usr/local/bin/kiro-lint:431
-#: usr/local/bin/kiro-probe:58 usr/local/bin/kiro-probe-report:137
-#: usr/local/bin/kiro-report:347 usr/local/bin/kiro-set-cores:49
-#: usr/local/bin/kiro-set-cores-min1:50 usr/local/bin/kiro-set-cores-min2:50
-#: usr/local/bin/kiro-skell:142 usr/local/bin/kiro-skell-all:143
-#: usr/local/bin/kiro-which-vga:50 usr/local/bin/kiro-xlibre-swap:309
-msgid "Unknown option:"
-msgstr "未知选项："
 
 #: usr/local/bin/kiro-calamares-log:220
 msgid "Kiro — Calamares Install Summary"

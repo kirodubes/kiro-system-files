@@ -1,0 +1,91 @@
+#!/bin/bash
+set -Euo pipefail
+##################################################################################################################
+# Author    : Erik Dubois
+# Website   : https://kiroproject.be
+##################################################################################################################
+#
+#   DO NOT JUST RUN THIS. EXAMINE AND JUDGE. RUN AT YOUR OWN RISK.
+#
+#   Purpose:
+#   Rewrites every JPEG XL app icon of archlinux-appstream-data as PNG data,
+#   keeping the .jxl file names. Run by the pacman hook
+#   /etc/pacman.d/hooks/kiro-appstream-jxl2png.hook after every install or
+#   upgrade of archlinux-appstream-data or kiro-system-files.
+#
+#   Why: since archlinux-appstream-data 20260910 the icons are JPEG XL, and
+#   the GTK 4.24 call pamac uses to draw them (gtk_icon_paintable_new_for_file)
+#   draws nothing for JXL, so every app icon in pamac is blank. GTK reads the
+#   image content, not the extension, so PNG data under the old name works.
+#   Drop this once pamac loads its icons through GdkTexture/gdk-pixbuf.
+#
+##################################################################################################################
+
+# shellcheck source=/usr/local/lib/kiro-common.sh
+if [[ -f /usr/local/lib/kiro-common.sh ]]; then
+    source /usr/local/lib/kiro-common.sh
+else
+    echo "ERROR: kiro-common.sh not found" >&2
+    exit 1
+fi
+
+ICON_DIR="/usr/share/swcatalog/icons"
+
+# Runs in a fresh bash per file (xargs), so it must not rely on kiro-common.sh.
+convert_one() {
+    local f="$1" tmp
+    # PNG data starts with 0x89: already converted
+    [[ "$(head -c1 "$f" | od -An -tx1 | tr -d ' ')" == "89" ]] && return 0
+    tmp="$(mktemp "${f}.XXXXXX")"
+    if djxl --quiet "$f" "${tmp}.png" >/dev/null 2>&1; then
+        chmod 644 "${tmp}.png"
+        mv -f "${tmp}.png" "$f"
+        rm -f "$tmp"
+    else
+        rm -f "$tmp" "${tmp}.png"
+        echo "$f"
+    fi
+}
+export -f convert_one
+
+main() {
+    for arg in "$@"; do
+        case "$arg" in
+            -h|--help)
+                show_help "$(basename "$0")" \
+                    "Convert the JPEG XL appstream icons to PNG so pamac shows them" \
+                    "[--help] [--version]" \
+                    ""
+                exit 0
+                ;;
+            -v|--version)
+                show_version "$(basename "$0")"
+                exit 0
+                ;;
+            *)
+                echo "${RED}$(_t "Unknown option:") ${arg}${RESET}" >&2
+                exit 1
+                ;;
+        esac
+    done
+
+    if [[ $EUID -ne 0 ]]; then
+        echo "${RED}$(_t "This script must be run as root.")${RESET}" >&2
+        exit 1
+    fi
+
+    # djxl comes with libjxl, which glycin (and so gtk4/pamac) depends on;
+    # without it there is no pamac to fix.
+    [[ -d "$ICON_DIR" ]] && command -v djxl >/dev/null 2>&1 || exit 0
+
+    local failed count
+    failed="$(find "$ICON_DIR" -type f -name '*.jxl' -print0 \
+        | xargs -0 -r -P "$(nproc)" -I{} bash -c 'convert_one "$1"' _ {})"
+    if [[ -n "$failed" ]]; then
+        # shellcheck disable=SC2034
+        count="$(wc -l <<< "$failed")"
+        log_warn "$(_tf 'Could not convert $count appstream icons to PNG; pamac shows them blank.')"
+    fi
+}
+
+main "$@"

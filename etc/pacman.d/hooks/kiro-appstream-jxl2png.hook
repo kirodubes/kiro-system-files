@@ -1,0 +1,11 @@
+[Trigger]
+Type = Package
+Operation = Install
+Operation = Upgrade
+Target = archlinux-appstream-data
+Target = kiro-system-files
+
+[Action]
+Description = Converting appstream icons from JPEG XL to PNG for pamac...
+When = PostTransaction
+Exec = /usr/local/bin/kiro-appstream-jxl2png

@@ -115,6 +115,32 @@ msgstr "Rapporto completo su sistema e hardware (inxi)"
 msgid "inxi;system;hardware;info;information;"
 msgstr "sistema;informazioni;inxi;system;hardware;info;information;"
 
+#: usr/local/bin/kiro-appstream-jxl2png:66 usr/local/bin/kiro-calamares-log:177
+#: usr/local/bin/kiro-diag:388 usr/local/bin/kiro-enable-ssh:55
+#: usr/local/bin/kiro-fix-gpg-conf:49 usr/local/bin/kiro-fix-mirrors:49
+#: usr/local/bin/kiro-fix-pacman-conf:51 usr/local/bin/kiro-fix-pacman-keys:49
+#: usr/local/bin/kiro-get-mirrors:49 usr/local/bin/kiro-get-nemesis:51
+#: usr/local/bin/kiro-iso-version:43 usr/local/bin/kiro-keep-kirotux-repo:50
+#: usr/local/bin/kiro-lint:431 usr/local/bin/kiro-probe:58
+#: usr/local/bin/kiro-probe-report:137 usr/local/bin/kiro-report:347
+#: usr/local/bin/kiro-set-cores:49 usr/local/bin/kiro-set-cores-min1:50
+#: usr/local/bin/kiro-set-cores-min2:50 usr/local/bin/kiro-skell:142
+#: usr/local/bin/kiro-skell-all:143 usr/local/bin/kiro-which-vga:50
+#: usr/local/bin/kiro-xlibre-swap:309
+msgid "Unknown option:"
+msgstr "Opzione sconosciuta:"
+
+#: usr/local/bin/kiro-appstream-jxl2png:73
+msgid "This script must be run as root."
+msgstr "Questo script deve essere eseguito come root."
+
+#: usr/local/bin/kiro-appstream-jxl2png:87
+#, sh-format
+msgid ""
+"Could not convert $count appstream icons to PNG; pamac shows them blank."
+msgstr ""
+"Impossibile convertire $count icone appstream in PNG; pamac le mostra vuote."
+
 #: usr/local/bin/kiro-audit:166 usr/local/lib/kiro-common.sh:237
 #, sh-format
 msgid "$name needs root — requesting your password..."
@@ -125,7 +151,7 @@ msgstr "$name richiede root — richiesta della tua password..."
 msgid "$name needs root — re-running with sudo..."
 msgstr "$name richiede root — riesecuzione con sudo..."
 
-#: usr/local/bin/kiro-audit:346 usr/local/bin/kiro-audit:1490
+#: usr/local/bin/kiro-audit:346 usr/local/bin/kiro-audit:1504
 #: usr/local/bin/kiro-diag:227
 msgid "Kernel"
 msgstr "Kernel"
@@ -199,88 +225,88 @@ msgstr "Integrità dei pacchetti (pacman -Qk)"
 msgid "Sysctl security baseline"
 msgstr "Baseline di sicurezza sysctl"
 
-#: usr/local/bin/kiro-audit:913 usr/local/bin/kiro-verify:243
+#: usr/local/bin/kiro-audit:919 usr/local/bin/kiro-verify:243
 msgid "ZRAM"
 msgstr "ZRAM"
 
-#: usr/local/bin/kiro-audit:935
+#: usr/local/bin/kiro-audit:941
 msgid "Udev rules"
 msgstr "Regole udev"
 
-#: usr/local/bin/kiro-audit:970
+#: usr/local/bin/kiro-audit:976
 msgid "Systemd drop-ins"
 msgstr "Drop-in di systemd"
 
-#: usr/local/bin/kiro-audit:986
+#: usr/local/bin/kiro-audit:992
 msgid "Modprobe & THP tuning"
 msgstr "Modprobe e tuning THP"
 
-#: usr/local/bin/kiro-audit:1000
+#: usr/local/bin/kiro-audit:1006
 msgid "Hardening & tuning (2026-05-28)"
 msgstr "Hardening e tuning (2026-05-28)"
 
-#: usr/local/bin/kiro-audit:1073
+#: usr/local/bin/kiro-audit:1079
 msgid "systemd-resolved configuration"
 msgstr "Configurazione di systemd-resolved"
 
-#: usr/local/bin/kiro-audit:1093
+#: usr/local/bin/kiro-audit:1107
 msgid "tuned-ppd power profile"
 msgstr "Profilo di alimentazione tuned-ppd"
 
-#: usr/local/bin/kiro-audit:1129
+#: usr/local/bin/kiro-audit:1143
 msgid "Tumbler / thumbnailing"
 msgstr "Tumbler / miniature"
 
-#: usr/local/bin/kiro-audit:1137
+#: usr/local/bin/kiro-audit:1151
 msgid "Failed systemd units"
 msgstr "Unità systemd in errore"
 
-#: usr/local/bin/kiro-audit:1155
+#: usr/local/bin/kiro-audit:1169
 msgid "Boot time and updates (info)"
 msgstr "Tempo di avvio e aggiornamenti (info)"
 
-#: usr/local/bin/kiro-audit:1171 usr/local/bin/kiro-diag:252
+#: usr/local/bin/kiro-audit:1185 usr/local/bin/kiro-diag:252
 msgid "Bootloader"
 msgstr "Bootloader"
 
-#: usr/local/bin/kiro-audit:1203
+#: usr/local/bin/kiro-audit:1217
 msgid "Btrfs snapshots"
 msgstr "Snapshot Btrfs"
 
-#: usr/local/bin/kiro-audit:1283
+#: usr/local/bin/kiro-audit:1297
 msgid "Disk format & encryption"
 msgstr "Formato del disco e cifratura"
 
-#: usr/local/bin/kiro-audit:1386
+#: usr/local/bin/kiro-audit:1400
 msgid "Kiro Plasma theme/config"
 msgstr "Tema/configurazione Kiro Plasma"
 
-#: usr/local/bin/kiro-audit:1486
+#: usr/local/bin/kiro-audit:1500
 msgid "Kiro ISO — Installed System Audit"
 msgstr "Kiro ISO — Audit del sistema installato"
 
-#: usr/local/bin/kiro-audit:1490
+#: usr/local/bin/kiro-audit:1504
 msgid "Date"
 msgstr "Data"
 
-#: usr/local/bin/kiro-audit:1490
+#: usr/local/bin/kiro-audit:1504
 msgid "Host"
 msgstr "Host"
 
-#: usr/local/bin/kiro-audit:1490
+#: usr/local/bin/kiro-audit:1504
 msgid "Virt"
 msgstr "Virtualizzazione"
 
-#: usr/local/bin/kiro-audit:1505
+#: usr/local/bin/kiro-audit:1519
 #, sh-format
 msgid "$vm_type (virtual machine)"
 msgstr "$vm_type (macchina virtuale)"
 
-#: usr/local/bin/kiro-audit:1542
+#: usr/local/bin/kiro-audit:1556
 msgid "Audit Summary"
 msgstr "Riepilogo dell'audit"
 
-#: usr/local/bin/kiro-audit:1553
+#: usr/local/bin/kiro-audit:1567
 #, sh-format
 msgid ""
 "Audit found $FAIL failure(s); $FIXED fix(es) applied — re-run to confirm"
@@ -288,22 +314,22 @@ msgstr ""
 "L'audit ha trovato errori: $FAIL; correzioni applicate: $FIXED — rieseguilo "
 "per conferma"
 
-#: usr/local/bin/kiro-audit:1555
+#: usr/local/bin/kiro-audit:1569
 #, sh-format
 msgid "Audit completed with $FAIL failure(s)"
 msgstr "Audit completato, errori: $FAIL"
 
-#: usr/local/bin/kiro-audit:1559
+#: usr/local/bin/kiro-audit:1573
 #, sh-format
 msgid "Audit completed with $WARN warning(s)"
 msgstr "Audit completato, avvisi: $WARN"
 
-#: usr/local/bin/kiro-audit:1563
+#: usr/local/bin/kiro-audit:1577
 #, sh-format
 msgid "$name — all checks passed"
 msgstr "$name — tutti i controlli superati"
 
-#: usr/local/bin/kiro-audit:1569
+#: usr/local/bin/kiro-audit:1583
 #, sh-format
 msgid ""
 "You are running on a virtual machine ($vm_type).\n"
@@ -316,20 +342,6 @@ msgstr ""
 "errori qui sopra dipendono molto probabilmente dalla VM o dall'ambiente "
 "live,\n"
 "non da un'installazione danneggiata."
-
-#: usr/local/bin/kiro-calamares-log:177 usr/local/bin/kiro-diag:388
-#: usr/local/bin/kiro-enable-ssh:55 usr/local/bin/kiro-fix-gpg-conf:49
-#: usr/local/bin/kiro-fix-mirrors:49 usr/local/bin/kiro-fix-pacman-conf:51
-#: usr/local/bin/kiro-fix-pacman-keys:49 usr/local/bin/kiro-get-mirrors:49
-#: usr/local/bin/kiro-get-nemesis:51 usr/local/bin/kiro-iso-version:43
-#: usr/local/bin/kiro-keep-kirotux-repo:50 usr/local/bin/kiro-lint:431
-#: usr/local/bin/kiro-probe:58 usr/local/bin/kiro-probe-report:137
-#: usr/local/bin/kiro-report:347 usr/local/bin/kiro-set-cores:49
-#: usr/local/bin/kiro-set-cores-min1:50 usr/local/bin/kiro-set-cores-min2:50
-#: usr/local/bin/kiro-skell:142 usr/local/bin/kiro-skell-all:143
-#: usr/local/bin/kiro-which-vga:50 usr/local/bin/kiro-xlibre-swap:309
-msgid "Unknown option:"
-msgstr "Opzione sconosciuta:"
 
 #: usr/local/bin/kiro-calamares-log:220
 msgid "Kiro — Calamares Install Summary"

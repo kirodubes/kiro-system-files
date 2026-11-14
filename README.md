@@ -17,12 +17,13 @@ System-level files for the Kiro distro — kernel parameters, udev rules, system
 - `security/` — limits.d entries
 - `tmpfiles.d/` — runtime tmpfs / cleanup rules
 - `samba/` — Samba config including `smb.conf.nemesis` (aligned byte-identical with the `arcolinux-nemesis` personal copy — see [HQ/ECOSYSTEM.md cascade rules](../../Insync/Kiro/Kiro-HQ/ECOSYSTEM.md))
-- `pacman.d/`, `X11/` — pacman drop-ins, keyboard layout maps
+- `pacman.d/`, `X11/` — pacman drop-ins (incl. the `kiro-appstream-jxl2png` hook), keyboard layout maps
 
 ### `usr/local/bin/` — the `kiro-*` toolchain
 
 | Command                | Purpose                                                              |
 |------------------------|----------------------------------------------------------------------|
+| `kiro-appstream-jxl2png` | Rewrite the JPEG XL appstream icons as PNG so pamac shows them (pacman hook) |
 | `kiro-audit`           | Audit a running install against expected Kiro defaults               |
 | `kiro-calamares-log`   | Summarise the Calamares installer log (timeline, warnings, verdict)  |
 | `kiro-diag`            | Diagnostic dump: ISO version, BIOS/UEFI, mounts, DM, kernels, NVIDIA |
