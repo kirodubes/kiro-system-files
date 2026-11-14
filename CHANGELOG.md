@@ -17,6 +17,8 @@
   reports the converted icons as altered, which is expected.
 - Tested on picard (Kiro, `pamac-aur` 11.7.5, gtk4 4.24.1): blank icons before, all icons shown after; the hook
   fired on a reinstall of `archlinux-appstream-data` and converted all 3,863 icons.
+- Fix the same day: the script was committed without its exec bit (644), so the hook failed with "call to execv
+  failed (Permission denied)". Now 755 in git.
 - Temporary: remove once pamac loads its icons through GdkTexture/gdk-pixbuf (upstream issue in preparation).
 
 ### Files Modified

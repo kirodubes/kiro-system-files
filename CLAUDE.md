@@ -39,6 +39,8 @@ Key sections and their functions:
 
 ## Script conventions
 
+- New script: `chmod 755` before `git add` and check `git ls-files -s` shows `100755` — a 644 script installs
+  non-executable and a pacman hook calling it fails with `call to execv failed (Permission denied)` (2026-11-14)
 - First line after shebang: `set -Euo pipefail`
 - Source `kiro-common.sh` before any logic
 - Use library logging functions — never raw `echo` for user-facing output
