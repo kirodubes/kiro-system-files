@@ -1,5 +1,26 @@
 # CHANGELOG
 
+## 2026.11.15
+
+### What Changed
+- **The whole systemd-oomd policy now lives in this package.** The kiro-iso airootfs carried its own
+  `system.slice.d/oomd.conf`, `user.slice.d/oomd.conf` and `/etc/systemd/oomd.conf`, which landed on every install
+  unowned and overlapped with this package's drop-ins. The one that mattered, the `user.slice` policy, moves here;
+  the ISO copies are removed in kiro-iso and kiro-iso-next the same day. Found by a kiro-check on the Medion.
+
+### Technical Details
+- New `etc/systemd/system/user.slice.d/10-kiro-oomd-per-slice.conf` with `ManagedOOMMemoryPressure=kill` and no
+  limit of its own, so `/user.slice` keeps the default 60% exactly as before (`oomctl` on the Medion: system.slice
+  80%, user.slice 60%, app.slice 80%). It is not a duplicate of `user/slice.d/`: that one applies inside each
+  `systemd --user` instance, this one to the system manager's `user.slice`.
+- The ISO's `oomd.conf` only set the systemd default limit (60%) and the 20s duration this package already sets in
+  `oomd.conf.d/10-kiro-oomd.conf`, so dropping it changes nothing.
+
+### Files Modified
+- etc/systemd/system/user.slice.d/10-kiro-oomd-per-slice.conf (new)
+- etc/systemd/oomd.conf.d/10-kiro-oomd.conf (comment lists the three per-slice files)
+- CHANGELOG.md
+
 ## 2026.11.14
 
 ### What Changed
