@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## 2026.11.19
+
+### What Changed
+- **Web pages and links open in Firefox by default.** With no default browser set, DankMaterialShell's `dms-open`
+  won (it sorts first among the apps that claim web pages), and outside a DMS session it only replies "DMS is not
+  running": Kiro News and every other link opened nothing. Seen on picard, where a DMS edition is installed next to
+  noctalia. A browser the user picks, or a desktop's own default list, still wins.
+
+### Technical Details
+- `usr/share/applications/mimeapps.list` (the lowest-priority default list) gains `text/html`,
+  `application/xhtml+xml`, `x-scheme-handler/http` and `x-scheme-handler/https` = `firefox.desktop`. Firefox is on
+  the Kiro and KiroTux ISOs; without it xdg-mime skips the entry and falls back as before.
+
+### Files Modified
+- `usr/share/applications/mimeapps.list`
+
 ## 2026.11.15
 
 ### What Changed

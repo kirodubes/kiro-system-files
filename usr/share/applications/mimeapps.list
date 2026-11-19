@@ -1,6 +1,12 @@
-# Kiro: folders open in Thunar.
+# Kiro: folders open in Thunar, web pages and links in Firefox.
 # Without a default, Disk Usage Analyzer (baobab, on the Kiro and KIROTUX ISOs) won: it comes first
 # alphabetically among the apps that declare inode/directory. This is the lowest-priority mimeapps.list,
 # so a desktop's own list (Plasma's kde-mimeapps.list -> Dolphin) and the user's choices still win.
+# Web pages had no default either, so DankMaterialShell's dms-open won on alphabet, and outside a DMS
+# session it only says "DMS is not running": no page or link opened (Kiro News on picard, 2026-11-19).
 [Default Applications]
 inode/directory=thunar.desktop
+text/html=firefox.desktop
+application/xhtml+xml=firefox.desktop
+x-scheme-handler/http=firefox.desktop
+x-scheme-handler/https=firefox.desktop
