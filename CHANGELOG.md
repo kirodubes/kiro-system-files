@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 2026.11.20
+
+### What Changed
+- **New default Kiro wallpaper.** `kiro-wallpaper.jpg` is now a Kiro Atelier painting: diagonal blue palette-knife
+  strokes over dark grey, 3840x2160. Every Kiro desktop already points to this path, so the new wallpaper shows up on
+  all of them without touching another package.
+
+### Technical Details
+- Same file name, file swapped in place (`blue-and-black-background-with-a-pattern-of-hexagons-palette-knife-0.75`
+  from the KA pack pool). JPG, 434 KB (the old one was 450 KB).
+
+### Files Modified
+- `usr/share/backgrounds/kiro/kiro-wallpaper.jpg`
+
 ## 2026.11.19
 
 ### What Changed
