@@ -3,16 +3,18 @@
 ## 2026.11.24
 
 ### What Changed
-- **`NVreg_DynamicPowerManagement=0x02` is no longer set on every NVIDIA machine.** It only helps laptops with a
-  Turing GPU; on desktops and pre-Turing cards it does nothing useful, and Ampere and newer get it from the driver
-  default. kiro-hwd now writes it on Turing laptops only (`/etc/modprobe.d/10-kiro-hwd-nvidia.conf`), the same
-  split as CachyOS chwd `2305306`.
+- **`NVreg_DynamicPowerManagement=0x02` is back in `nvidia.conf` for every NVIDIA machine** (reverts this
+  morning's 26.11-16 change). The plan was to set it only on Turing laptops, through kiro-hwd, as CachyOS chwd
+  `2305306` does. But the riker upgrade test showed kiro-hwd doesn't run on every install path: the NVIDIA boot entry
+  (`driver=nonfree`) skips the kiro-hwd job, and older installs may not have kiro-hwd at all (this package doesn't
+  depend on it). A Turing laptop on those paths would lose 0x02 and keep its GPU powered at idle. 0x02 on a desktop
+  or a non-Turing card is harmless, which is how Kiro shipped it until today.
 
 ### Technical Details
-- Ship together with kiro-hwd's matching change (same release), so a Turing laptop never ends up with neither.
-- The change reaches the boot-time driver at the next initramfs rebuild (the nvidia modules load from the
-  initramfs), together with kiro-hwd's file.
-- The udev rule comment that pointed to `nvidia.conf` for NVIDIA power management now points to kiro-hwd.
+- Both files are restored byte for byte from before `5217aef`. kiro-hwd 26.11-04 still writes
+  `10-kiro-hwd-nvidia.conf` on Turing laptops it handles; that file sets the same value, so the two don't clash.
+- On the NVIDIA-entry install nvidia loads from the root filesystem (not the initramfs), so the line applies after
+  a plain reboot; on a kiro-hwd (line 3) install it reaches the initramfs at the next rebuild, the same as before.
 
 ### Files Modified
 - `etc/modprobe.d/nvidia.conf`

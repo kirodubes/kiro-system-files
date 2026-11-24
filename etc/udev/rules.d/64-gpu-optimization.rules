@@ -6,8 +6,7 @@
 # NVIDIA: PCI power/control=auto is intentionally omitted. The proprietary
 # NVIDIA driver manages its own power states; forcing PCI autosuspend via udev
 # causes GPU hangs and black screens on GTX 900/1000 and some RTX cards.
-# Runtime power management comes from NVreg_DynamicPowerManagement instead: kiro-hwd writes it for
-# Turing laptops (/etc/modprobe.d/10-kiro-hwd-nvidia.conf); Ampere and newer use the driver default.
+# Use NVreg_DynamicPowerManagement in modprobe.d/nvidia.conf instead.
 
 # AMD/ATI GPUs: enable dynamic power management
 ACTION=="add", SUBSYSTEM=="pci", ATTRS{vendor}=="0x1002", ATTRS{class}=="0x030000", \
