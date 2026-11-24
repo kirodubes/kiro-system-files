@@ -1,5 +1,24 @@
 # CHANGELOG
 
+## 2026.11.24
+
+### What Changed
+- **`NVreg_DynamicPowerManagement=0x02` is no longer set on every NVIDIA machine.** It only helps laptops with a
+  Turing GPU; on desktops and pre-Turing cards it does nothing useful, and Ampere and newer get it from the driver
+  default. kiro-hwd now writes it on Turing laptops only (`/etc/modprobe.d/10-kiro-hwd-nvidia.conf`), the same
+  split as CachyOS chwd `2305306`.
+
+### Technical Details
+- Ship together with kiro-hwd's matching change (same release), so a Turing laptop never ends up with neither.
+- The change reaches the boot-time driver at the next initramfs rebuild (the nvidia modules load from the
+  initramfs), together with kiro-hwd's file.
+- The udev rule comment that pointed to `nvidia.conf` for NVIDIA power management now points to kiro-hwd.
+
+### Files Modified
+- `etc/modprobe.d/nvidia.conf`
+- `etc/udev/rules.d/64-gpu-optimization.rules`
+- `CHANGELOG.md`
+
 ## 2026.11.20
 
 ### What Changed
