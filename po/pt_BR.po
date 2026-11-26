@@ -116,18 +116,19 @@ msgid "inxi;system;hardware;info;information;"
 msgstr "sistema;informações;inxi;system;hardware;info;information;"
 
 #: usr/local/bin/kiro-appstream-jxl2png:66 usr/local/bin/kiro-aur-check:200
-#: usr/local/bin/kiro-calamares-log:177 usr/local/bin/kiro-diag:388
-#: usr/local/bin/kiro-enable-ssh:55 usr/local/bin/kiro-fix-gpg-conf:49
-#: usr/local/bin/kiro-fix-mirrors:49 usr/local/bin/kiro-fix-pacman-conf:51
-#: usr/local/bin/kiro-fix-pacman-keys:49 usr/local/bin/kiro-get-mirrors:49
-#: usr/local/bin/kiro-get-nemesis:51 usr/local/bin/kiro-iso-version:43
-#: usr/local/bin/kiro-keep-kirotux-repo:50 usr/local/bin/kiro-lint:431
-#: usr/local/bin/kiro-paru-aur-check:127 usr/local/bin/kiro-probe:58
-#: usr/local/bin/kiro-probe-report:137 usr/local/bin/kiro-report:347
-#: usr/local/bin/kiro-set-cores:49 usr/local/bin/kiro-set-cores-min1:50
-#: usr/local/bin/kiro-set-cores-min2:50 usr/local/bin/kiro-skell:142
-#: usr/local/bin/kiro-skell-all:143 usr/local/bin/kiro-which-vga:50
-#: usr/local/bin/kiro-xlibre-swap:309 usr/local/bin/kiro-yay-aur-check:129
+#: usr/local/bin/kiro-aur-check-notice:98 usr/local/bin/kiro-calamares-log:177
+#: usr/local/bin/kiro-diag:388 usr/local/bin/kiro-enable-ssh:55
+#: usr/local/bin/kiro-fix-gpg-conf:49 usr/local/bin/kiro-fix-mirrors:49
+#: usr/local/bin/kiro-fix-pacman-conf:51 usr/local/bin/kiro-fix-pacman-keys:49
+#: usr/local/bin/kiro-get-mirrors:49 usr/local/bin/kiro-get-nemesis:51
+#: usr/local/bin/kiro-iso-version:43 usr/local/bin/kiro-keep-kirotux-repo:50
+#: usr/local/bin/kiro-lint:431 usr/local/bin/kiro-paru-aur-check:127
+#: usr/local/bin/kiro-probe:58 usr/local/bin/kiro-probe-report:137
+#: usr/local/bin/kiro-report:347 usr/local/bin/kiro-set-cores:49
+#: usr/local/bin/kiro-set-cores-min1:50 usr/local/bin/kiro-set-cores-min2:50
+#: usr/local/bin/kiro-skell:142 usr/local/bin/kiro-skell-all:143
+#: usr/local/bin/kiro-which-vga:50 usr/local/bin/kiro-xlibre-swap:309
+#: usr/local/bin/kiro-yay-aur-check:129
 msgid "Unknown option:"
 msgstr "Opção desconhecida:"
 
@@ -350,7 +351,9 @@ msgstr ""
 msgid ""
 "The installed version $installed is not in the AUR history of this package, "
 "so there are no changes to show (usual for -git packages)."
-msgstr "A versão instalada $installed não está no histórico do AUR deste pacote, então não há alterações para mostrar (comum em pacotes -git)."
+msgstr ""
+"A versão instalada $installed não está no histórico do AUR deste pacote, "
+"então não há alterações para mostrar (comum em pacotes -git)."
 
 #: usr/local/bin/kiro-aur-check:133
 #, sh-format
@@ -409,6 +412,29 @@ msgstr "Compilação de $pkgbase interrompida."
 #: usr/local/bin/kiro-aur-check:235
 msgid "The PKGBUILD could not be read, so it was not checked."
 msgstr "Não foi possível ler o PKGBUILD, então ele não foi verificado."
+
+#: usr/local/bin/kiro-aur-check-notice:112
+msgid "Kiro has an AUR check for paru and yay."
+msgstr "O Kiro tem uma verificação do AUR para paru e yay."
+
+#: usr/local/bin/kiro-aur-check-notice:113
+msgid ""
+"Before an AUR package is built, it shows the lines worth a look: download-"
+"and-run, reading keys or browser data, unverified sources, and what changed "
+"since the version you have."
+msgstr "Antes de um pacote do AUR ser compilado, ela mostra as linhas que merecem uma olhada: baixar e executar, ler chaves ou dados do navegador, fontes não verificadas e o que mudou desde a versão que você tem."
+
+#: usr/local/bin/kiro-aur-check-notice:114
+msgid "It is off for you. Switching it on is up to you:"
+msgstr "Ela está desativada para você. Ativá-la é escolha sua:"
+
+#: usr/local/bin/kiro-aur-check-notice:115
+msgid "ATT (Archlinux Tweak Tool): Pacman page, AUR check"
+msgstr "ATT (Archlinux Tweak Tool): página Pacman, Verificação do AUR"
+
+#: usr/local/bin/kiro-aur-check-notice:124
+msgid "More: man kiro-aur-check"
+msgstr "Mais: man kiro-aur-check"
 
 #: usr/local/bin/kiro-calamares-log:220
 msgid "Kiro — Calamares Install Summary"

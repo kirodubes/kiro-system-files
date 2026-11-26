@@ -20,6 +20,11 @@
   Installer, which shows this diff in its GUI.
 - **Findings in colour:** `[DANGER]` bold red, `[WARNING]` orange (yellow on terminals without 256 colours),
   `[INFO]` blue — for the scanner's findings and the AUR history lines, with paru and with yay.
+- **Told in the terminal when the check is off.** When paru or yay is installed or updated, pacman now ends with a
+  few coloured lines: Kiro has an AUR check, it is off for you, switching it on is up to you — through ATT (Pacman
+  page, AUR check) or one command per helper. It shows only for the helpers whose check is still off, and nothing
+  when it is on for all. It also shows once when this package first brings it, so existing users hear about it
+  without waiting for a paru or yay update. New `kiro-aur-check-notice` (man page included); it never changes a file.
 
 ### Technical Details
 - The scanning is CachyOS Package Installer's `cachyos-pi-scan` (new nemesis package from KIRO-PKG-BUILD-3PARTY,
@@ -77,12 +82,25 @@
   first (`findings="$(…)" || status=$?`) so its exit status survives — a pipe would hand the ERR trap a non-zero
   pipeline. Orange is `tput setaf 208` when `tput colors` ≥ 256. Colour variables come from `kiro-common.sh`, empty
   when stdout is not a terminal, so logs and pasted reports stay plain (checked).
+- Notice hook `zz-kiro-aur-check-notice.hook`: `Type = Path` on `usr/bin/paru` / `usr/bin/yay` (Install, Upgrade —
+  catches paru, paru-bin, paru-git, yay-bin …) plus `Operation = Install` on the notice script itself, which fires
+  only when the file is new, so a later kiro-system-files update stays quiet. **Not named `kiro-*`:** ATT's Repair
+  skips every target of a `kiro-*`/`edu-*` hook because those rewrite their targets; this one only reads, so paru's
+  and yay's binaries stay checked. `zz-` sorts it after `kiro-paru-aur-check.hook`, so it sees the state that hook
+  leaves. The user is `SUDO_USER` (paru and yay call `sudo pacman`); their own `~/.config/paru/paru.conf` wins over
+  `/etc/paru.conf` as paru does, and the paru command shown needs `sudo` only for `/etc/paru.conf`. pacman pipes
+  hook output, so `kiro-common.sh` leaves the colours empty; the script takes them from `TERM` (`tput -T`) unless
+  `NO_COLOR` or a dumb terminal. Tested on scratch configs: off/off, on/on (prints nothing), no user, piped with
+  `TERM=xterm-256color` (colour codes present), Dutch and Japanese; `tests/check.sh` 0 FAIL. 5 new strings in the
+  13 languages, ATT's own words for the page and section name.
 
 ### Files Modified
 - `usr/local/bin/kiro-aur-check`, `usr/local/bin/kiro-paru-aur-check`, `etc/pacman.d/hooks/kiro-paru-aur-check.hook`,
   `usr/share/man/man8/kiro-aur-check.8`, `usr/share/man/man8/kiro-paru-aur-check.8` (new); `po/*`, `usr/share/locale/*`
 - `usr/local/bin/kiro-yay-aur-check`, `usr/share/kiro/yay/aur-check.lua`, `usr/share/man/man8/kiro-yay-aur-check.8`
   (new); `usr/local/bin/kiro-aur-check`, `usr/share/man/man8/kiro-aur-check.8` (mention yay)
+- `usr/local/bin/kiro-aur-check-notice`, `etc/pacman.d/hooks/zz-kiro-aur-check-notice.hook`,
+  `usr/share/man/man8/kiro-aur-check-notice.8` (new); `po/*`, `usr/share/locale/*`
 
 ## 2026.11.24
 

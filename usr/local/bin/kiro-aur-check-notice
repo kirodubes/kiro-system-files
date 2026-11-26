@@ -1,0 +1,129 @@
+#!/bin/bash
+set -Euo pipefail
+##################################################################################################################
+# Author    : Erik Dubois
+# Website   : https://kiroproject.be
+##################################################################################################################
+#
+#   DO NOT JUST RUN THIS. EXAMINE AND JUDGE. RUN AT YOUR OWN RISK.
+#
+#   Purpose:
+#   Tells the user, in colour in the pacman output, that Kiro has an AUR check for paru and yay
+#   (kiro-aur-check) and that switching it on is up to them. It runs from a pacman hook when paru
+#   or yay is installed or updated, and once when kiro-system-files first brings this script. It
+#   only reads: for the user who ran pacman (SUDO_USER) it shows only the helpers whose check is
+#   still off, and prints nothing when every installed helper already has it on.
+#
+#   Why: paru and yay read the user's own config, which a pacman hook must not rewrite, so
+#   existing users have to switch the check on themselves (ATT or one command) — and they need
+#   to hear that it exists.
+#
+##################################################################################################################
+
+# shellcheck source=/usr/local/lib/kiro-common.sh
+if [[ -f /usr/local/lib/kiro-common.sh ]]; then
+    source /usr/local/lib/kiro-common.sh
+else
+    echo "ERROR: kiro-common.sh not found" >&2
+    exit 1
+fi
+
+# shellcheck disable=SC2034  # template variable, unused here
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+PARU_TOOL="/usr/local/bin/kiro-paru-aur-check"
+YAY_TOOL="/usr/local/bin/kiro-yay-aur-check"
+PARU_CONF="/etc/paru.conf"
+
+# pacman pipes hook output, so stdout is never a terminal and kiro-common.sh leaves the colours
+# empty. pacman prints the lines to the user's terminal as they are: take the colours from TERM.
+hook_colours() {
+    [[ -t 1 ]] && return 0
+    [[ -n "${NO_COLOR:-}" || "${TERM:-dumb}" == "dumb" ]] && return 0
+    command -v tput >/dev/null 2>&1 || return 0
+    tput -T "${TERM}" setaf 1 >/dev/null 2>&1 || return 0
+    YELLOW="$(tput -T "${TERM}" setaf 3)"
+    CYAN="$(tput -T "${TERM}" setaf 6)"
+    BOLD="$(tput -T "${TERM}" bold)"
+    RESET="$(tput -T "${TERM}" sgr0)"
+}
+
+# The home folder of the user who ran pacman; empty when pacman ran as root without sudo.
+user_home() {
+    local user="${KIRO_NOTICE_USER:-${SUDO_USER:-}}"
+    [[ -n "${user}" && "${user}" != "root" ]] || return 0
+    getent passwd "${user}" | cut -d: -f6 || true
+}
+
+# paru reads the user's own paru.conf when there is one, else /etc/paru.conf.
+pick_paru_conf() {
+    local home="$1"
+    if [[ -n "${home}" && -f "${home}/.config/paru/paru.conf" ]]; then
+        PARU_CONF="${home}/.config/paru/paru.conf"
+    fi
+}
+
+# on / off / other / absent; "other" (an own PreBuildCommand) is a choice and gets no notice.
+paru_state() {
+    local state
+    command -v paru >/dev/null 2>&1 || { echo "absent"; return 0; }
+    state="$("${PARU_TOOL}" --status --file "${PARU_CONF}" 2>/dev/null)" || state="off"
+    [[ "${state}" == "no-paru" ]] && state="off"
+    echo "${state}"
+}
+
+yay_state() {
+    local home="$1" state
+    command -v yay >/dev/null 2>&1 || { echo "absent"; return 0; }
+    [[ -n "${home}" ]] || { echo "off"; return 0; }
+    state="$("${YAY_TOOL}" --status --file "${home}/.config/yay/init.lua" 2>/dev/null)" || state="off"
+    [[ "${state}" == "on" ]] && echo "on" || echo "off"
+}
+
+main() {
+    local arg home paru yay
+    for arg in "$@"; do
+        case "$arg" in
+            -h|--help)
+                show_help "$(basename "$0")" \
+                    "Tell the user that Kiro's AUR check for paru and yay exists and how to switch it on" \
+                    "[--help] [--version]" \
+                    "Run by a pacman hook when paru or yay is installed or updated. Prints nothing when the check is on."
+                exit 0
+                ;;
+            -v|--version)
+                show_version "$(basename "$0")"
+                exit 0
+                ;;
+            *)
+                echo "${RED}$(_t "Unknown option:") ${arg}${RESET}" >&2
+                exit 1
+                ;;
+        esac
+    done
+
+    home="$(user_home)"
+    pick_paru_conf "${home}"
+    paru="$(paru_state)"
+    yay="$(yay_state "${home}")"
+    [[ "${paru}" == "off" || "${yay}" == "off" ]] || exit 0
+
+    hook_colours
+    echo
+    echo "${BOLD}${CYAN}$(_t "Kiro has an AUR check for paru and yay.")${RESET}"
+    echo "${CYAN}$(_t "Before an AUR package is built, it shows the lines worth a look: download-and-run, reading keys or browser data, unverified sources, and what changed since the version you have.")${RESET}"
+    echo "${BOLD}${YELLOW}$(_t "It is off for you. Switching it on is up to you:")${RESET}"
+    echo "${YELLOW}  $(_t "ATT (Archlinux Tweak Tool): Pacman page, AUR check")${RESET}"
+    if [[ "${paru}" == "off" && "${PARU_CONF}" == "/etc/paru.conf" ]]; then
+        echo "${YELLOW}  paru: sudo kiro-paru-aur-check --enable${RESET}"
+    elif [[ "${paru}" == "off" ]]; then
+        echo "${YELLOW}  paru: kiro-paru-aur-check --file ~/.config/paru/paru.conf --enable${RESET}"
+    fi
+    if [[ "${yay}" == "off" ]]; then
+        echo "${YELLOW}  yay:  kiro-yay-aur-check --enable${RESET}"
+    fi
+    echo "${CYAN}$(_t "More: man kiro-aur-check")${RESET}"
+    echo
+    exit 0
+}
+
+main "$@"

@@ -116,18 +116,19 @@ msgid "inxi;system;hardware;info;information;"
 msgstr "systeem;informatie;inxi;system;hardware;info;information;"
 
 #: usr/local/bin/kiro-appstream-jxl2png:66 usr/local/bin/kiro-aur-check:200
-#: usr/local/bin/kiro-calamares-log:177 usr/local/bin/kiro-diag:388
-#: usr/local/bin/kiro-enable-ssh:55 usr/local/bin/kiro-fix-gpg-conf:49
-#: usr/local/bin/kiro-fix-mirrors:49 usr/local/bin/kiro-fix-pacman-conf:51
-#: usr/local/bin/kiro-fix-pacman-keys:49 usr/local/bin/kiro-get-mirrors:49
-#: usr/local/bin/kiro-get-nemesis:51 usr/local/bin/kiro-iso-version:43
-#: usr/local/bin/kiro-keep-kirotux-repo:50 usr/local/bin/kiro-lint:431
-#: usr/local/bin/kiro-paru-aur-check:127 usr/local/bin/kiro-probe:58
-#: usr/local/bin/kiro-probe-report:137 usr/local/bin/kiro-report:347
-#: usr/local/bin/kiro-set-cores:49 usr/local/bin/kiro-set-cores-min1:50
-#: usr/local/bin/kiro-set-cores-min2:50 usr/local/bin/kiro-skell:142
-#: usr/local/bin/kiro-skell-all:143 usr/local/bin/kiro-which-vga:50
-#: usr/local/bin/kiro-xlibre-swap:309 usr/local/bin/kiro-yay-aur-check:129
+#: usr/local/bin/kiro-aur-check-notice:98 usr/local/bin/kiro-calamares-log:177
+#: usr/local/bin/kiro-diag:388 usr/local/bin/kiro-enable-ssh:55
+#: usr/local/bin/kiro-fix-gpg-conf:49 usr/local/bin/kiro-fix-mirrors:49
+#: usr/local/bin/kiro-fix-pacman-conf:51 usr/local/bin/kiro-fix-pacman-keys:49
+#: usr/local/bin/kiro-get-mirrors:49 usr/local/bin/kiro-get-nemesis:51
+#: usr/local/bin/kiro-iso-version:43 usr/local/bin/kiro-keep-kirotux-repo:50
+#: usr/local/bin/kiro-lint:431 usr/local/bin/kiro-paru-aur-check:127
+#: usr/local/bin/kiro-probe:58 usr/local/bin/kiro-probe-report:137
+#: usr/local/bin/kiro-report:347 usr/local/bin/kiro-set-cores:49
+#: usr/local/bin/kiro-set-cores-min1:50 usr/local/bin/kiro-set-cores-min2:50
+#: usr/local/bin/kiro-skell:142 usr/local/bin/kiro-skell-all:143
+#: usr/local/bin/kiro-which-vga:50 usr/local/bin/kiro-xlibre-swap:309
+#: usr/local/bin/kiro-yay-aur-check:129
 msgid "Unknown option:"
 msgstr "Onbekende optie:"
 
@@ -350,13 +351,18 @@ msgstr ""
 msgid ""
 "The installed version $installed is not in the AUR history of this package, "
 "so there are no changes to show (usual for -git packages)."
-msgstr "De geïnstalleerde versie $installed staat niet in de AUR-geschiedenis van dit pakket, dus er zijn geen wijzigingen te tonen (normaal voor -git-pakketten)."
+msgstr ""
+"De geïnstalleerde versie $installed staat niet in de AUR-geschiedenis van "
+"dit pakket, dus er zijn geen wijzigingen te tonen (normaal voor -git-"
+"pakketten)."
 
 #: usr/local/bin/kiro-aur-check:133
 #, sh-format
 msgid ""
 "The package files have not changed since the installed version $installed."
-msgstr "De pakketbestanden zijn niet gewijzigd sinds de geïnstalleerde versie $installed."
+msgstr ""
+"De pakketbestanden zijn niet gewijzigd sinds de geïnstalleerde versie "
+"$installed."
 
 #: usr/local/bin/kiro-aur-check:136
 #, sh-format
@@ -407,6 +413,29 @@ msgstr "Bouwen van $pkgbase gestopt."
 #: usr/local/bin/kiro-aur-check:235
 msgid "The PKGBUILD could not be read, so it was not checked."
 msgstr "De PKGBUILD kon niet gelezen worden, dus hij is niet gecontroleerd."
+
+#: usr/local/bin/kiro-aur-check-notice:112
+msgid "Kiro has an AUR check for paru and yay."
+msgstr "Kiro heeft een AUR-controle voor paru en yay."
+
+#: usr/local/bin/kiro-aur-check-notice:113
+msgid ""
+"Before an AUR package is built, it shows the lines worth a look: download-"
+"and-run, reading keys or browser data, unverified sources, and what changed "
+"since the version you have."
+msgstr "Voordat een AUR-pakket gebouwd wordt, toont ze de regels die een blik waard zijn: downloaden en uitvoeren, sleutels of browsergegevens lezen, niet-geverifieerde bronnen, en wat er veranderd is sinds de versie die je hebt."
+
+#: usr/local/bin/kiro-aur-check-notice:114
+msgid "It is off for you. Switching it on is up to you:"
+msgstr "Ze staat uit voor jou. Aanzetten is jouw keuze:"
+
+#: usr/local/bin/kiro-aur-check-notice:115
+msgid "ATT (Archlinux Tweak Tool): Pacman page, AUR check"
+msgstr "ATT (Archlinux Tweak Tool): pagina Pacman, AUR-controle"
+
+#: usr/local/bin/kiro-aur-check-notice:124
+msgid "More: man kiro-aur-check"
+msgstr "Meer: man kiro-aur-check"
 
 #: usr/local/bin/kiro-calamares-log:220
 msgid "Kiro — Calamares Install Summary"

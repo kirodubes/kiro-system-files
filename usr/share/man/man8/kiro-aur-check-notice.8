@@ -1,0 +1,34 @@
+.TH KIRO-AUR-CHECK-NOTICE 8 "2026-11-26" "Kiro" "Kiro System Tools"
+.SH NAME
+kiro-aur-check-notice \- tell the user that the AUR check exists and how to switch it on
+.SH SYNOPSIS
+.B kiro-aur-check-notice
+[\fB\-h\fR|\fB\-\-help\fR]
+[\fB\-v\fR|\fB\-\-version\fR]
+.SH DESCRIPTION
+.B kiro-aur-check-notice
+runs from the pacman hook
+.I /etc/pacman.d/hooks/zz-kiro-aur-check-notice.hook
+when paru or yay is installed or updated, and once when kiro-system-files first installs it.
+For the user who ran pacman (\fBSUDO_USER\fR) it asks
+.BR kiro-paru-aur-check (8)
+and
+.BR kiro-yay-aur-check (8)
+whether the check is on, and for each installed helper where it is still off it prints, in
+colour, how to switch it on: ATT (Pacman page, AUR check) or one command. When the check is on
+for every installed helper it prints nothing. It never changes a file: switching the check on
+is up to the user.
+.SH ENVIRONMENT
+.TP
+.B SUDO_USER
+The user whose paru and yay configs are read. Without it (pacman run as root) only
+.I /etc/paru.conf
+is checked for paru, and yay is reported as off.
+.TP
+.B TERM ", " NO_COLOR
+pacman pipes hook output, so the colours come from \fBTERM\fR; \fBNO_COLOR\fR or a dumb
+terminal turns them off.
+.SH SEE ALSO
+.BR kiro-aur-check (8),
+.BR kiro-paru-aur-check (8),
+.BR kiro-yay-aur-check (8)

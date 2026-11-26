@@ -1,0 +1,18 @@
+# Not named kiro-*: ATT's Repair skips the targets of kiro-* hooks (those rewrite files); this one only reads.
+# zz- sorts it after kiro-paru-aur-check.hook, so the notice sees the state that hook leaves.
+[Trigger]
+Type = Path
+Operation = Install
+Operation = Upgrade
+Target = usr/bin/paru
+Target = usr/bin/yay
+
+[Trigger]
+Type = Path
+Operation = Install
+Target = usr/local/bin/kiro-aur-check-notice
+
+[Action]
+Description = Kiro AUR check for paru and yay...
+When = PostTransaction
+Exec = /usr/local/bin/kiro-aur-check-notice
