@@ -25,6 +25,12 @@
   marker. `--disable` comments the line and keeps the marker, so the hook's default run (no option) leaves it off.
   `--status` prints on / off / other / no-paru for ATT. `KIRO_PARU_CONF` / `KIRO_PI_SCAN` point both scripts at
   scratch files for tests.
+- **Every Kiro user has their own `~/.config/paru/paru.conf`** (kiro-dot-files skel, with `SkipReview` on), so
+  paru never reads `/etc/paru.conf` for them — found on picard when paru built a test package without the check.
+  New installs get the line from the skel (kiro-dot-files, same day). Existing users: `kiro-paru-aur-check --file
+  ~/.config/paru/paru.conf --enable` (what the ATT switch runs). The hook does **not** rewrite home folders.
+  Writes keep the file's owner and mode (root rewriting a user's file leaves it `user:user 644`, checked on
+  picard); the root check became "can I write this file and its folder".
 - The hook triggers by **path** (`etc/paru.conf`, the script itself), not by package: ATT's Repair skips every
   target of a `kiro-*` hook, and a package target would hide all of paru's files from it.
 - AUR history comes from the AUR RPC v5 (`curl --max-time 5`), same thresholds as CachyOS's `scanMetadata`; no

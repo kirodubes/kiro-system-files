@@ -49,6 +49,16 @@ status() {
     fi
 }
 
+# A user's own ~/.config/paru/paru.conf is rewritten as root by ATT: keep its owner and mode.
+keep_owner() {
+    local owner mode
+    owner="$(stat -c '%u:%g' "${PARU_CONF}")"
+    mode="$(stat -c '%a' "${PARU_CONF}")"
+    "$@"
+    chown "${owner}" "${PARU_CONF}" 2>/dev/null || true
+    chmod "${mode}" "${PARU_CONF}"
+}
+
 add_line() {
     local tmp
     tmp="$(mktemp "${PARU_CONF}.XXXXXX")"
@@ -60,7 +70,6 @@ add_line() {
     else
         { cat "${PARU_CONF}"; printf '\n[bin]\n%s\n%s\n' "${MARKER}" "${LINE}"; } > "${tmp}"
     fi
-    chmod 644 "${tmp}"
     mv "${tmp}" "${PARU_CONF}"
 }
 
@@ -73,15 +82,15 @@ enable_check() {
             ;;
     esac
     if has_marker && grep -qE '^#[[:space:]]*PreBuildCommand[[:space:]]*=[[:space:]]*/usr/local/bin/kiro-aur-check' "${PARU_CONF}"; then
-        sed -i -E 's|^#[[:space:]]*(PreBuildCommand[[:space:]]*=[[:space:]]*/usr/local/bin/kiro-aur-check)|\1|' "${PARU_CONF}"
+        keep_owner sed -i -E 's|^#[[:space:]]*(PreBuildCommand[[:space:]]*=[[:space:]]*/usr/local/bin/kiro-aur-check)|\1|' "${PARU_CONF}"
     else
-        add_line
+        keep_owner add_line
     fi
 }
 
 disable_check() {
     [[ "$(status)" == "on" ]] || return 0
-    sed -i -E 's|^([[:space:]]*PreBuildCommand[[:space:]]*=[[:space:]]*/usr/local/bin/kiro-aur-check)|#\1|' "${PARU_CONF}"
+    keep_owner sed -i -E 's|^([[:space:]]*PreBuildCommand[[:space:]]*=[[:space:]]*/usr/local/bin/kiro-aur-check)|#\1|' "${PARU_CONF}"
 }
 
 # The hook: add the line once. A marker (even with the line switched off) or someone else's
@@ -89,18 +98,20 @@ disable_check() {
 ensure_default() {
     has_marker && return 0
     [[ -n "$(active_line || true)" ]] && return 0
-    add_line
+    keep_owner add_line
 }
 
 main() {
     local action="ensure" arg
-    for arg in "$@"; do
+    while [[ $# -gt 0 ]]; do
+        arg="$1"
+        shift
         case "$arg" in
             -h|--help)
                 show_help "$(basename "$0")" \
                     "Switch the AUR check before paru builds on or off in /etc/paru.conf" \
-                    "[--help] [--version] [--enable | --disable | --status]" \
-                    "Without an option the check is added once, unless paru.conf already has a choice"
+                    "[--help] [--version] [--enable | --disable | --status] [--file PATH]" \
+                    "Without an option the check is added once, unless paru.conf already has a choice. --file: a user's own ~/.config/paru/paru.conf"
                 exit 0
                 ;;
             -v|--version)
@@ -110,6 +121,8 @@ main() {
             --enable) action="enable" ;;
             --disable) action="disable" ;;
             --status) action="status" ;;
+            --file) PARU_CONF="${1:-}"; shift || true ;;
+            --file=*) PARU_CONF="${arg#*=}" ;;
             *)
                 echo "${RED}$(_t "Unknown option:") ${arg}${RESET}" >&2
                 exit 1
@@ -125,7 +138,7 @@ main() {
         status
         exit 0
     fi
-    if [[ $EUID -ne 0 && -z "${KIRO_PARU_CONF:-}" ]]; then
+    if [[ ! -w "${PARU_CONF}" || ! -w "$(dirname -- "${PARU_CONF}")" ]]; then
         echo "${RED}$(_t "This script must be run as root.")${RESET}" >&2
         exit 1
     fi
