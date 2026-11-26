@@ -81,6 +81,22 @@ print(f"AUR: {votes} votes, maintainer {who}, https://aur.archlinux.org/pkgbase/
 ' || echo "AUR history: skipped (could not read the answer)"
 }
 
+# Orange needs a 256-colour terminal; elsewhere warnings fall back to yellow. Empty when not a terminal.
+ORANGE="${YELLOW}"
+if [[ -n "${YELLOW}" ]] && (( $(tput colors 2>/dev/null || echo 8) >= 256 )); then
+    ORANGE="$(tput setaf 208)"
+fi
+
+# Colour the level tag a finding line starts with: [DANGER] red, [WARNING] orange, [INFO] blue.
+colorize() {
+    awk -v danger="${BOLD}${RED}" -v warning="${BOLD}${ORANGE}" -v info="${BLUE}" -v reset="${RESET}" '
+        /^[[:space:]]*\[DANGER\]/  { sub(/\[DANGER\]/, danger "[DANGER]" reset) }
+        /^[[:space:]]*\[WARNING\]/ { sub(/\[WARNING\]/, warning "[WARNING]" reset) }
+        /^[[:space:]]*\[INFO\]/    { sub(/\[INFO\]/, info "[INFO]" reset) }
+        { print }
+    '
+}
+
 pkgbase_of() {
     local dir="$1" name=""
     [[ -f "${dir}/.SRCINFO" ]] && name="$(sed -n 's/^pkgbase = //p' "${dir}/.SRCINFO" | head -1)"
@@ -134,10 +150,11 @@ main() {
         exit 0
     fi
 
-    local status=0
-    "${SCANNER}" "${dir}" || status=$?
+    local status=0 findings
+    findings="$("${SCANNER}" "${dir}")" || status=$?
+    [[ -n "${findings}" ]] && printf '%s\n' "${findings}" | colorize
     echo
-    aur_history "${pkgbase}"
+    aur_history "${pkgbase}" | colorize
     echo
     log_info "$(_t "A reading aid, not a guarantee: read the PKGBUILD before you trust it.")"
 

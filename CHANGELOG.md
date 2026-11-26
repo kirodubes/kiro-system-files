@@ -14,6 +14,8 @@
 - **The same check for yay.** yay 13 and newer runs it too, before its menus, downloads and builds, for every AUR
   package including AUR dependencies; on Danger + no it stops with "build stopped by the AUR check". New
   `kiro-yay-aur-check` switches it on/off in the user's `~/.config/yay/init.lua` (man page included).
+- **Findings in colour:** `[DANGER]` bold red, `[WARNING]` orange (yellow on terminals without 256 colours),
+  `[INFO]` blue — for the scanner's findings and the AUR history lines, with paru and with yay.
 
 ### Technical Details
 - The scanning is CachyOS Package Installer's `cachyos-pi-scan` (new nemesis package from KIRO-PKG-BUILD-3PARTY,
@@ -57,6 +59,10 @@
   is removed. `--enable` creates `~/.config/yay/init.lua` (and the folder) owned like the folder above it, mode
   644; `--disable` comments the line out; `--status` prints on / off / no-file and is the default. The rest of a
   user's init.lua is kept. No pacman hook: root never edits home folders (skel for new accounts, ATT for existing).
+- Colours: `colorize()` (awk) colours only the level tag at the start of a line. The scanner's output is captured
+  first (`findings="$(…)" || status=$?`) so its exit status survives — a pipe would hand the ERR trap a non-zero
+  pipeline. Orange is `tput setaf 208` when `tput colors` ≥ 256. Colour variables come from `kiro-common.sh`, empty
+  when stdout is not a terminal, so logs and pasted reports stay plain (checked).
 
 ### Files Modified
 - `usr/local/bin/kiro-aur-check`, `usr/local/bin/kiro-paru-aur-check`, `etc/pacman.d/hooks/kiro-paru-aur-check.hook`,
