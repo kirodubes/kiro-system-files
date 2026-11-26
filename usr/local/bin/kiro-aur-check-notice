@@ -11,12 +11,13 @@ set -Euo pipefail
 #   Tells the user, in colour in the pacman output, that Kiro has an AUR check for paru and yay
 #   (kiro-aur-check) and that switching it on is up to them. It runs from a pacman hook when paru
 #   or yay is installed or updated, and once when kiro-system-files first brings this script. It
-#   only reads: for the user who ran pacman (SUDO_USER) it shows only the helpers whose check is
-#   still off, and prints nothing when every installed helper already has it on.
+#   never changes a config: for the user who ran pacman (SUDO_USER) it shows only the helpers whose
+#   check was never set up, and it shows once per user, then never again (a stamp in
+#   /var/lib/kiro/aur-check-notice). A check the user switched off is a choice and gets no notice.
 #
 #   Why: paru and yay read the user's own config, which a pacman hook must not rewrite, so
 #   existing users have to switch the check on themselves (ATT or one command) — and they need
-#   to hear that it exists.
+#   to hear that it exists — once, not on every update.
 #
 ##################################################################################################################
 
@@ -33,6 +34,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 PARU_TOOL="/usr/local/bin/kiro-paru-aur-check"
 YAY_TOOL="/usr/local/bin/kiro-yay-aur-check"
 PARU_CONF="/etc/paru.conf"
+STAMP_DIR="${KIRO_NOTICE_STAMPS:-/var/lib/kiro/aur-check-notice}"
 
 # pacman pipes hook output, so stdout is never a terminal and kiro-common.sh leaves the colours
 # empty. pacman prints the lines to the user's terminal as they are: take the colours from TERM.
@@ -62,25 +64,36 @@ pick_paru_conf() {
     fi
 }
 
-# on / off / other / absent; "other" (an own PreBuildCommand) is a choice and gets no notice.
+# on / off / chosen / absent. "chosen": the Kiro marker is there with the line switched off, or an own
+# PreBuildCommand — the user decided, so no notice.
 paru_state() {
     local state
     command -v paru >/dev/null 2>&1 || { echo "absent"; return 0; }
     state="$("${PARU_TOOL}" --status --file "${PARU_CONF}" 2>/dev/null)" || state="off"
-    [[ "${state}" == "no-paru" ]] && state="off"
-    echo "${state}"
+    case "${state}" in
+        on) echo "on" ;;
+        other) echo "chosen" ;;
+        *) grep -q '^# Kiro: AUR check' "${PARU_CONF}" 2>/dev/null && echo "chosen" || echo "off" ;;
+    esac
 }
 
 yay_state() {
-    local home="$1" state
+    local home="$1" init state
     command -v yay >/dev/null 2>&1 || { echo "absent"; return 0; }
     [[ -n "${home}" ]] || { echo "off"; return 0; }
-    state="$("${YAY_TOOL}" --status --file "${home}/.config/yay/init.lua" 2>/dev/null)" || state="off"
-    [[ "${state}" == "on" ]] && echo "on" || echo "off"
+    init="${home}/.config/yay/init.lua"
+    state="$("${YAY_TOOL}" --status --file "${init}" 2>/dev/null)" || state="off"
+    if [[ "${state}" == "on" ]]; then
+        echo "on"
+    elif grep -q '^-- Kiro: AUR check' "${init}" 2>/dev/null; then
+        echo "chosen"
+    else
+        echo "off"
+    fi
 }
 
 main() {
-    local arg home paru yay
+    local arg home paru yay stamp user
     for arg in "$@"; do
         case "$arg" in
             -h|--help)
@@ -101,6 +114,9 @@ main() {
         esac
     done
 
+    user="${KIRO_NOTICE_USER:-${SUDO_USER:-root}}"
+    stamp="${STAMP_DIR}/${user}"
+    [[ -e "${stamp}" ]] && exit 0
     home="$(user_home)"
     pick_paru_conf "${home}"
     paru="$(paru_state)"
@@ -122,7 +138,9 @@ main() {
         echo "${YELLOW}  yay:  kiro-yay-aur-check --enable${RESET}"
     fi
     echo "${CYAN}$(_t "More: man kiro-aur-check")${RESET}"
+    echo "${CYAN}$(_t "This message is shown only once.")${RESET}"
     echo
+    mkdir -p "${STAMP_DIR}" 2>/dev/null && : > "${stamp}" 2>/dev/null || true
     exit 0
 }
 

@@ -116,7 +116,7 @@ msgid "inxi;system;hardware;info;information;"
 msgstr "sistema;información;inxi;system;hardware;info;information;"
 
 #: usr/local/bin/kiro-appstream-jxl2png:66 usr/local/bin/kiro-aur-check:200
-#: usr/local/bin/kiro-aur-check-notice:98 usr/local/bin/kiro-calamares-log:177
+#: usr/local/bin/kiro-aur-check-notice:111 usr/local/bin/kiro-calamares-log:177
 #: usr/local/bin/kiro-diag:388 usr/local/bin/kiro-enable-ssh:55
 #: usr/local/bin/kiro-fix-gpg-conf:49 usr/local/bin/kiro-fix-mirrors:49
 #: usr/local/bin/kiro-fix-pacman-conf:51 usr/local/bin/kiro-fix-pacman-keys:49
@@ -414,28 +414,35 @@ msgstr "Compilación de $pkgbase detenida."
 msgid "The PKGBUILD could not be read, so it was not checked."
 msgstr "No se pudo leer el PKGBUILD, así que no se comprobó."
 
-#: usr/local/bin/kiro-aur-check-notice:112
+#: usr/local/bin/kiro-aur-check-notice:128
 msgid "Kiro has an AUR check for paru and yay."
 msgstr "Kiro tiene una comprobación de AUR para paru y yay."
 
-#: usr/local/bin/kiro-aur-check-notice:113
+#: usr/local/bin/kiro-aur-check-notice:129
 msgid ""
 "Before an AUR package is built, it shows the lines worth a look: download-"
 "and-run, reading keys or browser data, unverified sources, and what changed "
 "since the version you have."
-msgstr "Antes de compilar un paquete de AUR, muestra las líneas que merecen una mirada: descargar y ejecutar, leer claves o datos del navegador, fuentes sin verificar y lo que cambió desde la versión que tienes."
+msgstr ""
+"Antes de compilar un paquete de AUR, muestra las líneas que merecen una "
+"mirada: descargar y ejecutar, leer claves o datos del navegador, fuentes sin "
+"verificar y lo que cambió desde la versión que tienes."
 
-#: usr/local/bin/kiro-aur-check-notice:114
+#: usr/local/bin/kiro-aur-check-notice:130
 msgid "It is off for you. Switching it on is up to you:"
 msgstr "Está desactivada para ti. Activarla es decisión tuya:"
 
-#: usr/local/bin/kiro-aur-check-notice:115
+#: usr/local/bin/kiro-aur-check-notice:131
 msgid "ATT (Archlinux Tweak Tool): Pacman page, AUR check"
 msgstr "ATT (Archlinux Tweak Tool): página Pacman, Comprobación de AUR"
 
-#: usr/local/bin/kiro-aur-check-notice:124
+#: usr/local/bin/kiro-aur-check-notice:140
 msgid "More: man kiro-aur-check"
 msgstr "Más: man kiro-aur-check"
+
+#: usr/local/bin/kiro-aur-check-notice:141
+msgid "This message is shown only once."
+msgstr "Este mensaje se muestra solo una vez."
 
 #: usr/local/bin/kiro-calamares-log:220
 msgid "Kiro — Calamares Install Summary"

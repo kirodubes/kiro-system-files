@@ -22,9 +22,10 @@
   `[INFO]` blue — for the scanner's findings and the AUR history lines, with paru and with yay.
 - **Told in the terminal when the check is off.** When paru or yay is installed or updated, pacman now ends with a
   few coloured lines: Kiro has an AUR check, it is off for you, switching it on is up to you — through ATT (Pacman
-  page, AUR check) or one command per helper. It shows only for the helpers whose check is still off, and nothing
-  when it is on for all. It also shows once when this package first brings it, so existing users hear about it
-  without waiting for a paru or yay update. New `kiro-aur-check-notice` (man page included); it never changes a file.
+  page, AUR check) or one command per helper. **Once per user, never a nag:** after it has been shown it stays
+  quiet, and someone who switched the check off themselves never sees it. It appears when this package first
+  brings it, or later when paru or yay is first installed. New `kiro-aur-check-notice` (man page included); it
+  never changes a config.
 
 ### Technical Details
 - The scanning is CachyOS Package Installer's `cachyos-pi-scan` (new nemesis package from KIRO-PKG-BUILD-3PARTY,
@@ -90,7 +91,10 @@
   leaves. The user is `SUDO_USER` (paru and yay call `sudo pacman`); their own `~/.config/paru/paru.conf` wins over
   `/etc/paru.conf` as paru does, and the paru command shown needs `sudo` only for `/etc/paru.conf`. pacman pipes
   hook output, so `kiro-common.sh` leaves the colours empty; the script takes them from `TERM` (`tput -T`) unless
-  `NO_COLOR` or a dumb terminal. Tested on scratch configs: off/off, on/on (prints nothing), no user, piped with
+  `NO_COLOR` or a dumb terminal. Once only: a per-user stamp in `/var/lib/kiro/aur-check-notice/` (the hook runs
+  as root) is written after the notice; "switched off by the user" = Kiro marker present with the line commented
+  (paru: `# Kiro: AUR check`, yay: `-- Kiro: AUR check`) or an own `PreBuildCommand`. Tested: 1st run shows, 2nd
+  run silent, both helpers switched off by the user silent. Earlier tests on scratch configs: off/off, on/on (prints nothing), no user, piped with
   `TERM=xterm-256color` (colour codes present), Dutch and Japanese; `tests/check.sh` 0 FAIL. 5 new strings in the
   13 languages, ATT's own words for the page and section name.
 

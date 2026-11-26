@@ -14,10 +14,13 @@ For the user who ran pacman (\fBSUDO_USER\fR) it asks
 .BR kiro-paru-aur-check (8)
 and
 .BR kiro-yay-aur-check (8)
-whether the check is on, and for each installed helper where it is still off it prints, in
-colour, how to switch it on: ATT (Pacman page, AUR check) or one command. When the check is on
-for every installed helper it prints nothing. It never changes a file: switching the check on
-is up to the user.
+whether the check is on, and for each installed helper where it was never set up it prints, in
+colour, how to switch it on: ATT (Pacman page, AUR check) or one command. It does this once per
+user: afterwards a stamp in
+.I /var/lib/kiro/aur-check-notice
+keeps it quiet. A check the user switched off (the Kiro marker with the line commented out, or
+an own PreBuildCommand) counts as a choice and gets no notice. It never changes a config:
+switching the check on is up to the user. Delete the stamp to see the notice again.
 .SH ENVIRONMENT
 .TP
 .B SUDO_USER

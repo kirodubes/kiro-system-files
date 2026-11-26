@@ -116,7 +116,7 @@ msgid "inxi;system;hardware;info;information;"
 msgstr "rendszer;hardver;információ;inxi;system;hardware;info;information;"
 
 #: usr/local/bin/kiro-appstream-jxl2png:66 usr/local/bin/kiro-aur-check:200
-#: usr/local/bin/kiro-aur-check-notice:98 usr/local/bin/kiro-calamares-log:177
+#: usr/local/bin/kiro-aur-check-notice:111 usr/local/bin/kiro-calamares-log:177
 #: usr/local/bin/kiro-diag:388 usr/local/bin/kiro-enable-ssh:55
 #: usr/local/bin/kiro-fix-gpg-conf:49 usr/local/bin/kiro-fix-mirrors:49
 #: usr/local/bin/kiro-fix-pacman-conf:51 usr/local/bin/kiro-fix-pacman-keys:49
@@ -413,28 +413,35 @@ msgstr "A(z) $pkgbase fordítása leállt."
 msgid "The PKGBUILD could not be read, so it was not checked."
 msgstr "A PKGBUILD nem olvasható, ezért nem lett ellenőrizve."
 
-#: usr/local/bin/kiro-aur-check-notice:112
+#: usr/local/bin/kiro-aur-check-notice:128
 msgid "Kiro has an AUR check for paru and yay."
 msgstr "A Kirónak van AUR-ellenőrzése a paruhoz és a yayhoz."
 
-#: usr/local/bin/kiro-aur-check-notice:113
+#: usr/local/bin/kiro-aur-check-notice:129
 msgid ""
 "Before an AUR package is built, it shows the lines worth a look: download-"
 "and-run, reading keys or browser data, unverified sources, and what changed "
 "since the version you have."
-msgstr "Mielőtt egy AUR-csomag elkészül, megmutatja a figyelemre méltó sorokat: letöltés és futtatás, kulcsok vagy böngészőadatok olvasása, ellenőrizetlen források, és mi változott a nálad lévő verzió óta."
+msgstr ""
+"Mielőtt egy AUR-csomag elkészül, megmutatja a figyelemre méltó sorokat: "
+"letöltés és futtatás, kulcsok vagy böngészőadatok olvasása, ellenőrizetlen "
+"források, és mi változott a nálad lévő verzió óta."
 
-#: usr/local/bin/kiro-aur-check-notice:114
+#: usr/local/bin/kiro-aur-check-notice:130
 msgid "It is off for you. Switching it on is up to you:"
 msgstr "Nálad ki van kapcsolva. Hogy bekapcsolod-e, rajtad múlik:"
 
-#: usr/local/bin/kiro-aur-check-notice:115
+#: usr/local/bin/kiro-aur-check-notice:131
 msgid "ATT (Archlinux Tweak Tool): Pacman page, AUR check"
 msgstr "ATT (Archlinux Tweak Tool): Pacman oldal, AUR-ellenőrzés"
 
-#: usr/local/bin/kiro-aur-check-notice:124
+#: usr/local/bin/kiro-aur-check-notice:140
 msgid "More: man kiro-aur-check"
 msgstr "Több: man kiro-aur-check"
+
+#: usr/local/bin/kiro-aur-check-notice:141
+msgid "This message is shown only once."
+msgstr "Ez az üzenet csak egyszer jelenik meg."
 
 #: usr/local/bin/kiro-calamares-log:220
 msgid "Kiro — Calamares Install Summary"
