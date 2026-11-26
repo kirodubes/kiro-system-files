@@ -11,10 +11,14 @@
 - New `kiro-aur-check` (what paru runs) and `kiro-paru-aur-check` (switches it on/off in `/etc/paru.conf`), with
   man pages. A pacman hook adds the check once when paru or kiro-system-files is installed or updated; a user who
   switched it off, or runs a `PreBuildCommand` of their own, is left alone.
+- **The same check for yay.** yay 13 and newer runs it too, before its menus, downloads and builds, for every AUR
+  package including AUR dependencies; on Danger + no it stops with "build stopped by the AUR check". New
+  `kiro-yay-aur-check` switches it on/off in the user's `~/.config/yay/init.lua` (man page included).
 
 ### Technical Details
 - The scanning is CachyOS Package Installer's `cachyos-pi-scan` (new nemesis package from KIRO-PKG-BUILD-3PARTY,
-  `optdepends` here). Without it the check prints one line and the build goes on — it never blocks because of us.
+  a dependency of this package). Without it the check prints one line and the build goes on — it never blocks
+  because of us.
 - **Why before the build, not a pacman hook:** makepkg runs the PKGBUILD as the user before pacman is called; a
   pacman hook would come too late. paru's `PreBuildCommand` runs in the PKGBUILD's folder with `PKGBASE` set.
   **It belongs in `[bin]`, not `[options]`** (paru-git 2.2.1 rejects it there as unknown). A non-zero exit makes
@@ -41,10 +45,24 @@
   danger PKGBUILDs — warning builds, danger + n stops before the build, danger + y builds; `tests/check.sh` 0 FAIL.
   Then with the real `cachyos-pi-scan` 2.0.1-1 package on picard: findings and AUR history correct. Fix: with no
   terminal to ask, the "stopped" banner showed twice — it now stops right after the first one.
+- **yay:** yay 13+ has a Lua config (`~/.config/yay/init.lua`) with an `AURPreInstall` autocmd: once per AUR package
+  base (dependencies included), after the PKGBUILDs are fetched, before the clean/diff/edit menus, `makepkg
+  --verifysource` and the build; `yay.abort()` stops it without a traceback (yay `959f0d5`, `doc/lua.md`,
+  `pkg/sync/workdir/aur_preinstall.go`). `/usr/share/kiro/yay/aur-check.lua` registers it and runs `PKGBASE=<base>
+  kiro-aur-check '<dir>'` through `os.execute` (terminal inherited, so y/N works); a non-zero exit → `yay.abort`.
+  It accepts both shapes of `os.execute`'s result (number in gopher-lua / Lua 5.1, boolean in 5.2+), tested with a
+  stub in lua5.1 and lua 5.4, with quotes in the package name and folder.
+- yay has **no system-wide config**, so `kiro-yay-aur-check` edits the user's own file: one marked line that loads
+  the hook only when it exists (`if io.open(...) then dofile(...) end`), so yay still starts if kiro-system-files
+  is removed. `--enable` creates `~/.config/yay/init.lua` (and the folder) owned like the folder above it, mode
+  644; `--disable` comments the line out; `--status` prints on / off / no-file and is the default. The rest of a
+  user's init.lua is kept. No pacman hook: root never edits home folders (skel for new accounts, ATT for existing).
 
 ### Files Modified
 - `usr/local/bin/kiro-aur-check`, `usr/local/bin/kiro-paru-aur-check`, `etc/pacman.d/hooks/kiro-paru-aur-check.hook`,
   `usr/share/man/man8/kiro-aur-check.8`, `usr/share/man/man8/kiro-paru-aur-check.8` (new); `po/*`, `usr/share/locale/*`
+- `usr/local/bin/kiro-yay-aur-check`, `usr/share/kiro/yay/aur-check.lua`, `usr/share/man/man8/kiro-yay-aur-check.8`
+  (new); `usr/local/bin/kiro-aur-check`, `usr/share/man/man8/kiro-aur-check.8` (mention yay)
 
 ## 2026.11.24
 

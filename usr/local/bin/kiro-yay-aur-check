@@ -1,0 +1,155 @@
+#!/bin/bash
+set -Euo pipefail
+##################################################################################################################
+# Author    : Erik Dubois
+# Website   : https://kiroproject.be
+##################################################################################################################
+#
+#   DO NOT JUST RUN THIS. EXAMINE AND JUDGE. RUN AT YOUR OWN RISK.
+#
+#   Purpose:
+#   Switches the AUR check (kiro-aur-check) on or off for yay by managing one line in the user's
+#   ~/.config/yay/init.lua that loads /usr/share/kiro/yay/aur-check.lua, marked with a
+#   "-- Kiro: AUR check" comment. That file registers yay's AURPreInstall hook (yay 13+), which
+#   runs kiro-aur-check before yay downloads or builds an AUR package. --enable creates init.lua
+#   when there is none; the rest of a user's init.lua is left alone. For ATT and for people.
+#
+#   Why: yay has no system-wide config, only ~/.config/yay/init.lua, so the check is switched on
+#   per user: the skel ships the line for new accounts, ATT adds it for existing ones.
+#
+##################################################################################################################
+
+# shellcheck source=/usr/local/lib/kiro-common.sh
+if [[ -f /usr/local/lib/kiro-common.sh ]]; then
+    source /usr/local/lib/kiro-common.sh
+else
+    echo "ERROR: kiro-common.sh not found" >&2
+    exit 1
+fi
+
+# shellcheck disable=SC2034  # template variable, unused here
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+INIT_LUA="${KIRO_YAY_INIT:-${HOME}/.config/yay/init.lua}"
+HOOK_LUA="/usr/share/kiro/yay/aur-check.lua"
+MARKER="-- Kiro: AUR check — shows risky PKGBUILD lines before yay builds (kiro-aur-check)"
+LINE="if io.open(\"${HOOK_LUA}\") then dofile(\"${HOOK_LUA}\") end"
+# the line, with the dots escaped, for grep -E / sed -E
+LINE_RE="if io\\.open\\(\"/usr/share/kiro/yay/aur-check\\.lua\"\\) then dofile\\(\"/usr/share/kiro/yay/aur-check\\.lua\"\\) end"
+
+status() {
+    if grep -qE "^[[:space:]]*${LINE_RE}" "${INIT_LUA}"; then
+        echo "on"
+    else
+        echo "off"
+    fi
+}
+
+# ATT rewrites the user's init.lua as root: keep its owner and mode.
+keep_owner() {
+    local owner mode
+    owner="$(stat -c '%u:%g' "${INIT_LUA}")"
+    mode="$(stat -c '%a' "${INIT_LUA}")"
+    "$@"
+    chown "${owner}" "${INIT_LUA}" 2>/dev/null || true
+    chmod "${mode}" "${INIT_LUA}"
+}
+
+# No init.lua yet: create it (and ~/.config/yay) owned by whoever owns the nearest existing folder above it.
+create_file() {
+    local dir ancestor owner
+    dir="$(dirname -- "${INIT_LUA}")"
+    ancestor="${dir}"
+    while [[ ! -d "${ancestor}" ]]; do
+        ancestor="$(dirname -- "${ancestor}")"
+    done
+    owner="$(stat -c '%u:%g' "${ancestor}")"
+    if [[ ! -d "${dir}" ]]; then
+        mkdir -p "${dir}"
+        chown "${owner}" "${dir}" 2>/dev/null || true
+    fi
+    : > "${INIT_LUA}"
+    chown "${owner}" "${INIT_LUA}" 2>/dev/null || true
+    chmod 644 "${INIT_LUA}"
+}
+
+add_line() {
+    local tmp
+    tmp="$(mktemp "${INIT_LUA}.XXXXXX")"
+    { cat "${INIT_LUA}"; [[ -s "${INIT_LUA}" ]] && echo; printf '%s\n%s\n' "${MARKER}" "${LINE}"; } > "${tmp}"
+    mv "${tmp}" "${INIT_LUA}"
+}
+
+enable_check() {
+    [[ -f "${INIT_LUA}" ]] || create_file
+    [[ "$(status)" == "on" ]] && return 0
+    if grep -qE "^[[:space:]]*--[[:space:]]*${LINE_RE}" "${INIT_LUA}"; then
+        keep_owner sed -i -E "s|^([[:space:]]*)--[[:space:]]*(${LINE_RE})|\\1\\2|" "${INIT_LUA}"
+    else
+        keep_owner add_line
+    fi
+}
+
+disable_check() {
+    [[ -f "${INIT_LUA}" && "$(status)" == "on" ]] || return 0
+    keep_owner sed -i -E "s|^([[:space:]]*)(${LINE_RE})|\\1-- \\2|" "${INIT_LUA}"
+}
+
+# Writing needs the file (or, when it does not exist yet, the nearest existing folder above it) to be writable.
+can_write() {
+    local target="${INIT_LUA}"
+    while [[ ! -e "${target}" ]]; do
+        target="$(dirname -- "${target}")"
+    done
+    [[ -w "${target}" ]]
+}
+
+main() {
+    local action="status" arg
+    while [[ $# -gt 0 ]]; do
+        arg="$1"
+        shift
+        case "$arg" in
+            -h|--help)
+                show_help "$(basename "$0")" \
+                    "Switch the AUR check before yay builds on or off in ~/.config/yay/init.lua" \
+                    "[--help] [--version] [--enable | --disable | --status] [--file PATH]" \
+                    "Without an option it prints the status. --file: another user's init.lua (ATT runs it as root)"
+                exit 0
+                ;;
+            -v|--version)
+                show_version "$(basename "$0")"
+                exit 0
+                ;;
+            --enable) action="enable" ;;
+            --disable) action="disable" ;;
+            --status) action="status" ;;
+            --file) INIT_LUA="${1:-}"; shift || true ;;
+            --file=*) INIT_LUA="${arg#*=}" ;;
+            *)
+                echo "${RED}$(_t "Unknown option:") ${arg}${RESET}" >&2
+                exit 1
+                ;;
+        esac
+    done
+
+    if [[ "${action}" == "status" ]]; then
+        if [[ -f "${INIT_LUA}" ]]; then
+            status
+        else
+            echo "no-file"
+        fi
+        exit 0
+    fi
+    if ! can_write; then
+        echo "${RED}$(_t "This script must be run as root.")${RESET}" >&2
+        exit 1
+    fi
+
+    case "${action}" in
+        enable) enable_check; log_success "$(_t "AUR check switched on for yay.")" ;;
+        disable) disable_check; log_success "$(_t "AUR check switched off for yay.")" ;;
+    esac
+    exit 0
+}
+
+main "$@"

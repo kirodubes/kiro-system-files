@@ -10,10 +10,11 @@ set -Euo pipefail
 #   Purpose:
 #   Shows the lines of an AUR package worth a look before it is built. paru runs it from
 #   PreBuildCommand ([bin] in /etc/paru.conf, set by kiro-paru-aur-check) in the folder that
-#   holds the PKGBUILD, with PKGBASE set. It runs cachyos-pi-scan (CachyOS's rules, read-only:
-#   nothing from the package is executed), adds the package's AUR history (orphaned, new,
+#   holds the PKGBUILD, with PKGBASE set; yay (13+) runs it from its AURPreInstall hook (set by
+#   kiro-yay-aur-check). It runs cachyos-pi-scan (CachyOS's rules, read-only: nothing from the
+#   package is executed), adds the package's AUR history (orphaned, new,
 #   maintainer changed, few votes) and, on a dangerous finding, asks before the build goes on.
-#   Exit 1 stops paru; warnings and notes never stop a build. Also usable by hand:
+#   Exit 1 stops paru or yay; warnings and notes never stop a build. Also usable by hand:
 #   kiro-aur-check [folder-with-PKGBUILD].
 #
 #   Why: AUR malware runs inside makepkg, as the user, before pacman is ever called — the
@@ -106,9 +107,9 @@ main() {
         case "$arg" in
             -h|--help)
                 show_help "$(basename "$0")" \
-                    "Show the lines of an AUR package worth a look before paru builds it" \
+                    "Show the lines of an AUR package worth a look before paru or yay builds it" \
                     "[--help] [--version] [folder-with-PKGBUILD]" \
-                    "paru runs this from PreBuildCommand; see kiro-paru-aur-check"
+                    "paru runs this from PreBuildCommand, yay from its AURPreInstall hook; see kiro-paru-aur-check and kiro-yay-aur-check"
                 exit 0
                 ;;
             -v|--version)

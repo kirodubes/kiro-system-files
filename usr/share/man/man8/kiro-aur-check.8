@@ -25,8 +25,15 @@ section of
 .IR /etc/paru.conf ,
 set by
 .BR kiro-paru-aur-check (8).
+yay (13 or newer) runs it from its
+.B AURPreInstall
+hook, loaded from
+.I ~/.config/yay/init.lua
+and set by
+.BR kiro-yay-aur-check (8),
+before its menus, downloads and builds.
 When a finding is dangerous it asks whether to continue; answering no (or having no
-terminal to ask on) exits 1, which stops paru before the build. Warnings and notes are
+terminal to ask on) exits 1, which stops paru or yay before the build. Warnings and notes are
 only shown.
 .PP
 This is a reading aid, not a guarantee: no findings does not make a package safe.
@@ -59,6 +66,7 @@ kiro-aur-check ~/Downloads/some-package
 .EE
 .SH SEE ALSO
 .BR kiro-paru-aur-check (8),
+.BR kiro-yay-aur-check (8),
 .BR paru.conf (5)
 .SH AUTHOR
 Erik Dubois <https://www.erikdubois.be>

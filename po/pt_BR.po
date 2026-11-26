@@ -115,24 +115,24 @@ msgstr "Relatório completo do sistema e do hardware (inxi)"
 msgid "inxi;system;hardware;info;information;"
 msgstr "sistema;informações;inxi;system;hardware;info;information;"
 
-#: usr/local/bin/kiro-appstream-jxl2png:66 usr/local/bin/kiro-aur-check:117
+#: usr/local/bin/kiro-appstream-jxl2png:66 usr/local/bin/kiro-aur-check:120
 #: usr/local/bin/kiro-calamares-log:177 usr/local/bin/kiro-diag:388
 #: usr/local/bin/kiro-enable-ssh:55 usr/local/bin/kiro-fix-gpg-conf:49
 #: usr/local/bin/kiro-fix-mirrors:49 usr/local/bin/kiro-fix-pacman-conf:51
 #: usr/local/bin/kiro-fix-pacman-keys:49 usr/local/bin/kiro-get-mirrors:49
 #: usr/local/bin/kiro-get-nemesis:51 usr/local/bin/kiro-iso-version:43
 #: usr/local/bin/kiro-keep-kirotux-repo:50 usr/local/bin/kiro-lint:431
-#: usr/local/bin/kiro-paru-aur-check:114 usr/local/bin/kiro-probe:58
+#: usr/local/bin/kiro-paru-aur-check:127 usr/local/bin/kiro-probe:58
 #: usr/local/bin/kiro-probe-report:137 usr/local/bin/kiro-report:347
 #: usr/local/bin/kiro-set-cores:49 usr/local/bin/kiro-set-cores-min1:50
 #: usr/local/bin/kiro-set-cores-min2:50 usr/local/bin/kiro-skell:142
 #: usr/local/bin/kiro-skell-all:143 usr/local/bin/kiro-which-vga:50
-#: usr/local/bin/kiro-xlibre-swap:309
+#: usr/local/bin/kiro-xlibre-swap:309 usr/local/bin/kiro-yay-aur-check:129
 msgid "Unknown option:"
 msgstr "Opção desconhecida:"
 
 #: usr/local/bin/kiro-appstream-jxl2png:73
-#: usr/local/bin/kiro-paru-aur-check:129
+#: usr/local/bin/kiro-paru-aur-check:142 usr/local/bin/kiro-yay-aur-check:144
 msgid "This script must be run as root."
 msgstr "Este script deve ser executado como root."
 
@@ -345,7 +345,7 @@ msgstr ""
 "falhas acima muito provavelmente vêm da VM ou do ambiente live,\n"
 "não de uma instalação quebrada."
 
-#: usr/local/bin/kiro-aur-check:91
+#: usr/local/bin/kiro-aur-check:94
 #, sh-format
 msgid ""
 "Dangerous lines found and nobody to ask: the build of $pkgbase is stopped."
@@ -354,17 +354,17 @@ msgstr ""
 "$pkgbase foi interrompida."
 
 #. Translators: keep [y/N] and the answer keys y/N as they are
-#: usr/local/bin/kiro-aur-check:96
+#: usr/local/bin/kiro-aur-check:99
 #, sh-format
 msgid "Continue building $pkgbase anyway? [y/N]"
 msgstr "Continuar compilando $pkgbase mesmo assim? [y/N]"
 
-#: usr/local/bin/kiro-aur-check:127
+#: usr/local/bin/kiro-aur-check:130
 #, sh-format
 msgid "AUR check: $pkgbase"
 msgstr "Verificação do AUR: $pkgbase"
 
-#: usr/local/bin/kiro-aur-check:130
+#: usr/local/bin/kiro-aur-check:133
 msgid ""
 "cachyos-pi-scan is not installed, so nothing was checked. Install it with: "
 "sudo pacman -S cachyos-pi-scan"
@@ -372,18 +372,18 @@ msgstr ""
 "O cachyos-pi-scan não está instalado, então nada foi verificado. Instale "
 "com: sudo pacman -S cachyos-pi-scan"
 
-#: usr/local/bin/kiro-aur-check:139
+#: usr/local/bin/kiro-aur-check:142
 msgid "A reading aid, not a guarantee: read the PKGBUILD before you trust it."
 msgstr ""
 "Uma ajuda de leitura, não uma garantia: leia o PKGBUILD antes de confiar "
 "nele."
 
-#: usr/local/bin/kiro-aur-check:144
+#: usr/local/bin/kiro-aur-check:147
 #, sh-format
 msgid "Build of $pkgbase stopped."
 msgstr "Compilação de $pkgbase interrompida."
 
-#: usr/local/bin/kiro-aur-check:149
+#: usr/local/bin/kiro-aur-check:152
 msgid "The PKGBUILD could not be read, so it was not checked."
 msgstr "Não foi possível ler o PKGBUILD, então ele não foi verificado."
 
@@ -707,16 +707,16 @@ msgstr "Linter de configuração do Kiro"
 msgid "Lint Summary"
 msgstr "Resumo da análise"
 
-#: usr/local/bin/kiro-paru-aur-check:71
+#: usr/local/bin/kiro-paru-aur-check:80
 msgid "paru.conf already runs another PreBuildCommand; it was left alone."
 msgstr ""
 "O paru.conf já executa outro PreBuildCommand; ele foi mantido como está."
 
-#: usr/local/bin/kiro-paru-aur-check:135
+#: usr/local/bin/kiro-paru-aur-check:148
 msgid "AUR check switched on for paru."
 msgstr "Verificação do AUR ativada para o paru."
 
-#: usr/local/bin/kiro-paru-aur-check:136
+#: usr/local/bin/kiro-paru-aur-check:149
 msgid "AUR check switched off for paru."
 msgstr "Verificação do AUR desativada para o paru."
 
@@ -1202,6 +1202,14 @@ msgstr "Escolha [1/2/3]: "
 #, sh-format
 msgid "Invalid choice: $choice"
 msgstr "Escolha inválida: $choice"
+
+#: usr/local/bin/kiro-yay-aur-check:149
+msgid "AUR check switched on for yay."
+msgstr "Verificação do AUR ativada para o yay."
+
+#: usr/local/bin/kiro-yay-aur-check:150
+msgid "AUR check switched off for yay."
+msgstr "Verificação do AUR desativada para o yay."
 
 #: usr/local/lib/kiro-common.sh:167
 msgid "WARNING"

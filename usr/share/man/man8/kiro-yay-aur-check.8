@@ -1,0 +1,63 @@
+.TH KIRO-YAY-AUR-CHECK 8 "2026-11-26" "Kiro" "Kiro System Tools"
+.SH NAME
+kiro-yay-aur-check \- switch the AUR check before yay builds on or off
+.SH SYNOPSIS
+.B kiro-yay-aur-check
+[\fB\-h\fR|\fB\-\-help\fR]
+[\fB\-v\fR|\fB\-\-version\fR]
+[\fB\-\-enable\fR | \fB\-\-disable\fR | \fB\-\-status\fR]
+[\fB\-\-file\fR \fIPATH\fR]
+.SH DESCRIPTION
+.B kiro-yay-aur-check
+manages one line in the user's
+.IR ~/.config/yay/init.lua :
+.PP
+.EX
+-- Kiro: AUR check \(em shows risky PKGBUILD lines before yay builds (kiro-aur-check)
+if io.open("/usr/share/kiro/yay/aur-check.lua") then dofile("/usr/share/kiro/yay/aur-check.lua") end
+.EE
+.PP
+That file registers yay's
+.B AURPreInstall
+hook (yay 13 or newer). yay runs it once per AUR package base, dependencies included,
+before its menus, source downloads and builds; it runs
+.BR kiro-aur-check (8),
+and a non-zero exit stops yay.
+.PP
+yay has no system-wide config, so the check is switched on per user: new accounts get the
+line from
+.IR /etc/skel ,
+existing ones through ATT or this command. The rest of init.lua is left alone, and the
+line does nothing when kiro-system-files is removed.
+.SH OPTIONS
+.TP
+.B \-\-enable
+Switch the check on; creates init.lua (and its folder) when there is none.
+.TP
+.B \-\-disable
+Switch it off: the line is commented out, the marker stays.
+.TP
+.B \-\-status
+Print on, off or no-file. This is the default.
+.TP
+.BI \-\-file " PATH"
+Another init.lua, for example a user's when run as root.
+.TP
+.BR \-h ", " \-\-help
+Print a help message and exit.
+.TP
+.BR \-v ", " \-\-version
+Print version information and exit.
+.SH FILES
+.TP
+.I ~/.config/yay/init.lua
+yay's Lua config.
+.TP
+.I /usr/share/kiro/yay/aur-check.lua
+The hook it loads.
+.SH SEE ALSO
+.BR kiro-aur-check (8),
+.BR kiro-paru-aur-check (8),
+.BR yay (8)
+.SH AUTHOR
+Erik Dubois <https://www.erikdubois.be>
