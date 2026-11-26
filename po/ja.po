@@ -117,7 +117,7 @@ msgstr "システムとハードウェアの完全なレポート（inxi）"
 msgid "inxi;system;hardware;info;information;"
 msgstr "システム;ハードウェア;情報;inxi;system;hardware;info;information;"
 
-#: usr/local/bin/kiro-appstream-jxl2png:66 usr/local/bin/kiro-aur-check:120
+#: usr/local/bin/kiro-appstream-jxl2png:66 usr/local/bin/kiro-aur-check:200
 #: usr/local/bin/kiro-calamares-log:177 usr/local/bin/kiro-diag:388
 #: usr/local/bin/kiro-enable-ssh:55 usr/local/bin/kiro-fix-gpg-conf:49
 #: usr/local/bin/kiro-fix-mirrors:49 usr/local/bin/kiro-fix-pacman-conf:51
@@ -347,7 +347,30 @@ msgstr ""
 "上記の失敗は VM やライブ環境によるものである可能性が高く、\n"
 "インストールの破損ではありません。"
 
-#: usr/local/bin/kiro-aur-check:94
+#: usr/local/bin/kiro-aur-check:124
+#, sh-format
+msgid ""
+"The installed version $installed is not in the AUR history of this package, "
+"so there are no changes to show (usual for -git packages)."
+msgstr "インストール済みのバージョン $installed はこのパッケージの AUR 履歴にないため、表示できる変更はありません（-git パッケージでは普通です）。"
+
+#: usr/local/bin/kiro-aur-check:133
+#, sh-format
+msgid ""
+"The package files have not changed since the installed version $installed."
+msgstr "インストール済みのバージョン $installed 以降、パッケージのファイルは変更されていません。"
+
+#: usr/local/bin/kiro-aur-check:136
+#, sh-format
+msgid "Changes since the installed version $installed:"
+msgstr "インストール済みのバージョン $installed 以降の変更:"
+
+#: usr/local/bin/kiro-aur-check:144
+#, sh-format
+msgid "$more more lines. Read them all with: $where"
+msgstr "あと $more 行あります。すべて読むには: $where"
+
+#: usr/local/bin/kiro-aur-check:174
 #, sh-format
 msgid ""
 "Dangerous lines found and nobody to ask: the build of $pkgbase is stopped."
@@ -356,17 +379,17 @@ msgstr ""
 "ました。"
 
 #. Translators: keep [y/N] and the answer keys y/N as they are
-#: usr/local/bin/kiro-aur-check:99
+#: usr/local/bin/kiro-aur-check:179
 #, sh-format
 msgid "Continue building $pkgbase anyway? [y/N]"
 msgstr "それでも $pkgbase のビルドを続けますか? [y/N]"
 
-#: usr/local/bin/kiro-aur-check:130
+#: usr/local/bin/kiro-aur-check:210
 #, sh-format
 msgid "AUR check: $pkgbase"
 msgstr "AUR チェック: $pkgbase"
 
-#: usr/local/bin/kiro-aur-check:133
+#: usr/local/bin/kiro-aur-check:213
 msgid ""
 "cachyos-pi-scan is not installed, so nothing was checked. Install it with: "
 "sudo pacman -S cachyos-pi-scan"
@@ -374,18 +397,18 @@ msgstr ""
 "cachyos-pi-scan がインストールされていないため、何もチェックされませんでし"
 "た。次でインストールできます: sudo pacman -S cachyos-pi-scan"
 
-#: usr/local/bin/kiro-aur-check:142
+#: usr/local/bin/kiro-aur-check:225
 msgid "A reading aid, not a guarantee: read the PKGBUILD before you trust it."
 msgstr ""
 "読むための手がかりであり、保証ではありません: 信頼する前に PKGBUILD を読んで"
 "ください。"
 
-#: usr/local/bin/kiro-aur-check:147
+#: usr/local/bin/kiro-aur-check:230
 #, sh-format
 msgid "Build of $pkgbase stopped."
 msgstr "$pkgbase のビルドを停止しました。"
 
-#: usr/local/bin/kiro-aur-check:152
+#: usr/local/bin/kiro-aur-check:235
 msgid "The PKGBUILD could not be read, so it was not checked."
 msgstr "PKGBUILD を読み込めなかったため、チェックされていません。"
 

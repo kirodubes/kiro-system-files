@@ -115,7 +115,7 @@ msgstr "Volledig systeem- en hardwarerapport (inxi)"
 msgid "inxi;system;hardware;info;information;"
 msgstr "systeem;informatie;inxi;system;hardware;info;information;"
 
-#: usr/local/bin/kiro-appstream-jxl2png:66 usr/local/bin/kiro-aur-check:120
+#: usr/local/bin/kiro-appstream-jxl2png:66 usr/local/bin/kiro-aur-check:200
 #: usr/local/bin/kiro-calamares-log:177 usr/local/bin/kiro-diag:388
 #: usr/local/bin/kiro-enable-ssh:55 usr/local/bin/kiro-fix-gpg-conf:49
 #: usr/local/bin/kiro-fix-mirrors:49 usr/local/bin/kiro-fix-pacman-conf:51
@@ -345,7 +345,30 @@ msgstr ""
 "fouten hierboven komen waarschijnlijk door de VM of de live-omgeving,\n"
 "niet door een kapotte installatie."
 
-#: usr/local/bin/kiro-aur-check:94
+#: usr/local/bin/kiro-aur-check:124
+#, sh-format
+msgid ""
+"The installed version $installed is not in the AUR history of this package, "
+"so there are no changes to show (usual for -git packages)."
+msgstr "De geïnstalleerde versie $installed staat niet in de AUR-geschiedenis van dit pakket, dus er zijn geen wijzigingen te tonen (normaal voor -git-pakketten)."
+
+#: usr/local/bin/kiro-aur-check:133
+#, sh-format
+msgid ""
+"The package files have not changed since the installed version $installed."
+msgstr "De pakketbestanden zijn niet gewijzigd sinds de geïnstalleerde versie $installed."
+
+#: usr/local/bin/kiro-aur-check:136
+#, sh-format
+msgid "Changes since the installed version $installed:"
+msgstr "Wijzigingen sinds de geïnstalleerde versie $installed:"
+
+#: usr/local/bin/kiro-aur-check:144
+#, sh-format
+msgid "$more more lines. Read them all with: $where"
+msgstr "Nog $more regels. Lees ze allemaal met: $where"
+
+#: usr/local/bin/kiro-aur-check:174
 #, sh-format
 msgid ""
 "Dangerous lines found and nobody to ask: the build of $pkgbase is stopped."
@@ -354,17 +377,17 @@ msgstr ""
 "$pkgbase is gestopt."
 
 #. Translators: keep [y/N] and the answer keys y/N as they are
-#: usr/local/bin/kiro-aur-check:99
+#: usr/local/bin/kiro-aur-check:179
 #, sh-format
 msgid "Continue building $pkgbase anyway? [y/N]"
 msgstr "Toch doorgaan met het bouwen van $pkgbase? [y/N]"
 
-#: usr/local/bin/kiro-aur-check:130
+#: usr/local/bin/kiro-aur-check:210
 #, sh-format
 msgid "AUR check: $pkgbase"
 msgstr "AUR-controle: $pkgbase"
 
-#: usr/local/bin/kiro-aur-check:133
+#: usr/local/bin/kiro-aur-check:213
 msgid ""
 "cachyos-pi-scan is not installed, so nothing was checked. Install it with: "
 "sudo pacman -S cachyos-pi-scan"
@@ -372,16 +395,16 @@ msgstr ""
 "cachyos-pi-scan is niet geïnstalleerd, dus er is niets gecontroleerd. "
 "Installeer het met: sudo pacman -S cachyos-pi-scan"
 
-#: usr/local/bin/kiro-aur-check:142
+#: usr/local/bin/kiro-aur-check:225
 msgid "A reading aid, not a guarantee: read the PKGBUILD before you trust it."
 msgstr "Een leeshulp, geen garantie: lees de PKGBUILD voor je hem vertrouwt."
 
-#: usr/local/bin/kiro-aur-check:147
+#: usr/local/bin/kiro-aur-check:230
 #, sh-format
 msgid "Build of $pkgbase stopped."
 msgstr "Bouwen van $pkgbase gestopt."
 
-#: usr/local/bin/kiro-aur-check:152
+#: usr/local/bin/kiro-aur-check:235
 msgid "The PKGBUILD could not be read, so it was not checked."
 msgstr "De PKGBUILD kon niet gelezen worden, dus hij is niet gecontroleerd."
 

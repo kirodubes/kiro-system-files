@@ -14,6 +14,10 @@
 - **The same check for yay.** yay 13 and newer runs it too, before its menus, downloads and builds, for every AUR
   package including AUR dependencies; on Danger + no it stops with "build stopped by the AUR check". New
   `kiro-yay-aur-check` switches it on/off in the user's `~/.config/yay/init.lua` (man page included).
+- **On an update, the changes since the installed version.** Before paru or yay builds an update, the check now
+  shows what changed in the package's files since the version you have, at most 200 lines. Malware often arrives
+  as an update to a package people already trust; this is the part to read. Same method as CachyOS's Package
+  Installer, which shows this diff in its GUI.
 - **Findings in colour:** `[DANGER]` bold red, `[WARNING]` orange (yellow on terminals without 256 colours),
   `[INFO]` blue — for the scanner's findings and the AUR history lines, with paru and with yay.
 
@@ -59,6 +63,16 @@
   is removed. `--enable` creates `~/.config/yay/init.lua` (and the folder) owned like the folder above it, mode
   644; `--disable` comments the line out; `--status` prints on / off / no-file and is the default. The rest of a
   user's init.lua is kept. No pacman hook: root never edits home folders (skel for new accounts, ATT for existing).
+- Update diff (`update_diff`, CachyOS `aurclient.cpp` findCommit/diffSince): in the AUR git clone paru and yay build
+  in, take the first installed `pkgname` of `.SRCINFO`, walk `git rev-list --max-count=200 HEAD -- .SRCINFO`, and use
+  the **oldest** commit whose pkgbase version (`[epoch:]pkgver-pkgrel`) `vercmp`s equal to the installed one (a
+  maintainer can reuse an old version later). Then `git diff <it> HEAD -- . ':(exclude).SRCINFO'`. git runs as
+  CachyOS runs it: `core.hooksPath=/dev/null`, no system/global config, `--no-ext-diff --no-textconv`, and
+  `--attr-source=<empty tree>` so a package's `.gitattributes` cannot mark its PKGBUILD binary and hide the change
+  (tested: plain git said "Binary files differ", the check showed the line). Not a git clone, not installed (a new
+  install) → nothing; version not in the history (-git packages) → one line; over 200 lines → the rest as a
+  `git -C … diff` command. 4 new strings in 13 languages. Tested on an AUR clone of pfetch with installed versions
+  1.10.0-1 (diff), 1.11.0-1 (unchanged), 9.9-1 (not in history), the limit, and German.
 - Colours: `colorize()` (awk) colours only the level tag at the start of a line. The scanner's output is captured
   first (`findings="$(…)" || status=$?`) so its exit status survives — a pipe would hand the ERR trap a non-zero
   pipeline. Orange is `tput setaf 208` when `tput colors` ≥ 256. Colour variables come from `kiro-common.sh`, empty

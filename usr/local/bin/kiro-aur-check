@@ -81,6 +81,70 @@ print(f"AUR: {votes} votes, maintainer {who}, https://aur.archlinux.org/pkgbase/
 ' || echo "AUR history: skipped (could not read the answer)"
 }
 
+MAX_DIFF_LINES=200
+EMPTY_TREE="4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+
+# git as CachyOS's Package Installer runs it on an AUR clone: no hooks, no external diff or textconv, and no
+# attributes from the package, so a .gitattributes cannot hide its changes (for example by marking them binary).
+safe_git() {
+    GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0 \
+        git -c core.hooksPath=/dev/null -c core.quotePath=false --attr-source="${EMPTY_TREE}" "$@"
+}
+
+# [epoch:]pkgver-pkgrel of the pkgbase section of a .SRCINFO read on stdin
+srcinfo_version() {
+    awk -F ' = ' '
+        /^pkgname = / { exit }
+        /^[[:space:]]*pkgver = / { ver = $2 }
+        /^[[:space:]]*pkgrel = / { rel = $2 }
+        /^[[:space:]]*epoch = /  { epoch = $2 }
+        END { if (ver != "") printf "%s%s-%s", (epoch != "" ? epoch ":" : ""), ver, rel }
+    '
+}
+
+# On an update: what changed in the package's files (not .SRCINFO) since the installed version, from the AUR git
+# clone paru and yay build in. Same method as CachyOS (aurclient.cpp findCommit/diffSince).
+update_diff() {
+    local dir="$1" installed="" name commit version found="" diff total more where
+    safe_git -C "${dir}" rev-parse --is-inside-work-tree >/dev/null 2>&1 || return 0
+    [[ -f "${dir}/.SRCINFO" ]] || return 0
+    while read -r name; do
+        installed="$(pacman -Q -- "${name}" 2>/dev/null | awk '{ print $2 }')" || installed=""
+        [[ -n "${installed}" ]] && break
+    done < <(sed -n 's/^pkgname = //p' "${dir}/.SRCINFO")
+    [[ -n "${installed}" ]] || return 0
+
+    # The oldest commit with that version: a maintainer can name an old version again later, and starting
+    # there would leave out what was added in between.
+    while read -r commit; do
+        version="$(safe_git -C "${dir}" show "${commit}:.SRCINFO" 2>/dev/null | srcinfo_version)" || version=""
+        [[ -n "${version}" && "$(vercmp "${version}" "${installed}")" == "0" ]] && found="${commit}"
+    done < <(safe_git -C "${dir}" rev-list --max-count=200 HEAD -- .SRCINFO 2>/dev/null)
+    if [[ -z "${found}" ]]; then
+        log_info "$(_tf 'The installed version $installed is not in the AUR history of this package, so there are no changes to show (usual for -git packages).')"
+        return 0
+    fi
+
+    local color="--no-color"
+    [[ -t 1 ]] && color="--color=always"
+    diff="$(safe_git -C "${dir}" diff "${color}" --no-ext-diff --no-textconv --no-renames --unified=3 \
+        "${found}" HEAD -- . ':(exclude).SRCINFO' 2>/dev/null)" || return 0
+    if [[ -z "${diff}" ]]; then
+        log_info "$(_tf 'The package files have not changed since the installed version $installed.')"
+        return 0
+    fi
+    echo "${BOLD}$(_tf 'Changes since the installed version $installed:')${RESET}"
+    total="$(printf '%s\n' "${diff}" | wc -l)"
+    printf '%s\n' "${diff}" | head -n "${MAX_DIFF_LINES}" || true
+    if (( total > MAX_DIFF_LINES )); then
+        # shellcheck disable=SC2034  # read inside the _tf string
+        more=$(( total - MAX_DIFF_LINES ))
+        # shellcheck disable=SC2034
+        where="git -C $(cd -- "${dir}" && pwd) diff ${found:0:12} HEAD"
+        log_info "$(_tf '$more more lines. Read them all with: $where')"
+    fi
+}
+
 # Orange needs a 256-colour terminal; elsewhere warnings fall back to yellow. Empty when not a terminal.
 ORANGE="${YELLOW}"
 if [[ -n "${YELLOW}" ]] && (( $(tput colors 2>/dev/null || echo 8) >= 256 )); then
@@ -155,6 +219,8 @@ main() {
     [[ -n "${findings}" ]] && printf '%s\n' "${findings}" | colorize
     echo
     aur_history "${pkgbase}" | colorize
+    echo
+    update_diff "${dir}"
     echo
     log_info "$(_t "A reading aid, not a guarantee: read the PKGBUILD before you trust it.")"
 

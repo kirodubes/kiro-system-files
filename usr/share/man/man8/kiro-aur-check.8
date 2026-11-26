@@ -60,6 +60,16 @@ The scanner (package cachyos-pi-scan). Without it nothing is checked and the bui
 .TP
 .I /usr/local/lib/kiro-common.sh
 Shared library.
+.PP
+On an update it also shows what changed in the package's files (PKGBUILD, install scripts, patches \(em not
+.IR .SRCINFO )
+since the installed version, read from the AUR git clone paru and yay build in: the oldest commit whose
+.I .SRCINFO
+has the installed version, compared with the new one, at most 200 lines. git runs without hooks, external diff
+programs or the package's own
+.IR .gitattributes ,
+so a package cannot hide its changes. Packages that build the newest source code (\-git) are usually not in their
+own history; then it says so.
 .SH EXAMPLES
 .EX
 kiro-aur-check ~/Downloads/some-package
