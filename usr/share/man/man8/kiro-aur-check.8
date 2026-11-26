@@ -1,0 +1,64 @@
+.TH KIRO-AUR-CHECK 8 "2026-11-26" "Kiro" "Kiro System Tools"
+.SH NAME
+kiro-aur-check \- show the lines of an AUR package worth a look before it is built
+.SH SYNOPSIS
+.B kiro-aur-check
+[\fB\-h\fR|\fB\-\-help\fR]
+[\fB\-v\fR|\fB\-\-version\fR]
+[\fIfolder\fR]
+.SH DESCRIPTION
+.B kiro-aur-check
+reads the PKGBUILD in \fIfolder\fR (default: the current folder) and the scripts next to it
+with
+.BR cachyos-pi-scan (1)
+\- CachyOS Package Installer's scanner \- and prints what deserves a closer look:
+downloading and running a script, reading keys, passwords or browser data, unverified
+sources, services enabled from an install script, and more. Nothing from the package is
+executed. It then adds the package's AUR history: orphaned, maintainer changed, less than
+30 days old, very few votes.
+.PP
+On Kiro, paru runs it before every AUR build through
+.B PreBuildCommand
+in the
+.B [bin]
+section of
+.IR /etc/paru.conf ,
+set by
+.BR kiro-paru-aur-check (8).
+When a finding is dangerous it asks whether to continue; answering no (or having no
+terminal to ask on) exits 1, which stops paru before the build. Warnings and notes are
+only shown.
+.PP
+This is a reading aid, not a guarantee: no findings does not make a package safe.
+.SH OPTIONS
+.TP
+.BR \-h ", " \-\-help
+Print a help message and exit.
+.TP
+.BR \-v ", " \-\-version
+Print version information and exit.
+.SH ENVIRONMENT
+.TP
+.B PKGBASE
+Set by paru; the package name used for the AUR history. Without it the name comes from
+.I .SRCINFO
+or the folder name.
+.SH EXIT STATUS
+0 when the build may go on, 1 when it should stop (a dangerous finding that was not
+confirmed).
+.SH FILES
+.TP
+.I /usr/bin/cachyos-pi-scan
+The scanner (package cachyos-pi-scan). Without it nothing is checked and the build goes on.
+.TP
+.I /usr/local/lib/kiro-common.sh
+Shared library.
+.SH EXAMPLES
+.EX
+kiro-aur-check ~/Downloads/some-package
+.EE
+.SH SEE ALSO
+.BR kiro-paru-aur-check (8),
+.BR paru.conf (5)
+.SH AUTHOR
+Erik Dubois <https://www.erikdubois.be>

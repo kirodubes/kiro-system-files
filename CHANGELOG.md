@@ -1,5 +1,43 @@
 # CHANGELOG
 
+## 2026.11.26
+
+### What Changed
+- **AUR check before paru builds a package (on by default).** paru now shows the lines of an AUR package worth a
+  look before it builds it: download-and-run, reading `~/.ssh` or browser data, unverified sources, services
+  enabled from an install script, and the package's AUR history (orphaned, maintainer changed, less than 30 days
+  old, very few votes). On a dangerous finding it asks `Continue building <pkg> anyway? [y/N]`; no (or no terminal)
+  stops the build. Warnings and notes are only shown. It is a reading aid, not a guarantee, and says so.
+- New `kiro-aur-check` (what paru runs) and `kiro-paru-aur-check` (switches it on/off in `/etc/paru.conf`), with
+  man pages. A pacman hook adds the check once when paru or kiro-system-files is installed or updated; a user who
+  switched it off, or runs a `PreBuildCommand` of their own, is left alone.
+
+### Technical Details
+- The scanning is CachyOS Package Installer's `cachyos-pi-scan` (new nemesis package from KIRO-PKG-BUILD-3PARTY,
+  `optdepends` here). Without it the check prints one line and the build goes on — it never blocks because of us.
+- **Why before the build, not a pacman hook:** makepkg runs the PKGBUILD as the user before pacman is called; a
+  pacman hook would come too late. paru's `PreBuildCommand` runs in the PKGBUILD's folder with `PKGBASE` set.
+  **It belongs in `[bin]`, not `[options]`** (paru-git 2.2.1 rejects it there as unknown). A non-zero exit makes
+  paru stop with "failed to run" before the build (proven on picard with a probe package).
+- paru reads one config: `/etc/paru.conf` (owned by paru, a backup file) unless the user has
+  `~/.config/paru/paru.conf`. `kiro-paru-aur-check` therefore edits `/etc/paru.conf` in place: under an existing
+  `[bin]`, or a new `[bin]` at the end (stock paru.conf only has a commented `#[bin]`), with a `# Kiro: AUR check`
+  marker. `--disable` comments the line and keeps the marker, so the hook's default run (no option) leaves it off.
+  `--status` prints on / off / other / no-paru for ATT. `KIRO_PARU_CONF` / `KIRO_PI_SCAN` point both scripts at
+  scratch files for tests.
+- The hook triggers by **path** (`etc/paru.conf`, the script itself), not by package: ATT's Repair skips every
+  target of a `kiro-*` hook, and a package target would hide all of paru's files from it.
+- AUR history comes from the AUR RPC v5 (`curl --max-time 5`), same thresholds as CachyOS's `scanMetadata`; no
+  answer → one "skipped" line. Translations: headings and prompts in 13 languages (report-tool rule), findings
+  stay English.
+- Tested: paru.conf logic on scratch copies (stock, existing `[bin]`, own PreBuildCommand, off stays off, no
+  duplicates); `kiro-aur-check` on fixtures and on AUR `yay-bin` (0.3 s); real paru on picard with clean / warning /
+  danger PKGBUILDs — warning builds, danger + n stops before the build, danger + y builds; `tests/check.sh` 0 FAIL.
+
+### Files Modified
+- `usr/local/bin/kiro-aur-check`, `usr/local/bin/kiro-paru-aur-check`, `etc/pacman.d/hooks/kiro-paru-aur-check.hook`,
+  `usr/share/man/man8/kiro-aur-check.8`, `usr/share/man/man8/kiro-paru-aur-check.8` (new); `po/*`, `usr/share/locale/*`
+
 ## 2026.11.24
 
 ### What Changed

@@ -115,13 +115,14 @@ msgstr "完整的系统和硬件报告（inxi）"
 msgid "inxi;system;hardware;info;information;"
 msgstr "系统;硬件;信息;inxi;system;hardware;info;information;"
 
-#: usr/local/bin/kiro-appstream-jxl2png:66 usr/local/bin/kiro-calamares-log:177
-#: usr/local/bin/kiro-diag:388 usr/local/bin/kiro-enable-ssh:55
-#: usr/local/bin/kiro-fix-gpg-conf:49 usr/local/bin/kiro-fix-mirrors:49
-#: usr/local/bin/kiro-fix-pacman-conf:51 usr/local/bin/kiro-fix-pacman-keys:49
-#: usr/local/bin/kiro-get-mirrors:49 usr/local/bin/kiro-get-nemesis:51
-#: usr/local/bin/kiro-iso-version:43 usr/local/bin/kiro-keep-kirotux-repo:50
-#: usr/local/bin/kiro-lint:431 usr/local/bin/kiro-probe:58
+#: usr/local/bin/kiro-appstream-jxl2png:66 usr/local/bin/kiro-aur-check:117
+#: usr/local/bin/kiro-calamares-log:177 usr/local/bin/kiro-diag:388
+#: usr/local/bin/kiro-enable-ssh:55 usr/local/bin/kiro-fix-gpg-conf:49
+#: usr/local/bin/kiro-fix-mirrors:49 usr/local/bin/kiro-fix-pacman-conf:51
+#: usr/local/bin/kiro-fix-pacman-keys:49 usr/local/bin/kiro-get-mirrors:49
+#: usr/local/bin/kiro-get-nemesis:51 usr/local/bin/kiro-iso-version:43
+#: usr/local/bin/kiro-keep-kirotux-repo:50 usr/local/bin/kiro-lint:431
+#: usr/local/bin/kiro-paru-aur-check:114 usr/local/bin/kiro-probe:58
 #: usr/local/bin/kiro-probe-report:137 usr/local/bin/kiro-report:347
 #: usr/local/bin/kiro-set-cores:49 usr/local/bin/kiro-set-cores-min1:50
 #: usr/local/bin/kiro-set-cores-min2:50 usr/local/bin/kiro-skell:142
@@ -131,6 +132,7 @@ msgid "Unknown option:"
 msgstr "未知选项："
 
 #: usr/local/bin/kiro-appstream-jxl2png:73
+#: usr/local/bin/kiro-paru-aur-check:129
 msgid "This script must be run as root."
 msgstr "此脚本必须以 root 身份运行。"
 
@@ -338,6 +340,44 @@ msgstr ""
 "kiro-audit 面向真实硬件（裸机）——\n"
 "上面的失败很可能是虚拟机或 live 环境造成的，\n"
 "并不代表安装已损坏。"
+
+#: usr/local/bin/kiro-aur-check:91
+#, sh-format
+msgid ""
+"Dangerous lines found and nobody to ask: the build of $pkgbase is stopped."
+msgstr "发现危险的行且无人可问：已停止构建 $pkgbase。"
+
+#. Translators: keep [y/N] and the answer keys y/N as they are
+#: usr/local/bin/kiro-aur-check:96
+#, sh-format
+msgid "Continue building $pkgbase anyway? [y/N]"
+msgstr "仍要继续构建 $pkgbase 吗？[y/N]"
+
+#: usr/local/bin/kiro-aur-check:127
+#, sh-format
+msgid "AUR check: $pkgbase"
+msgstr "AUR 检查：$pkgbase"
+
+#: usr/local/bin/kiro-aur-check:130
+msgid ""
+"cachyos-pi-scan is not installed, so nothing was checked. Install it with: "
+"sudo pacman -S cachyos-pi-scan"
+msgstr ""
+"未安装 cachyos-pi-scan，因此没有检查任何内容。可用以下命令安装：sudo pacman "
+"-S cachyos-pi-scan"
+
+#: usr/local/bin/kiro-aur-check:139
+msgid "A reading aid, not a guarantee: read the PKGBUILD before you trust it."
+msgstr "这只是阅读辅助，不是保证：信任之前请先阅读 PKGBUILD。"
+
+#: usr/local/bin/kiro-aur-check:144
+#, sh-format
+msgid "Build of $pkgbase stopped."
+msgstr "已停止构建 $pkgbase。"
+
+#: usr/local/bin/kiro-aur-check:149
+msgid "The PKGBUILD could not be read, so it was not checked."
+msgstr "无法读取 PKGBUILD，因此未检查。"
 
 #: usr/local/bin/kiro-calamares-log:220
 msgid "Kiro — Calamares Install Summary"
@@ -653,6 +693,18 @@ msgstr "Kiro 配置检查器"
 #: usr/local/bin/kiro-lint:443
 msgid "Lint Summary"
 msgstr "检查摘要"
+
+#: usr/local/bin/kiro-paru-aur-check:71
+msgid "paru.conf already runs another PreBuildCommand; it was left alone."
+msgstr "paru.conf 已在运行另一个 PreBuildCommand；保持不变。"
+
+#: usr/local/bin/kiro-paru-aur-check:135
+msgid "AUR check switched on for paru."
+msgstr "已为 paru 开启 AUR 检查。"
+
+#: usr/local/bin/kiro-paru-aur-check:136
+msgid "AUR check switched off for paru."
+msgstr "已为 paru 关闭 AUR 检查。"
 
 #: usr/local/bin/kiro-pci-latency:58
 msgid "setpci not found — install pciutils"

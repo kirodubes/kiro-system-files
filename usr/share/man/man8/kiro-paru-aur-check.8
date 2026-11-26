@@ -1,0 +1,56 @@
+.TH KIRO-PARU-AUR-CHECK 8 "2026-11-26" "Kiro" "Kiro System Tools"
+.SH NAME
+kiro-paru-aur-check \- switch the AUR check before paru builds on or off
+.SH SYNOPSIS
+.B kiro-paru-aur-check
+[\fB\-h\fR|\fB\-\-help\fR]
+[\fB\-v\fR|\fB\-\-version\fR]
+[\fB\-\-enable\fR | \fB\-\-disable\fR | \fB\-\-status\fR]
+.SH DESCRIPTION
+.B kiro-paru-aur-check
+manages one line in
+.IR /etc/paru.conf ,
+under
+.BR [bin] :
+.PP
+.EX
+# Kiro: AUR check \(em shows risky PKGBUILD lines before paru builds (kiro-aur-check)
+PreBuildCommand = /usr/local/bin/kiro-aur-check
+.EE
+.PP
+Without an option it adds that line only when there is no Kiro marker and no
+PreBuildCommand yet. A pacman hook runs it that way whenever paru or kiro-system-files is
+installed or updated, so the check is on by default, and a choice someone made (the check
+switched off, or a PreBuildCommand of their own) is never overwritten.
+.PP
+paru reads only one config file. Someone with their own
+.I ~/.config/paru/paru.conf
+needs the line there as well.
+.SH OPTIONS
+.TP
+.B \-\-enable
+Switch the check on (refused when paru.conf already runs another PreBuildCommand).
+.TP
+.B \-\-disable
+Switch it off: the line is commented out, the marker stays.
+.TP
+.B \-\-status
+Print on, off, other (another PreBuildCommand) or no-paru. Needs no root.
+.TP
+.BR \-h ", " \-\-help
+Print a help message and exit.
+.TP
+.BR \-v ", " \-\-version
+Print version information and exit.
+.SH FILES
+.TP
+.I /etc/paru.conf
+paru's system config (owned by the paru package).
+.TP
+.I /etc/pacman.d/hooks/kiro-paru-aur-check.hook
+Runs this command after paru or kiro-system-files changes.
+.SH SEE ALSO
+.BR kiro-aur-check (8),
+.BR paru.conf (5)
+.SH AUTHOR
+Erik Dubois <https://www.erikdubois.be>

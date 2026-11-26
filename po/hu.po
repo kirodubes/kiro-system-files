@@ -115,13 +115,14 @@ msgstr "Teljes rendszer- és hardverjelentés (inxi)"
 msgid "inxi;system;hardware;info;information;"
 msgstr "rendszer;hardver;információ;inxi;system;hardware;info;information;"
 
-#: usr/local/bin/kiro-appstream-jxl2png:66 usr/local/bin/kiro-calamares-log:177
-#: usr/local/bin/kiro-diag:388 usr/local/bin/kiro-enable-ssh:55
-#: usr/local/bin/kiro-fix-gpg-conf:49 usr/local/bin/kiro-fix-mirrors:49
-#: usr/local/bin/kiro-fix-pacman-conf:51 usr/local/bin/kiro-fix-pacman-keys:49
-#: usr/local/bin/kiro-get-mirrors:49 usr/local/bin/kiro-get-nemesis:51
-#: usr/local/bin/kiro-iso-version:43 usr/local/bin/kiro-keep-kirotux-repo:50
-#: usr/local/bin/kiro-lint:431 usr/local/bin/kiro-probe:58
+#: usr/local/bin/kiro-appstream-jxl2png:66 usr/local/bin/kiro-aur-check:117
+#: usr/local/bin/kiro-calamares-log:177 usr/local/bin/kiro-diag:388
+#: usr/local/bin/kiro-enable-ssh:55 usr/local/bin/kiro-fix-gpg-conf:49
+#: usr/local/bin/kiro-fix-mirrors:49 usr/local/bin/kiro-fix-pacman-conf:51
+#: usr/local/bin/kiro-fix-pacman-keys:49 usr/local/bin/kiro-get-mirrors:49
+#: usr/local/bin/kiro-get-nemesis:51 usr/local/bin/kiro-iso-version:43
+#: usr/local/bin/kiro-keep-kirotux-repo:50 usr/local/bin/kiro-lint:431
+#: usr/local/bin/kiro-paru-aur-check:114 usr/local/bin/kiro-probe:58
 #: usr/local/bin/kiro-probe-report:137 usr/local/bin/kiro-report:347
 #: usr/local/bin/kiro-set-cores:49 usr/local/bin/kiro-set-cores-min1:50
 #: usr/local/bin/kiro-set-cores-min2:50 usr/local/bin/kiro-skell:142
@@ -131,6 +132,7 @@ msgid "Unknown option:"
 msgstr "Ismeretlen kapcsoló:"
 
 #: usr/local/bin/kiro-appstream-jxl2png:73
+#: usr/local/bin/kiro-paru-aur-check:129
 msgid "This script must be run as root."
 msgstr "Ezt a szkriptet rootként kell futtatni."
 
@@ -342,6 +344,48 @@ msgstr ""
 "A kiro-audit valódi hardverre (bare metal) készült — a\n"
 "fenti hibákat valószínűleg a VM vagy a live környezet okozza,\n"
 "nem hibás telepítés."
+
+#: usr/local/bin/kiro-aur-check:91
+#, sh-format
+msgid ""
+"Dangerous lines found and nobody to ask: the build of $pkgbase is stopped."
+msgstr ""
+"Veszélyes sorok találhatók, és nincs kit megkérdezni: a(z) $pkgbase "
+"fordítása leállt."
+
+#. Translators: keep [y/N] and the answer keys y/N as they are
+#: usr/local/bin/kiro-aur-check:96
+#, sh-format
+msgid "Continue building $pkgbase anyway? [y/N]"
+msgstr "Mégis folytatod a(z) $pkgbase fordítását? [y/N]"
+
+#: usr/local/bin/kiro-aur-check:127
+#, sh-format
+msgid "AUR check: $pkgbase"
+msgstr "AUR-ellenőrzés: $pkgbase"
+
+#: usr/local/bin/kiro-aur-check:130
+msgid ""
+"cachyos-pi-scan is not installed, so nothing was checked. Install it with: "
+"sudo pacman -S cachyos-pi-scan"
+msgstr ""
+"A cachyos-pi-scan nincs telepítve, így semmi sem lett ellenőrizve. Telepítsd "
+"így: sudo pacman -S cachyos-pi-scan"
+
+#: usr/local/bin/kiro-aur-check:139
+msgid "A reading aid, not a guarantee: read the PKGBUILD before you trust it."
+msgstr ""
+"Olvasási segítség, nem garancia: olvasd el a PKGBUILD-et, mielőtt megbízol "
+"benne."
+
+#: usr/local/bin/kiro-aur-check:144
+#, sh-format
+msgid "Build of $pkgbase stopped."
+msgstr "A(z) $pkgbase fordítása leállt."
+
+#: usr/local/bin/kiro-aur-check:149
+msgid "The PKGBUILD could not be read, so it was not checked."
+msgstr "A PKGBUILD nem olvasható, ezért nem lett ellenőrizve."
 
 #: usr/local/bin/kiro-calamares-log:220
 msgid "Kiro — Calamares Install Summary"
@@ -662,6 +706,19 @@ msgstr "Kiro konfigurációs linter"
 #: usr/local/bin/kiro-lint:443
 msgid "Lint Summary"
 msgstr "Lint összegzés"
+
+#: usr/local/bin/kiro-paru-aur-check:71
+msgid "paru.conf already runs another PreBuildCommand; it was left alone."
+msgstr ""
+"A paru.conf már egy másik PreBuildCommandot futtat; az változatlan maradt."
+
+#: usr/local/bin/kiro-paru-aur-check:135
+msgid "AUR check switched on for paru."
+msgstr "AUR-ellenőrzés bekapcsolva a paru számára."
+
+#: usr/local/bin/kiro-paru-aur-check:136
+msgid "AUR check switched off for paru."
+msgstr "AUR-ellenőrzés kikapcsolva a paru számára."
 
 #: usr/local/bin/kiro-pci-latency:58
 msgid "setpci not found — install pciutils"

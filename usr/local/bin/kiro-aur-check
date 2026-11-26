@@ -1,0 +1,157 @@
+#!/bin/bash
+set -Euo pipefail
+##################################################################################################################
+# Author    : Erik Dubois
+# Website   : https://kiroproject.be
+##################################################################################################################
+#
+#   DO NOT JUST RUN THIS. EXAMINE AND JUDGE. RUN AT YOUR OWN RISK.
+#
+#   Purpose:
+#   Shows the lines of an AUR package worth a look before it is built. paru runs it from
+#   PreBuildCommand ([bin] in /etc/paru.conf, set by kiro-paru-aur-check) in the folder that
+#   holds the PKGBUILD, with PKGBASE set. It runs cachyos-pi-scan (CachyOS's rules, read-only:
+#   nothing from the package is executed), adds the package's AUR history (orphaned, new,
+#   maintainer changed, few votes) and, on a dangerous finding, asks before the build goes on.
+#   Exit 1 stops paru; warnings and notes never stop a build. Also usable by hand:
+#   kiro-aur-check [folder-with-PKGBUILD].
+#
+#   Why: AUR malware runs inside makepkg, as the user, before pacman is ever called — the
+#   only moment to look is before the build.
+#
+##################################################################################################################
+
+# shellcheck source=/usr/local/lib/kiro-common.sh
+if [[ -f /usr/local/lib/kiro-common.sh ]]; then
+    source /usr/local/lib/kiro-common.sh
+else
+    echo "ERROR: kiro-common.sh not found" >&2
+    exit 1
+fi
+
+# shellcheck disable=SC2034  # template variable, unused here
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+SCANNER="${KIRO_PI_SCAN:-/usr/bin/cachyos-pi-scan}"   # override for tests
+AUR_RPC="https://aur.archlinux.org/rpc/v5/info"
+
+# Same thresholds as CachyOS Package Installer's scanMetadata (src/pkgscan.cpp)
+aur_history() {
+    local pkgbase="$1" json
+    json="$(curl -fsS --max-time 5 --get --data-urlencode "arg[]=${pkgbase}" "${AUR_RPC}" 2>/dev/null)" || {
+        echo "AUR history: skipped (no answer from aur.archlinux.org)"
+        return 0
+    }
+    printf '%s' "${json}" | python3 -I -c '
+import json, sys, time
+try:
+    results = json.load(sys.stdin).get("results") or []
+except ValueError:
+    results = []
+if not results:
+    print("AUR history: not on the AUR (a local PKGBUILD?)")
+    sys.exit(0)
+p = results[0]
+now = time.time()
+age_days = (now - (p.get("FirstSubmitted") or now)) / 86400
+edit_hours = (now - (p.get("LastModified") or 0)) / 3600
+maint, sub = p.get("Maintainer"), p.get("Submitter")
+votes, pop = p.get("NumVotes") or 0, p.get("Popularity") or 0.0
+out = []
+if not maint:
+    out.append(("WARNING", "Nobody maintains this package",
+                "Orphaned packages can be adopted by anyone, and nobody is watching for problems."))
+elif sub and sub != maint:
+    out.append(("INFO", "The maintainer has changed",
+                f"Submitted by {sub}, now maintained by {maint}. Taking over an abandoned package is a known way to slip in malware."))
+if age_days < 30:
+    out.append(("WARNING", "This package is very new",
+                f"It was first submitted {int(age_days)} day(s) ago, so few people have looked at it."))
+if edit_hours < 72 and age_days >= 30:
+    out.append(("INFO", "This package changed very recently",
+                f"The last change is {int(edit_hours)} hour(s) old. Malicious updates are usually found and removed within days."))
+if votes < 3 and pop < 0.05:
+    out.append(("INFO", "Hardly anybody uses this package",
+                f"It has {votes} vote(s). Problems in rarely used packages stay unnoticed for longer."))
+for level, title, detail in out:
+    print(f"[{level}] {title}\n    {detail}")
+who = maint or "none"
+base = p.get("PackageBase") or ""
+print(f"AUR: {votes} votes, maintainer {who}, https://aur.archlinux.org/pkgbase/{base}")
+' || echo "AUR history: skipped (could not read the answer)"
+}
+
+pkgbase_of() {
+    local dir="$1" name=""
+    [[ -f "${dir}/.SRCINFO" ]] && name="$(sed -n 's/^pkgbase = //p' "${dir}/.SRCINFO" | head -1)"
+    [[ -z "${name}" ]] && name="$(basename "$(cd -- "${dir}" && pwd)")"
+    printf '%s' "${name}"
+}
+
+ask_to_continue() {
+    local pkgbase="$1" answer=""
+    if ! { : < /dev/tty; } 2>/dev/null; then
+        log_warn "$(_tf 'Dangerous lines found and nobody to ask: the build of $pkgbase is stopped.')"
+        return 1
+    fi
+    echo
+    # Translators: keep [y/N] and the answer keys y/N as they are
+    printf '%s ' "${YELLOW}$(_tf 'Continue building $pkgbase anyway? [y/N]')${RESET}" > /dev/tty
+    read -r answer < /dev/tty || answer=""
+    [[ "${answer}" == [yY] ]]
+}
+
+main() {
+    local dir="." arg
+    for arg in "$@"; do
+        case "$arg" in
+            -h|--help)
+                show_help "$(basename "$0")" \
+                    "Show the lines of an AUR package worth a look before paru builds it" \
+                    "[--help] [--version] [folder-with-PKGBUILD]" \
+                    "paru runs this from PreBuildCommand; see kiro-paru-aur-check"
+                exit 0
+                ;;
+            -v|--version)
+                show_version "$(basename "$0")"
+                exit 0
+                ;;
+            -*)
+                echo "${RED}$(_t "Unknown option:") ${arg}${RESET}" >&2
+                exit 1
+                ;;
+            *)
+                dir="$arg"
+                ;;
+        esac
+    done
+
+    local pkgbase="${PKGBASE:-$(pkgbase_of "${dir}")}"
+    log_section "$(_tf 'AUR check: $pkgbase')"
+
+    if [[ ! -x "${SCANNER}" ]]; then
+        log_warn "$(_t "cachyos-pi-scan is not installed, so nothing was checked. Install it with: sudo pacman -S cachyos-pi-scan")"
+        exit 0
+    fi
+
+    local status=0
+    "${SCANNER}" "${dir}" || status=$?
+    echo
+    aur_history "${pkgbase}"
+    echo
+    log_info "$(_t "A reading aid, not a guarantee: read the PKGBUILD before you trust it.")"
+
+    case "${status}" in
+        2)
+            if ! ask_to_continue "${pkgbase}"; then
+                log_warn "$(_tf 'Build of $pkgbase stopped.')"
+                exit 1
+            fi
+            ;;
+        3)
+            log_warn "$(_t "The PKGBUILD could not be read, so it was not checked.")"
+            ;;
+    esac
+    exit 0
+}
+
+main "$@"
