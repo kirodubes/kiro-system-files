@@ -39,6 +39,8 @@
 - Tested: paru.conf logic on scratch copies (stock, existing `[bin]`, own PreBuildCommand, off stays off, no
   duplicates); `kiro-aur-check` on fixtures and on AUR `yay-bin` (0.3 s); real paru on picard with clean / warning /
   danger PKGBUILDs — warning builds, danger + n stops before the build, danger + y builds; `tests/check.sh` 0 FAIL.
+  Then with the real `cachyos-pi-scan` 2.0.1-1 package on picard: findings and AUR history correct. Fix: with no
+  terminal to ask, the "stopped" banner showed twice — it now stops right after the first one.
 
 ### Files Modified
 - `usr/local/bin/kiro-aur-check`, `usr/local/bin/kiro-paru-aur-check`, `etc/pacman.d/hooks/kiro-paru-aur-check.hook`,

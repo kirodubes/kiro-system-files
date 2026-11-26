@@ -91,7 +91,7 @@ ask_to_continue() {
     local pkgbase="$1" answer=""
     if ! { : < /dev/tty; } 2>/dev/null; then
         log_warn "$(_tf 'Dangerous lines found and nobody to ask: the build of $pkgbase is stopped.')"
-        return 1
+        exit 1
     fi
     echo
     # Translators: keep [y/N] and the answer keys y/N as they are
