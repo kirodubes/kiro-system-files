@@ -42,6 +42,10 @@ Key sections and their functions:
 - New script: `chmod 755` before `git add` and check `git ls-files -s` shows `100755` — a 644 script installs
   non-executable and a pacman hook calling it fails with `call to execv failed (Permission denied)` (2026-11-14)
 - First line after shebang: `set -Euo pipefail`
+- `set -E` + the ERR trap + `pipefail`: a `x="$(cmd | …)"` whose `cmd` can fail (`pacman -Q` of a package that
+  is not installed, `git show` of a missing file, `printf … | head`) fires the trap — an error banner and a 10 s
+  wait — even without `-e`. Add `|| x=""` / `|| true`, and test the failing case with the real tool, not a stub
+  that always succeeds (kiro-aur-check, 2026-11-26).
 - Source `kiro-common.sh` before any logic
 - Use library logging functions — never raw `echo` for user-facing output
 - Root checks via `require_root_tools` or `[[ $EUID -ne 0 ]]` guard
